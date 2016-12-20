@@ -1,0 +1,25 @@
+type project
+title
+    SyntacticVersioning
+owners
+    Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
+authors 
+    Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
+projectUrl
+    https://github.com/fsprojects/SyntacticVersioning
+iconUrl
+    https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png
+licenseUrl
+    https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt
+requireLicenseAcceptance
+    false
+copyright
+    Copyright 2015
+tags
+    syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff
+summary
+    Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)
+description
+    Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)
+
+
