@@ -15,7 +15,6 @@ open System.IO
 #load "packages/build/SourceLink.Fake/tools/Fake.fsx"
 open SourceLink
 #endif
-
 // --------------------------------------------------------------------------------------
 // START TODO: Provide project-specific details below
 // --------------------------------------------------------------------------------------
@@ -80,6 +79,14 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
     | f when f.EndsWith("shproj") -> Shproj
     | _                           -> failwith (sprintf "Project file %s not supported. Unknown project type." projFileName)
 
+let (|FsFile|CsFile|) (codeFileName:string) =
+    match codeFileName with
+    | f when f.EndsWith(".fsx") -> FsFile
+    | f when f.EndsWith(".fs") -> FsFile
+    | f when f.EndsWith(".cs") -> CsFile
+    | _                           -> failwith (sprintf "Code file %s not supported. Unknown code type." codeFileName)
+
+
 // Generate assembly info files with the right version & up-to-date information
 Target "AssemblyInfo" (fun _ ->
     let getAssemblyInfoAttributes projectName =
@@ -107,6 +114,42 @@ Target "AssemblyInfo" (fun _ ->
         | Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
         | Shproj -> ()
         )
+)
+let exampleProjects = "tests/ExampleProjects/"
+module create=
+    open FscHelper
+    let fsharpProjectFromFile fileName name=
+        let dllName = sprintf "%s.dll" name
+        let dll =  exampleProjects </> "lib"</> dllName
+        let assemblyInfo =  exampleProjects </> "src"</> "AssemblyInfo.fs"
+        [fileName; assemblyInfo] |>
+            compile 
+                [ Out dll
+                  Target Library ]
+        |> ignore
+        //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
+        
+    open CscHelper
+    let csharpProjectFromFile fileName name=
+        let dllName = sprintf "%s.dll" name
+        let dll =  exampleProjects </> "lib"</> dllName
+        let assemblyInfo =  exampleProjects </> "src"</> "AssemblyInfo.cs"
+        [fileName; assemblyInfo] |>
+            csc (fun parameters ->
+                { parameters with Output = dll; Target = Library })
+        |> ignore
+        //mcs -target:library -out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.cs"
+
+Target "ExampleProjects" (fun _ ->
+    !! "tests/ExampleProjects/src/**/*.?s"
+    |> Seq.map (fun f -> (f, Path.GetFileNameWithoutExtension(f)) )
+    |> Seq.filter (fun (f, n) -> n<>"AssemblyInfo")
+    |> Seq.iter (fun (fileName, name) ->
+        match fileName with
+        | FsFile -> create.fsharpProjectFromFile fileName name
+        | CsFile -> create.csharpProjectFromFile fileName name
+    )
+
 )
 
 // Copies binaries from default VS location to expected bin folder
@@ -379,6 +422,7 @@ Target "All" DoNothing
 "AssemblyInfo"
   ==> "Build"
   ==> "CopyBinaries"
+  ==> "ExampleProjects"
   ==> "RunTests"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
