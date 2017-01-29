@@ -10,6 +10,7 @@ module TestHelper=
   let asm = Assembly.GetExecutingAssembly()
   let testPath= Path.GetDirectoryName asm.Location
   let exampleProjectsLibPath = testPath </> "../../../ExampleProjects/lib"
+  // since all the dll-s have unique names, they can be loaded at the same time
   let csharp = exampleProjectsLibPath </> "Csharp.dll"
   let csharp2 = exampleProjectsLibPath </> "Csharp2.dll"
   let enum = exampleProjectsLibPath </> "Enum.dll"

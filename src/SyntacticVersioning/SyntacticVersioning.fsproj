@@ -60,7 +60,9 @@
   -->
   <Import Project="..\..\.paket\paket.targets" />
   <ItemGroup>
-    <Compile Include="Library.fs" />
+    <Compile Include="Models.fs" />
+    <Compile Include="Reflect.fs" />
+    <Compile Include="SurfaceArea.fs" />
     <None Include="Script.fsx" />
     <None Include="paket.references" />
     <None Include="paket.template" />
