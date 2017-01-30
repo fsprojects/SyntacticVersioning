@@ -7,16 +7,29 @@ type NetType =
 
 type InstanceOrStatic = | Instance | Static
 type Name = string
-type Attribute = string
-type Type = string
+type AttributeTypedArgument ={Value:obj}
+type Attribute = {FullName:string; ConstructorArguments: AttributeTypedArgument list}
+type Type = { FullName:string }
 type Parameter = { Type:Type; Name:Name }
+
+module internal Print =
+  let whenStatic (flag:bool) (fulltypename:string) : string =
+        match flag with
+          | true -> fulltypename
+          | false -> sprintf "(Instance/Inheritance of %s)" fulltypename
+  let parameters (attrs,parameters)=failwith "not implemented"
+
 type Member= 
-    |RecordConstructor of Attribute list * Parameter list
-    |Constructor of Attribute list * Parameter list
-    |Event of InstanceOrStatic * Name * Attribute list *Parameter list * Type
-    |Field of InstanceOrStatic * Name * Type
-    |Method of InstanceOrStatic * Name * Attribute list *Parameter list * Type
-    |Property of InstanceOrStatic * Name * Type
+    |RecordConstructor of Type * Attribute list * Parameter list
+    |Constructor of Type *Attribute list * Parameter list
+    |Event of Type * InstanceOrStatic * Name * Attribute list *Parameter list * Type
+    |Field of Type *InstanceOrStatic * Name * Type
+    |Method of Type *InstanceOrStatic * Name * Attribute list *Parameter list * Type
+    |Property of Type *InstanceOrStatic * Name * Type
+    with
+        override m.ToString ()=
+            match m with
+            | RecordConstructor (t,attrs,parameters) -> sprintf "{ %s.%s } -> %s" t.FullName (Print.parameters (attrs,parameters)) t.FullName
 
 type SurfaceOfType =
     { 

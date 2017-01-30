@@ -5,8 +5,10 @@ open System
 open System.Reflection
   
 module Reflect =
+  type private CAtDat = CustomAttributeData
+
   let private tagNetHlp (t: Type) : (string option * string option) =
-      let debuggerAttr (a:CustomAttributeData) = a.AttributeType.Name.Contains("Debugger")
+      let debuggerAttr (a:CAtDat) = a.AttributeType.Name.Contains("Debugger")
       match t with
         | _ when t.FullName.EndsWith("+Tags") -> (Some "UnionTags", None)
         | _ -> 
@@ -23,6 +25,7 @@ module Reflect =
           |> fun xs ->
             if Seq.isEmpty xs then (None,None) else Seq.head xs
   
+  [<CompiledName("TagNetType")>]
   let tagNetType (t: Type) : NetType =
       // TODO: Active/Partial Patterns, MeasureOfUnits? Any other?
       match tagNetHlp t with
@@ -44,7 +47,7 @@ module Reflect =
             | _ when t.IsAbstract ->
               NetType.Abstract
             | _ -> NetType.Class
-  
+  [<CompiledName("ExportedTypes")>]
   let exportedTypes (asm: Assembly): Type array =
       let ts =
         try
@@ -57,14 +60,33 @@ module Reflect =
       ts
 
   module private ToMember=
-    let attributeToString (a:CustomAttributeData)= a.ToString()
-    let parameterToParameter (p:ParameterInfo) = { Type=p.ParameterType.FullName; Name=p.Name }
-    let attributesToString atrs= atrs |>Seq.map attributeToString |> List.ofSeq
+    let rec typeFullName (t:Type) =
+        let fullname =
+          match t.IsGenericType with
+            | false ->
+              match String.IsNullOrEmpty t.FullName with
+                | true -> sprintf "'%s" (t.Name.ToUpperInvariant())
+                | false -> t.FullName 
+            | true ->
+              let args =
+                t.GetGenericArguments()
+                |> Array.map typeFullName
+                |> Array.reduce(sprintf "%s,%s")
+              sprintf "%s<%s>" (t.FullName.Substring(0,t.FullName.IndexOf('`'))) args
+        let guid = Guid.NewGuid().ToString()
+        fullname.Replace("+Tags",guid).Replace('+','.').Replace(guid,"+Tags")
+    let typeToType (t:System.Type):SyntacticVersioning.Type={ FullName=typeFullName t }
+    let attributeToAttribute (a:CAtDat) : SyntacticVersioning.Attribute= 
+      let args =a.ConstructorArguments |> Seq.map (fun ca-> {Value=ca.Value}) |> List.ofSeq
+      { FullName=a.AttributeType.FullName
+        ConstructorArguments=args }
+    let parameterToParameter (p:ParameterInfo) = { Type=typeToType p.ParameterType; Name=p.Name }
+    let attributesToString atrs= atrs |>Seq.map attributeToAttribute |> List.ofSeq
     let parametersToParameter prms= prms |>Seq.map parameterToParameter |> List.ofSeq
     let deconstructConstructor (ctr:ConstructorInfo) =
       let attr = ctr.CustomAttributes |> attributesToString
       let params' = ctr.GetParameters() |> parametersToParameter
-      (attr,params')
+      (typeToType ctr.ReflectedType, attr, params')
     let recordConstructor ctr : Member=
       RecordConstructor (deconstructConstructor ctr)
     let constructor' ctr : Member=
@@ -75,17 +97,22 @@ module Reflect =
       let mi = ei.EventHandlerType.GetMethod("Invoke")
       let attr = ei.CustomAttributes |> attributesToString
       let params' = mi.GetParameters() |> parametersToParameter
-      Event (isStatic mi.IsStatic, ei.Name,attr,params', mi.ReturnType.FullName)
+      Event (typeToType mi.ReflectedType,isStatic mi.IsStatic, ei.Name,attr,params',typeToType mi.ReturnType)
     let field (fi:FieldInfo) : Member=
-      Field (isStatic fi.IsStatic, fi.Name, fi.FieldType.FullName)
+      Field (typeToType fi.ReflectedType,isStatic fi.IsStatic, fi.Name, typeToType fi.FieldType)
     let method' (mi:MethodInfo) : Member= 
       let attr = mi.CustomAttributes |> attributesToString
       let params' = mi.GetParameters() |> parametersToParameter
-      Method (isStatic mi.IsStatic, mi.Name,attr,params', mi.ReturnType.FullName)
+      Method (typeToType mi.ReflectedType,isStatic mi.IsStatic, mi.Name,attr,params', typeToType mi.ReturnType)
     let property (pi:PropertyInfo) : Member= 
-      Property (isStatic (pi.GetGetMethod().IsStatic), pi.Name, pi.PropertyType.FullName)
-
+      Property (typeToType pi.ReflectedType, isStatic (pi.GetGetMethod().IsStatic), pi.Name, typeToType pi.PropertyType)
+    let constructors : BindingFlags list -> Type -> (SyntacticVersioning.Type*SyntacticVersioning.Member) array=
+      fun bfs t ->
+        t.GetConstructors(bfs |> List.fold(fun a x -> a ||| x) BindingFlags.Instance)
+        |> Array.sortBy(fun x -> x.Name, x.GetParameters() |> Array.length)
+        |> Array.map(fun x -> typeToType t, constructor' x)
   open ToMember
+  [<CompiledName("GetTypeMembers")>]
   let getTypeMembers (t:Type)=
         let tag = tagNetType t
         t.GetMembers() 
@@ -114,7 +141,7 @@ module Reflect =
                     None // TODO: Translate
                     (*
                     [| nt |]
-                    |> Array.collect (Reflect.constructers [BindingFlags.NonPublic])
+                    |> Array.collect (constructors [BindingFlags.NonPublic])
                     |> Array.map (fun (x,y) -> unionConstructor' (x,fullname,y))
                     |> Array.fold(fun a x -> x + a) String.Empty
                     |> (fun f->f) 
