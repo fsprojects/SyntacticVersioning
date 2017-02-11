@@ -7,7 +7,7 @@ type NetType =
 
 type InstanceOrStatic = | Instance | Static
 type Name = string
-type AttributeTypedArgument ={Value:obj}
+type AttributeTypedArgument ={Value:obj; Index:int}
 type Attribute = {FullName:string; ConstructorArguments: AttributeTypedArgument list}
 type Typ = { FullName:string }
 type Parameter = { Type:Typ; Name:Name }
@@ -21,15 +21,28 @@ type Member=
     |Field of Typ *InstanceOrStatic * Name * Typ
     |Method of Typ *InstanceOrStatic * Name * Attribute list *Parameter list * Typ
     |Property of Typ *InstanceOrStatic * Name * Typ
-    |UnionConstructors of Typ*(Constructor list)
+    |UnionConstructor of Typ*Constructor
 (*    with
         override m.ToString ()=
             match m with
             | RecordConstructor (t,attrs,parameters) -> sprintf "{ %s.%s } -> %s" t.FullName (Print.parameters (attrs,parameters)) t.FullName
 *)
 
-
-
+type EnumTyp =
+    {
+        FullName: string
+        Values: (string*string) list
+    }
+type UnionCase =
+    {
+        Name: string
+        Fields: Typ list
+    }
+type UnionCases =
+    {
+        Type:Typ
+        Cases:UnionCase list
+    }
 type SurfaceOfType =
     { 
         NetType: NetType

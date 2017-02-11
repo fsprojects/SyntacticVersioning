@@ -34,6 +34,24 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED8079DD
 EndProject
 Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SyntacticVersioning.Tests", "tests\SyntacticVersioning.Tests\SyntacticVersioning.Tests.fsproj", "{26D49AE5-F879-4321-A1AA-E7C35B60C874}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleProjects", "ExampleProjects", "{346C49A0-8F00-4D70-8FE0-28EDFEAB06A4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B448E2FC-4840-4585-BD6D-C808337065F4}"
+	ProjectSection(SolutionItems) = preProject
+		tests\ExampleProjects\src\AssemblyInfo.cs = tests\ExampleProjects\src\AssemblyInfo.cs
+		tests\ExampleProjects\src\AssemblyInfo.fs = tests\ExampleProjects\src\AssemblyInfo.fs
+		tests\ExampleProjects\src\Csharp.cs = tests\ExampleProjects\src\Csharp.cs
+		tests\ExampleProjects\src\Csharp2.cs = tests\ExampleProjects\src\Csharp2.cs
+		tests\ExampleProjects\src\Enum.cs = tests\ExampleProjects\src\Enum.cs
+		tests\ExampleProjects\src\Enum2.cs = tests\ExampleProjects\src\Enum2.cs
+		tests\ExampleProjects\src\Enum2.txt = tests\ExampleProjects\src\Enum2.txt
+		tests\ExampleProjects\src\Enum3.cs = tests\ExampleProjects\src\Enum3.cs
+		tests\ExampleProjects\src\Enum3.txt = tests\ExampleProjects\src\Enum3.txt
+		tests\ExampleProjects\src\Fsharp.fs = tests\ExampleProjects\src\Fsharp.fs
+		tests\ExampleProjects\src\Fsharp2.fs = tests\ExampleProjects\src\Fsharp2.fs
+		tests\ExampleProjects\src\Fsharp2.txt = tests\ExampleProjects\src\Fsharp2.txt
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +74,8 @@ Global
 		{83F16175-43B1-4C90-A1EE-8E351C33435D} = {A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}
 		{8E6D5255-776D-4B61-85F9-73C37AA1FB9A} = {A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}
 		{26D49AE5-F879-4321-A1AA-E7C35B60C874} = {ED8079DD-2B06-4030-9F0F-DC548F98E1C4}
+		{346C49A0-8F00-4D70-8FE0-28EDFEAB06A4} = {ED8079DD-2B06-4030-9F0F-DC548F98E1C4}
+		{B448E2FC-4840-4585-BD6D-C808337065F4} = {346C49A0-8F00-4D70-8FE0-28EDFEAB06A4}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

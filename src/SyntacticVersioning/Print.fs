@@ -1,5 +1,4 @@
 ﻿namespace SyntacticVersioning
-
 module Print=
   [<AutoOpen>]
   module internal Helpers =
@@ -10,11 +9,21 @@ module Print=
     let parameters (attrs:Attribute list) (prms:Parameter list) : string =
         match prms with
         | [] -> "System.Void"
-        | _  -> ""
-                (*prms 
-                |> 
-                |> List.reduce(sprintf "%s -> %s")
-                 *)
+        | _  ->
+          let ps =
+            prms
+            |> List.map(
+              fun x -> sprintf "%s:%s" x.Name (x.Type.FullName))
+          let ps' =
+            match Seq.isEmpty attrs with
+              | _ ->
+                match List.isEmpty ps with
+                  | true  -> [| |]
+                  | false -> [| ps |> List.reduce(sprintf "%s * %s") |]
+          
+          ps'
+          |> Array.reduce(sprintf "%s -> %s")
+
   [<CompiledName("MemberToString")>]
   let memberToString m : string=
     match m with
@@ -50,4 +59,44 @@ module Print=
           (whenStatic isStatic typ)
           name
           ptyp.FullName
-    | UnionConstructors (typ,ctors)->""
+    | UnionConstructor (typ,(typ',attrs,prms))->
+        sprintf "%s : %s -> %s"
+          typ.FullName (parameters attrs prms) typ'.FullName
+
+  let enumValues (t: EnumTyp) : (string * string) list =
+        t.Values
+        |> List.map(fun (name,value) -> sprintf "%s:%s" name value)
+        |> List.sort
+        |> List.reduce(fun x y -> sprintf "%s; %s" x y)
+        |> fun s ->
+          let t' = t.FullName
+          [ t',(sprintf "%s values: [ %s ]" t' s) ]
+    
+  let enums (t: EnumTyp) : (string * string) list =
+        t.Values
+        |> List.map(
+          fun (name,_) ->
+            let t' = t.FullName
+            t',(sprintf "%s.%s : %s" t' name t')
+          )
+
+  let unionValues (t:UnionCases)=
+      t.Cases
+      |> List.map(
+        fun x ->
+          let ps =
+            match x.Fields with
+              | [] -> ""
+              | fields ->
+                fields
+                |> List.map(fun pi -> pi.FullName)
+                |> List.fold(fun a x -> a + x) ""
+          match System.String.IsNullOrEmpty ps with
+            | true -> x.Name
+            | false -> sprintf "%s of %s" x.Name ps
+        )
+      |> List.sort
+      |> List.reduce(fun x y -> sprintf "%s | %s" x y)
+      |> fun s ->
+        let t' = t.Type.FullName
+        [ t',(sprintf "%s values: [ %s ]" t' s) ] 

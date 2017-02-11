@@ -25,6 +25,24 @@ module SurfaceArea =
         |> List.filter(isSumType >> not)
         |> List.map (fun x -> (typeFullName x,typeInfo x))
 
+      let enums' = ts
+                  |> List.filter (Reflect.tagNetType >> function | Enum -> true | _ -> false)
+                  |> List.map toEnumTyp
+      let enums =
+        enums'
+        |> List.map (fun x -> Print.enums x)
+        |> List.concat
+      let enumValues =
+        enums'
+        |> List.map (fun x -> Print.enumValues x)
+        |> List.concat
+      let unionValues =
+        ts
+        |> List.filter (Reflect.tagNetType >> function | SumType -> true | _ -> false)
+        |> List.map Reflect.getUnionCases
+        |> List.map (fun x -> Print.unionValues x)
+        |> List.concat
+      
       ts
       |> List.filter(isSumType >> not)
       |> List.map (fun t->
@@ -35,9 +53,9 @@ module SurfaceArea =
       |> List.concat
       |> List.append namespaces
       |> List.append types
-      //|> List.append enums
-      //|> List.append enumValues
-      //|> List.append unionValues
+      |> List.append enums
+      |> List.append enumValues
+      |> List.append unionValues
       |> List.distinct
       |> List.filter (fun (_,x) -> System.String.IsNullOrEmpty x |> not)
       |> List.fold(fun a xy -> a |> Set.add xy) Set.empty

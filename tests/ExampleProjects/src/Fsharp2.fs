@@ -1,4 +1,4 @@
-namespace SpiseMisu2
+namespace SpiseMisu
 
 type 'a Record = { foo: int; bar: float; fooBar: 'a -> 'a -> 'a -> 'a } with
   static member StaticFoo = 42
