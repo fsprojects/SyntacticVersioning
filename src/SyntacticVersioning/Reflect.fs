@@ -71,7 +71,9 @@ module Reflect =
               t.GetGenericArguments()
               |> Array.map typeFullName
               |> Array.reduce(sprintf "%s,%s")
-            sprintf "%s<%s>" (t.FullName.Substring(0,t.FullName.IndexOf('`'))) args
+            let name = if t.FullName <> null then (t.FullName.Substring(0,t.FullName.IndexOf('`'))) else ""
+            sprintf "%s<%s>" name args
+
       let guid = Guid.NewGuid().ToString()
       fullname.Replace("+Tags",guid).Replace('+','.').Replace(guid,"+Tags")
   [<CompiledName("TypeToTyp")>]

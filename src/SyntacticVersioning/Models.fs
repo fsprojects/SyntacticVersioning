@@ -45,16 +45,26 @@ type UnionCases =
     }
 type SurfaceOfType =
     { 
+        Type:Typ
         NetType: NetType
         Members: Member list
+        UnionCases: UnionCases option
+        Enum: EnumTyp option
     }
+    with
+    /// Create an instance of Surface of type with the required members set
+    static member Create t netType members=
+      {
+        Type=t; NetType=netType;Members=members
+        UnionCases=None;Enum=None
+      }
 
 type Namespace=
     {
-        /// A map from typename to Surface of Type
-        Types: Map<string,SurfaceOfType>
+        Name:string
+        Types: SurfaceOfType list
     }
 type Package=
     {
-        Namespaces: Map<string, Namespace>
+        Namespaces: Namespace list
     }
