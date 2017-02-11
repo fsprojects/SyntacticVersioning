@@ -11,7 +11,7 @@ module TestHelper=
   let wTrim (str:string) = str.Trim([| '\n';'\t';' ';'\r' |])
   let asm = Assembly.GetExecutingAssembly()
   let testPath= Path.GetDirectoryName asm.Location
-  let exampleProjectsPath = testPath </> "../../../ExampleProjects"
+  let exampleProjectsPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</>"ExampleProjects" )
   let exampleProjectsLibPath = exampleProjectsPath </> "lib"
   // since all the dll-s have unique names, they can be loaded at the same time
   let csharp = exampleProjectsLibPath </> "Csharp.dll" |> Assembly.LoadFile
@@ -46,7 +46,7 @@ let ``enum vs enum3`` () =
   let diff = SurfaceArea.diffAsStrings enum enum3
             |> nlJoin
             |> wTrim
-  System.Console.WriteLine( diff)
+  //System.Console.WriteLine( diff)
   Assert.AreEqual (enum3_txt, diff)
 
 [<Test>]

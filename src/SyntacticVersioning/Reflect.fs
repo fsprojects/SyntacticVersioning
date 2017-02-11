@@ -60,6 +60,7 @@ module Reflect =
           | _ as ex -> failwith ex.Message
       ts |> Array.toList
   let rec internal typeFullName (t:Type) =
+      let fsharpCoreAssembly = [].GetType().Assembly
       let fullname =
         match t.IsGenericType with
           | false ->
@@ -71,7 +72,11 @@ module Reflect =
               t.GetGenericArguments()
               |> Array.map typeFullName
               |> Array.reduce(sprintf "%s,%s")
-            let name = if t.FullName <> null then (t.FullName.Substring(0,t.FullName.IndexOf('`'))) else ""
+            let name = 
+                if t.Assembly <> fsharpCoreAssembly then
+                    (t.FullName.Substring(0,t.FullName.IndexOf('`'))) 
+                else 
+                    (t.Name.Substring(0,t.Name.IndexOf('`'))) 
             sprintf "%s<%s>" name args
 
       let guid = Guid.NewGuid().ToString()
