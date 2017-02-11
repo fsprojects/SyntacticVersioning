@@ -1,6 +1,6 @@
 * SpiseMisu.MyClassWithCLIEvent
 
-        - (Instance/Inheritance of Microsoft.FSharp.Control.FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>).Event1.Add : 
+        - (Instance/Inheritance of FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>).Event1.Add : 
                 sender:System.Object * args:System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>
                 -> System.Void
 
@@ -31,11 +31,11 @@
                 -> System.String
 
         - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).add_Event1 : 
-                handler:Microsoft.FSharp.Control.FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>
+                handler:FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>
                 -> System.Void
 
         - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).remove_Event1 : 
-                handler:Microsoft.FSharp.Control.FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>
+                handler:FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>
                 -> System.Void
 
         
