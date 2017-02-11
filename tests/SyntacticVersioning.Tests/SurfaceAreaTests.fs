@@ -20,6 +20,7 @@ let ``Union surface area`` () =
                 ]
                   
   Assert.AreEqual(expected, area.UnionCases.Value.Cases)
+  Assert.IsTrue(area.Enum.IsNone)
 
 type UnionPrime = Foo of (int * float) | Bar of float with
   member x.Baz = 42
@@ -44,3 +45,22 @@ let ``Union with params surface area`` () =
                   ]
 
   Assert.AreEqual(expected, area.UnionCases.Value.Cases)
+  Assert.IsTrue(area.Enum.IsNone)
+
+[<System.FlagsAttribute>]
+type EnumT = FooBar=0 | Foo=1 | Bar =2
+
+[<Test>]
+let ``Tag net type enum`` () =
+  let t = typeof<EnumT>
+  Assert.AreEqual(NetType.Enum, Reflect.tagNetType t)
+
+[<Test>]
+let ``Enum surface area`` () =
+  let t = typeof<EnumT>
+  let area = SurfaceArea.surfaceOfType t
+  let ts = sprintf "%A" area.UnionCases
+  let expected = [("FooBar","0"); ("Foo","1"); ("Bar","2")]
+
+  Assert.AreEqual(expected, area.Enum.Value.Values)
+  Assert.IsTrue(area.UnionCases.IsNone)
