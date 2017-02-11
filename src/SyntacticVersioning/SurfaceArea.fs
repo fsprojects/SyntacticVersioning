@@ -76,7 +76,7 @@ module SurfaceArea =
     |> List.map (fun t->
           let fullName = typeFullName t
           let members = getTypeMembers t
-          members |> List.map (fun m-> (fullName,Print.memberToString m))
+          members |> List.map (fun m-> (fullName, m.ToString()))
     )
     |> List.concat
     |> List.append namespaces
