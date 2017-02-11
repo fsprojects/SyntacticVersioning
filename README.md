@@ -30,7 +30,7 @@ ProjectScaffold requires a local git installation. You can download git from [Gi
 
 Mono | .NET
 ---- | ----
-[![Mono CI Build Status](https://img.shields.io/travis/fsprojects/SyntacticVersioning/master.svg)](https://travis-ci.org/fsprojects/ProjectScaffold) | [![.NET Build Status](https://img.shields.io/appveyor/ci/fsgit/SyntacticVersioning/master.svg)](https://ci.appveyor.com/project/fsgit/SyntacticVersioning)
+[![Mono CI Build Status](https://img.shields.io/travis/fsprojects/SyntacticVersioning/master.svg)](https://travis-ci.org/fsprojects/ProjectScaffold) | [![Build status](https://ci.appveyor.com/api/projects/status/tm885fiupthd22dp/branch/master?svg=true)](https://ci.appveyor.com/project/wallymathieu/syntacticversioning/branch/master)
 
 ## Maintainer(s)
 
