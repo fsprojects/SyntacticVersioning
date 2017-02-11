@@ -35,7 +35,6 @@ let ``Tag net type union prime`` () =
 let ``Union with params surface area`` () =
   let t = typeof<UnionPrime>
   let area = SurfaceArea.surfaceOfType t
-  let ts = sprintf "%A" area.UnionCases
   let expected = [
                   { Name= "Foo"
                     Fields= [{FullName="System.Tuple<System.Int32,System.Double>"}
@@ -59,8 +58,8 @@ let ``Tag net type enum`` () =
 let ``Enum surface area`` () =
   let t = typeof<EnumT>
   let area = SurfaceArea.surfaceOfType t
-  let ts = sprintf "%A" area.UnionCases
   let expected = [("FooBar","0"); ("Foo","1"); ("Bar","2")]
 
   Assert.AreEqual(expected, area.Enum.Value.Values)
   Assert.IsTrue(area.UnionCases.IsNone)
+
