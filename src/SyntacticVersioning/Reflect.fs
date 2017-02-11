@@ -7,24 +7,34 @@ open Microsoft.FSharp.Reflection
  
 module Reflect =
   type private CAtDat = CustomAttributeData
-
-  let private tagNetHlp (t: Type) : (string option * string option) =
+  open Microsoft.FSharp.Core
+  let private tagNetHlp (t: Type) : (string option * SourceConstructFlags option) =
       let debuggerAttr (a:CAtDat) = a.AttributeType.Name.Contains("Debugger")
-      match t with
-        | _ when t.FullName.EndsWith("+Tags") -> (Some "UnionTags", None)
-        | _ -> 
-          t.CustomAttributes
-          |> Seq.filter( debuggerAttr >> not )
-          |> Seq.map(
-            fun x ->
-              x.AttributeType.Name,
-              x.ConstructorArguments |> Seq.map(fun x -> x.Value.ToString()))
-          |> Seq.map(
-            fun (x,ys) ->
-              (if x.Equals("CompilationMappingAttribute") then None else Some x),
-              (if Seq.isEmpty ys then None else Seq.head ys |> Some))
-          |> fun xs ->
-            if Seq.isEmpty xs then (None,None) else Seq.head xs
+      let serializableAttr (a:CAtDat) = a.AttributeType = typeof<System.SerializableAttribute>
+      let compilationMappingAttr (a:CAtDat) = a.AttributeType = typeof<CompilationMappingAttribute>
+
+      if t.FullName.EndsWith("+Tags") then 
+         (Some "UnionTags", None)
+      else
+          let attrs = t.CustomAttributes
+                        |> Seq.filter( debuggerAttr >> not )
+                        |> Seq.filter( serializableAttr >> not )
+          
+          let compilationAttr = attrs |> Seq.tryFind compilationMappingAttr
+          match compilationAttr with
+          | Some attr-> 
+                (None, 
+                 attr.ConstructorArguments
+                    |> Seq.map(fun x -> x.Value) 
+                    |> Seq.cast<SourceConstructFlags>
+                    |> Seq.head 
+                    |> Some)
+          | None ->
+              attrs
+              |> Seq.map(fun x -> x.AttributeType.Name)
+              |> Seq.map(fun (x) ->(Some x), None)
+              |> fun xs ->
+                if Seq.isEmpty xs then (None,None) else Seq.head xs
   
   [<CompiledName("TagNetType")>]
   let tagNetType (t: Type) : NetType =
@@ -32,9 +42,9 @@ module Reflect =
       match tagNetHlp t with
         | Some "UnionTags"       , _________________ -> NetType.UnionTags
         | Some "StructAttribute" , _________________ -> NetType.Struct
-        | ______________________ , Some "Module"     -> NetType.Module
-        | ______________________ , Some "RecordType" -> NetType.RecordType
-        | ______________________ , Some "SumType"    -> NetType.SumType
+        | ______________________ , Some SourceConstructFlags.Module     -> NetType.Module
+        | ______________________ , Some SourceConstructFlags.RecordType -> NetType.RecordType
+        | ______________________ , Some SourceConstructFlags.SumType    -> NetType.SumType
         | ______________________ ,__________________ ->
           match t with
             | _ when t.IsInterface ->
