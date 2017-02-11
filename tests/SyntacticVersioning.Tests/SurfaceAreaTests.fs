@@ -5,10 +5,15 @@ open NUnit.Framework
 open System.Reflection
 
 type Union = FooBar | Foo | Bar 
+[<Test>]
+let ``Tag net type union`` () =
+  let t = typeof<Union>
+  Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
 
 [<Test>]
 let ``Union surface area`` () =
-  let area = SurfaceArea.surfaceOfType typeof<Union>
+  let t = typeof<Union>
+  let area = SurfaceArea.surfaceOfType t
   let expected =[ { Name= "FooBar";Fields= []}
                   { Name= "Foo";Fields= []}
                   { Name= "Bar";Fields= []}
@@ -21,8 +26,14 @@ type UnionPrime = Foo of (int * float) | Bar of float with
   static member Qux () = 42
 
 [<Test>]
+let ``Tag net type union prime`` () =
+  let t = typeof<Union>
+  Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
+
+[<Test>]
 let ``Union with params surface area`` () =
-  let area = SurfaceArea.surfaceOfType typeof<UnionPrime>
+  let t = typeof<UnionPrime>
+  let area = SurfaceArea.surfaceOfType t
   let ts = sprintf "%A" area.UnionCases
   let expected = [
                   { Name= "Foo"

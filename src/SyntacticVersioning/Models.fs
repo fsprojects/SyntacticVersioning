@@ -4,8 +4,13 @@ type NetType =
   | Abstract | Class | Enum | Interface | Static | Struct
   (* | Primitive | ValueType *)
   | Module | RecordType | SumType | UnionConstructor | UnionTags
+    with
+        override m.ToString ()=sprintf "%A" m
+
 
 type InstanceOrStatic = | Instance | Static
+    with
+        override m.ToString ()=sprintf "%A" m
 type Name = string
 type AttributeTypedArgument ={Value:obj; Index:int}
     with
