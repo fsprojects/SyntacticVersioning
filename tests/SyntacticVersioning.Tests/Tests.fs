@@ -29,21 +29,21 @@ module TestHelper=
 open TestHelper
 [<Test>]
 let ``csharp vs csharp2`` () =
-  let diff = SurfaceArea.diff csharp csharp2
+  let diff = SurfaceArea.diffAsStrings csharp csharp2
             |> nlJoin
             |> wTrim
   Assert.AreEqual ("", diff)
 
 [<Test>]
 let ``enum vs enum2`` () =
-  let diff = SurfaceArea.diff enum enum2
+  let diff = SurfaceArea.diffAsStrings enum enum2
             |> nlJoin
             |> wTrim
   Assert.AreEqual (enum2_txt, diff)
 
 [<Test>]
 let ``enum vs enum3`` () =
-  let diff = SurfaceArea.diff enum enum3
+  let diff = SurfaceArea.diffAsStrings enum enum3
             |> nlJoin
             |> wTrim
   System.Console.WriteLine( diff)
@@ -51,7 +51,7 @@ let ``enum vs enum3`` () =
 
 [<Test>]
 let ``fsharp vs fsharp2`` () =
-  let diff = SurfaceArea.diff fsharp fsharp2
+  let diff = SurfaceArea.diffAsStrings fsharp fsharp2
             |> nlJoin
             |> wTrim
   Assert.AreEqual (fsharp2_txt, diff)
