@@ -97,19 +97,12 @@ module Reflect =
     type 'a Roc = System.Collections.ObjectModel.ReadOnlyCollection<'a>
     type CatArg = CustomAttributeTypedArgument
 
-    let attributeToAttribute (a:CAtDat) : SyntacticVersioning.Attribute= 
-      let args =a.ConstructorArguments 
-                |> Seq.map (fun ca-> {Value=ca.Value; Index=1 }) 
-                |> List.ofSeq
-      { FullName=a.AttributeType.FullName
-        ConstructorArguments=args }
+
     let parameterToParameter (p:ParameterInfo) = { Type=typeToTyp p.ParameterType; Name=p.Name }
-    let attributesToString atrs= atrs |>Seq.map attributeToAttribute |> List.ofSeq
     let parametersToParameter prms= prms |>Seq.map parameterToParameter |> List.ofSeq
     let deconstructConstructor (ctr:ConstructorInfo) =
-      let attr = ctr.CustomAttributes |> attributesToString
       let params' = ctr.GetParameters() |> parametersToParameter
-      (typeToTyp ctr.ReflectedType, attr, params')
+      (typeToTyp ctr.ReflectedType, params')
     let recordConstructor ctr : Member=
       RecordConstructor (deconstructConstructor ctr)
     let constructor' ctr : Member=
@@ -118,15 +111,13 @@ module Reflect =
 
     let event' (ei:EventInfo) : Member=
       let mi = ei.EventHandlerType.GetMethod("Invoke")
-      let attr = ei.CustomAttributes |> attributesToString
       let params' = mi.GetParameters() |> parametersToParameter
-      Event (typeToTyp mi.ReflectedType,isStatic mi.IsStatic, ei.Name,attr,params',typeToTyp mi.ReturnType)
+      Event (typeToTyp mi.ReflectedType,isStatic mi.IsStatic, ei.Name, params',typeToTyp mi.ReturnType)
     let field (fi:FieldInfo) : Member=
       Field (typeToTyp fi.ReflectedType,isStatic fi.IsStatic, fi.Name, typeToTyp fi.FieldType)
     let method' (mi:MethodInfo) : Member= 
-      let attr = mi.CustomAttributes |> attributesToString
       let params' = mi.GetParameters() |> parametersToParameter
-      Method (typeToTyp mi.ReflectedType,isStatic mi.IsStatic, mi.Name,attr,params', typeToTyp mi.ReturnType)
+      Method (typeToTyp mi.ReflectedType,isStatic mi.IsStatic, mi.Name, params', typeToTyp mi.ReturnType)
     let property (pi:PropertyInfo) : Member= 
       Property (typeToTyp pi.ReflectedType, isStatic (pi.GetGetMethod().IsStatic), pi.Name, typeToTyp pi.PropertyType)
     let constructors (bfs: BindingFlags list) (t: Type): (Constructor) array=

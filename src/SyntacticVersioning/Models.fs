@@ -7,18 +7,11 @@ type NetType =
     with
         override m.ToString ()=sprintf "%A" m
 
-
 type InstanceOrStatic = | Instance | Static
     with
         override m.ToString ()=sprintf "%A" m
 type Name = string
-type AttributeTypedArgument ={Value:obj; Index:int}
-    with
-        override m.ToString ()=sprintf "[%i]%A" m.Index m.Value
-    
-type Attribute = {FullName:string; ConstructorArguments: AttributeTypedArgument list}
-    with
-        override m.ToString ()=sprintf "%s %O" m.FullName m.ConstructorArguments
+
 
 type Typ = { FullName:string }
     with
@@ -29,13 +22,13 @@ type Parameter = { Type:Typ; Name:Name }
       static member ToString x=sprintf "%s:%s" x.Name (x.Type.FullName)
       override x.ToString() = Parameter.ToString x
 
-type Constructor=Typ *Attribute list * Parameter list
+type Constructor=Typ * Parameter list
 type Member= 
     |RecordConstructor of Constructor
     |Constructor of Constructor
-    |Event of Typ * InstanceOrStatic * Name * Attribute list *Parameter list * Typ
+    |Event of Typ * InstanceOrStatic * Name * Parameter list * Typ
     |Field of Typ *InstanceOrStatic * Name * Typ
-    |Method of Typ *InstanceOrStatic * Name * Attribute list *Parameter list * Typ
+    |Method of Typ *InstanceOrStatic * Name * Parameter list * Typ
     |Property of Typ *InstanceOrStatic * Name * Typ
     |UnionConstructor of Typ*Constructor
     with
@@ -44,7 +37,7 @@ type Member=
             | Static -> typ.FullName
             | Instance -> sprintf "(Instance/Inheritance of %s)" typ.FullName
 
-       static member internal parameters (attrs:Attribute list) (prms:Parameter list) : string =
+       static member internal parameters (prms:Parameter list) : string =
           match prms with
             | [] -> "System.Void"
             | _  ->
@@ -52,8 +45,6 @@ type Member=
                 prms
                 |> List.map(Parameter.ToString)
               let ps' =
-                match Seq.isEmpty attrs with
-                  | _ ->
                     match List.isEmpty ps with
                       | true  -> [| |]
                       | false -> [| ps |> List.reduce(sprintf "%s * %s") |]
@@ -63,37 +54,37 @@ type Member=
 
         override m.ToString ()=
           match m with
-          | RecordConstructor (typ,attrs,prms)->
+          | RecordConstructor (typ,prms)->
             sprintf "{ %s.%s } -> %s" 
               typ.FullName
-              (Member.parameters attrs prms)
+              (Member.parameters prms)
               typ.FullName
-          | Constructor (typ,attrs,prms)-> 
+          | Constructor (typ,prms)-> 
               sprintf "new %s : %s -> %s" 
                 typ.FullName
-                (Member.parameters attrs prms)
+                (Member.parameters prms)
                 typ.FullName
-          | UnionConstructor (typ,(typ',attrs,prms))->
+          | UnionConstructor (typ,(typ',prms))->
               sprintf "%s : %s -> %s"
                 typ.FullName
-                (Member.parameters attrs prms)
+                (Member.parameters prms)
                 typ'.FullName
-          | Event (typ,isStatic,name,attrs,prms,rtyp)->
+          | Event (typ,isStatic,name,prms,rtyp)->
             sprintf "%s.%s : %s -> %s"
               (Member.whenStatic isStatic typ)
               (sprintf "%s.Add" name)
-              (Member.parameters attrs prms)
+              (Member.parameters prms)
               (rtyp.FullName)           
           | Field (typ,isStatic,name,rtyp) -> 
               sprintf "%s.%s : %s"
                 (Member.whenStatic isStatic typ)
                 name
                 (rtyp.FullName)
-          | Method (typ,isStatic,name,attrs,prms,rtyp) -> 
+          | Method (typ,isStatic,name,prms,rtyp) -> 
               sprintf "%s.%s : %s -> %s"
                 (Member.whenStatic isStatic typ)
                 name
-                (Member.parameters attrs prms)
+                (Member.parameters prms)
                 (rtyp.FullName)
           | Property (typ,isStatic,name,ptyp) ->
               sprintf "%s.%s : %s"
