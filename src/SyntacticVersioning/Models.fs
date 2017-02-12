@@ -1,5 +1,7 @@
 namespace SyntacticVersioning
 type Version = Major | Minor | Patch
+    with
+        override m.ToString ()=sprintf "%A" m
 type NetType =
   | Abstract | Class | Enum | Interface | Static | Struct
   (* | Primitive | ValueType *)
@@ -19,7 +21,11 @@ type Typ = { FullName:string }
 
 type Parameter = { Type:Typ; Name:Name }
     with
-      static member ToString x=sprintf "%s:%s" x.Name (x.Type.FullName)
+      static member ToString x=
+        if x.Name<>null then
+          sprintf "%s:%O" x.Name (x.Type)
+        else
+          sprintf "%O" x.Type
       override x.ToString() = Parameter.ToString x
 
 type Constructor=Typ * Parameter list
@@ -101,10 +107,12 @@ type EnumTyp =
     with
       override x.ToString()=sprintf "%A" x
 
+
+
 type UnionCase =
     {
         Name: string
-        Fields: Typ list
+        Fields: Parameter list
     }
     with
       static member ToString x=
@@ -113,7 +121,7 @@ type UnionCase =
             | [] -> ""
             | fields ->
               fields
-              |> List.map(fun pi -> pi.FullName)
+              |> List.map(Parameter.ToString)
               |> String.concat ""
         match System.String.IsNullOrEmpty ps with
           | true -> x.Name

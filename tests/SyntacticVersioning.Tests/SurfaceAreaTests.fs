@@ -9,6 +9,11 @@ type Union = FooBar | Foo | Bar
 let ``Tag net type union`` () =
   let t = typeof<Union>
   Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
+(*
+  let foo = Union.Foo
+  let fooT = foo.GetType()
+  Assert.IsTrue(Reflect.isSumType fooT)
+*)
 
 [<Test>]
 let ``Union surface area`` () =
@@ -28,6 +33,9 @@ type UnionPrime = Foo of (int * float) | Bar of float
 let ``Tag net type union prime`` () =
   let t = typeof<UnionPrime>
   Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
+  let foo=UnionPrime.Foo (1,0.1)
+  let fooT =foo.GetType()
+  Assert.IsTrue(Reflect.isSumType fooT)
 
 [<Test>]
 let ``Union with params surface area`` () =
@@ -35,21 +43,24 @@ let ``Union with params surface area`` () =
   let area = SurfaceArea.surfaceOfType t
   let expected = [
                   { Name= "Foo"
-                    Fields= [{FullName="System.Tuple<System.Int32,System.Double>"}
+                    Fields= [{Type= {FullName="System.Tuple<System.Int32,System.Double>"}; Name=null }
                             ]}
                   { Name= "Bar"
-                    Fields= [{FullName="System.Double"}]}
+                    Fields= [{Type={FullName="System.Double"}; Name=null}]}
                   ]
 
   Assert.AreEqual(expected, area.UnionCases.Value.Cases)
   Assert.IsTrue(area.Enum.IsNone)
 
-type UnionWithNames = Foo of (int * float) | Bar of float
+type UnionWithNames = Foo of num: int * diff:float | Bar of diff:float
 
 [<Test>]
 let ``Tag net type union with names`` () =
   let t = typeof<UnionWithNames>
   Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
+  let foo = UnionWithNames.Foo(num=1,diff=0.1)
+  let fooT = foo.GetType()
+  Assert.IsTrue(Reflect.isSumType fooT)
 
 [<Test>]
 let ``Union with names surface area`` () =
@@ -57,12 +68,13 @@ let ``Union with names surface area`` () =
   let area = SurfaceArea.surfaceOfType t
   let expected = [
                   { Name= "Foo"
-                    Fields= [{FullName="System.Tuple<System.Int32,System.Double>"}
+                    Fields= [{Type={FullName="System.Int32"}; Name="num"}
+                             {Type={FullName="System.Double"};Name="diff"}
                             ]}
                   { Name= "Bar"
-                    Fields= [{FullName="System.Double"}]}
+                    Fields= [{Type={FullName="System.Double"};Name="diff"}]}
                   ]
-
+  //printf "%A" area.UnionCases.Value.Cases
   Assert.AreEqual(expected, area.UnionCases.Value.Cases)
   Assert.IsTrue(area.Enum.IsNone)
 

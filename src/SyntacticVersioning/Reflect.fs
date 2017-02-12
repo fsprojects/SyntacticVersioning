@@ -170,6 +170,8 @@ module Reflect =
     let t' = typeToTyp t
     List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
 
+  /// Concrete type of a SumType, i.e. Foo and Bar when 
+  /// type SumType=Foo|Bar
   [<CompiledName("IsSumType")>]
   let isSumType (t: Type): bool =
         t.IsNested &&
@@ -197,7 +199,14 @@ module Reflect =
       |> Array.map(
         fun x ->
           let ps = x.GetFields()
-                |> Array.map(fun pi -> typeToTyp pi.PropertyType)
+                |> Array.map(fun pi ->
+                      { 
+                        Type= typeToTyp pi.PropertyType
+                        Name= if String.IsNullOrEmpty pi.Name || pi.Name = "Item" then 
+                                null
+                              else
+                                pi.Name
+                      })
                 |> Array.toList
           { Name=x.Name; Fields=ps }
       )
