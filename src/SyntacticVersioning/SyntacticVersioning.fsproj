@@ -61,8 +61,8 @@
   <ItemGroup>
     <Compile Include="Models.fs" />
     <Compile Include="Reflect.fs" />
-    <Compile Include="Print.fs" />
     <Compile Include="SurfaceArea.fs" />
+    <Compile Include="Compare.fs" />
     <None Include="paket.references" />
     <None Include="paket.template" />
     <Content Include="App.config" />

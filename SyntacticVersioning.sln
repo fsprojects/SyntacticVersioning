@@ -50,6 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B448E2FC-484
 		tests\ExampleProjects\src\Fsharp.fs = tests\ExampleProjects\src\Fsharp.fs
 		tests\ExampleProjects\src\Fsharp2.fs = tests\ExampleProjects\src\Fsharp2.fs
 		tests\ExampleProjects\src\Fsharp2.txt = tests\ExampleProjects\src\Fsharp2.txt
+		tests\ExampleProjects\src\CsharpWithAttribute.cs = tests\ExampleProjects\src\CsharpWithAttribute.cs
 	EndProjectSection
 EndProject
 Global

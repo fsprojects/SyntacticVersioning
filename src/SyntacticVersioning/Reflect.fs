@@ -191,7 +191,7 @@ module Reflect =
        Values= enumHlp t
     }
     
-  let getUnionCases (t:Type) : UnionCases=
+  let toUnionCases (t:Type) : UnionCases=
     let cases = 
       FSharpType.GetUnionCases(t)
       |> Array.map(

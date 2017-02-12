@@ -47,10 +47,10 @@ type Member=
               let ps' =
                     match List.isEmpty ps with
                       | true  -> [| |]
-                      | false -> [| ps |> List.reduce(sprintf "%s * %s") |]
+                      | false -> [| ps |> String.concat " * " |]
               
               ps'
-              |> Array.reduce(sprintf "%s -> %s")
+              |> String.concat " -> "
 
         override m.ToString ()=
           match m with
@@ -107,14 +107,35 @@ type UnionCase =
         Fields: Typ list
     }
     with
-      override x.ToString()=sprintf "%A" x
+      static member ToString x=
+        let ps =
+          match x.Fields with
+            | [] -> ""
+            | fields ->
+              fields
+              |> List.map(fun pi -> pi.FullName)
+              |> String.concat ""
+        match System.String.IsNullOrEmpty ps with
+          | true -> x.Name
+          | false -> sprintf "%s of %s" x.Name ps
+
+      override x.ToString()=UnionCase.ToString x
+
 type UnionCases =
     {
         Type:Typ
         Cases:UnionCase list
     }
     with
-      override x.ToString()=sprintf "%A" x
+      override t.ToString()=
+          t.Cases
+          |> List.map(UnionCase.ToString)
+          |> List.sort
+          |> String.concat " | "
+          |> fun s ->
+            let t' = t.Type.FullName
+            sprintf "%s values: [ %s ]" t' s
+
 type SurfaceOfType =
     { 
         Type:Typ

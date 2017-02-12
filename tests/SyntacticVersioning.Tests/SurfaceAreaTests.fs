@@ -22,18 +22,38 @@ let ``Union surface area`` () =
   Assert.AreEqual(expected, area.UnionCases.Value.Cases)
   Assert.IsTrue(area.Enum.IsNone)
 
-type UnionPrime = Foo of (int * float) | Bar of float with
-  member x.Baz = 42
-  static member Qux () = 42
+type UnionPrime = Foo of (int * float) | Bar of float
 
 [<Test>]
 let ``Tag net type union prime`` () =
-  let t = typeof<Union>
+  let t = typeof<UnionPrime>
   Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
 
 [<Test>]
 let ``Union with params surface area`` () =
   let t = typeof<UnionPrime>
+  let area = SurfaceArea.surfaceOfType t
+  let expected = [
+                  { Name= "Foo"
+                    Fields= [{FullName="System.Tuple<System.Int32,System.Double>"}
+                            ]}
+                  { Name= "Bar"
+                    Fields= [{FullName="System.Double"}]}
+                  ]
+
+  Assert.AreEqual(expected, area.UnionCases.Value.Cases)
+  Assert.IsTrue(area.Enum.IsNone)
+
+type UnionWithNames = Foo of (int * float) | Bar of float
+
+[<Test>]
+let ``Tag net type union with names`` () =
+  let t = typeof<UnionWithNames>
+  Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
+
+[<Test>]
+let ``Union with names surface area`` () =
+  let t = typeof<UnionWithNames>
   let area = SurfaceArea.surfaceOfType t
   let expected = [
                   { Name= "Foo"
