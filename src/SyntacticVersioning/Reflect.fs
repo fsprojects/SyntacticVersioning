@@ -179,6 +179,7 @@ module Reflect =
            | null  -> false
            | type' -> (tagNetType type') = SumType)
    
+  [<CompiledName("ToEnumTyp")>]
   let toEnumTyp (t:Type) : EnumTyp=
     let enumHlp : Type -> (string * string) list =
       fun t -> t.IsEnum |> function
@@ -193,6 +194,7 @@ module Reflect =
        Values= enumHlp t
     }
     
+  [<CompiledName("ToUnionCases")>]
   let toUnionCases (t:Type) : UnionCases=
     let cases = 
       FSharpType.GetUnionCases(t)
