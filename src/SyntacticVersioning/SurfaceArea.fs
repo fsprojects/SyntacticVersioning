@@ -27,19 +27,17 @@ module SurfaceArea =
   [<CompiledName("ExportedTypes")>]
   let exportedTypes assembly =
     let types = exportedTypes assembly
+    let toNs (ns,ts) ={
+                        Name = (if ns <> null then ns else "")
+                        Types= ts
+                      }
     let actual =
-        types 
-        |> List.map (fun t-> (t.Namespace, surfaceOfType t ))
-        |> List.groupBy (fun (ns,_)->ns)
-        |> List.map (fun (ns,ns_ts)-> (ns,ns_ts |> List.map snd)) 
-        |> List.map (fun (ns,ts)-> ( 
-                                    {
-                                        Name = (if ns <> null then ns else "")
-                                        Types= ts
-                                    }))
+        List.map ((fun (ns,ns_ts)-> (ns,ns_ts |> List.map snd)) >> toNs) (types 
+          |> List.map (fun t-> (t.Namespace, surfaceOfType t ))
+          |> List.groupBy (fun (ns,_)->ns))
     { Namespaces = actual}
    
-  let private raw (asm:Assembly) : (string * string) Set =
+  let raw (asm:Assembly) : (string * string) Set =
     let ts = Reflect.exportedTypes asm
 
     let namespaces =
@@ -57,28 +55,23 @@ module SurfaceArea =
                 |> List.filter (Reflect.tagNetType >> function | Enum -> true | _ -> false)
                 |> List.map toEnumTyp
     let enums =
-      enums'
-      |> List.map (fun x -> Print.enums x)
-      |> List.concat
+      List.collect (Print.enums) enums'
     let enumValues =
-      enums'
-      |> List.map (fun x -> Print.enumValues x)
-      |> List.concat
+      List.collect (Print.enumValues) enums'
     let unionValues =
-      ts
+      List.collect Print.unionValues (ts
       |> List.filter (Reflect.tagNetType >> function | SumType -> true | _ -> false)
-      |> List.map Reflect.getUnionCases
-      |> List.map (fun x -> Print.unionValues x)
-      |> List.concat
+      |> List.map Reflect.getUnionCases)
     
-    ts
-    |> List.filter(isSumType >> not)
-    |> List.map (fun t->
-          let fullName = typeFullName t
-          let members = getTypeMembers t
-          members |> List.map (fun m-> (fullName, m.ToString()))
-    )
-    |> List.concat
+    let nonSumTypes =(ts|> List.filter(isSumType >> not))
+
+    let members =
+      (List.collect (fun t->
+            let fullName = typeFullName t
+            let members = getTypeMembers t
+            members |> List.map (fun m-> (fullName, m.ToString()))) nonSumTypes)
+
+    members
     |> List.append namespaces
     |> List.append types
     |> List.append enums

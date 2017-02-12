@@ -12,6 +12,7 @@ module Reflect =
       let debuggerAttr (a:CAtDat) = a.AttributeType.Name.Contains("Debugger")
       let serializableAttr (a:CAtDat) = a.AttributeType = typeof<System.SerializableAttribute>
       let compilationMappingAttr (a:CAtDat) = a.AttributeType = typeof<CompilationMappingAttribute>
+      let attrName (a:CAtDat) = a.AttributeType.Name
 
       if t.FullName.EndsWith("+Tags") then 
          (Some "UnionTags", None)
@@ -30,9 +31,7 @@ module Reflect =
                     |> Seq.head 
                     |> Some)
           | None ->
-              attrs
-              |> Seq.map(fun x -> x.AttributeType.Name)
-              |> Seq.map(fun (x) ->(Some x), None)
+              (Seq.map (attrName >> (fun (x) ->(Some x), None)) attrs)
               |> fun xs ->
                 if Seq.isEmpty xs then (None,None) else Seq.head xs
   
@@ -67,7 +66,7 @@ module Reflect =
           | :? ReflectionTypeLoadException as ex ->
             ex.Types
             |> Array.filter(function | null -> false | _ -> true)
-          | _ as ex -> failwith ex.Message
+          | ex -> failwith ex.Message
       ts |> Array.toList
   let rec internal typeFullName (t:Type) =
       let fsharpCoreAssembly = [].GetType().Assembly
@@ -95,8 +94,8 @@ module Reflect =
   let typeToTyp (t:Type):Typ={ FullName=typeFullName t }
   [<AutoOpen>]
   module private ToMember=
-    type 'a roc = System.Collections.ObjectModel.ReadOnlyCollection<'a>
-    type catarg = CustomAttributeTypedArgument
+    type 'a Roc = System.Collections.ObjectModel.ReadOnlyCollection<'a>
+    type CatArg = CustomAttributeTypedArgument
 
     let attributeToAttribute (a:CAtDat) : SyntacticVersioning.Attribute= 
       let args =a.ConstructorArguments 
@@ -131,9 +130,9 @@ module Reflect =
     let property (pi:PropertyInfo) : Member= 
       Property (typeToTyp pi.ReflectedType, isStatic (pi.GetGetMethod().IsStatic), pi.Name, typeToTyp pi.PropertyType)
     let constructors (bfs: BindingFlags list) (t: Type): (Constructor) array=
-        t.GetConstructors(bfs |> List.fold(fun a x -> a ||| x) BindingFlags.Instance)
+        t.GetConstructors(bfs |> List.fold(( ||| )) BindingFlags.Instance)
         |> Array.sortBy(fun x -> x.Name, x.GetParameters() |> Array.length)
-        |> Array.map(fun x -> deconstructConstructor x)
+        |> Array.map(deconstructConstructor)
     let unionConstructors' t ctors :Member list=
       ctors|> List.map (fun ctor-> UnionConstructor (t,ctor))
 
@@ -178,12 +177,9 @@ module Reflect =
   [<CompiledName("GetTypeMembers")>]
   let getTypeMembers (t:Type) : Member list=
     let t' = typeToTyp t
-    t.GetMembers()
-    |> Array.toList
-    |> List.map (getTypeMember t')
-    |> List.concat
+    List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
 
-  [<CompiledName("IsSumType")>]         
+  [<CompiledName("IsSumType")>]
   let isSumType (t: Type): bool =
         t.IsNested &&
         (t.BaseType |> function

@@ -63,7 +63,6 @@
     <Compile Include="Reflect.fs" />
     <Compile Include="Print.fs" />
     <Compile Include="SurfaceArea.fs" />
-    <None Include="Script.fsx" />
     <None Include="paket.references" />
     <None Include="paket.template" />
     <Content Include="App.config" />

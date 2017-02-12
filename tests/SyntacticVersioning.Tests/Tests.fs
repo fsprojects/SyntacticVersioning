@@ -17,7 +17,7 @@ let ``enum vs enum2`` () =
   let diff = SurfaceArea.diffAsStrings enum enum2
             |> nlJoin
             |> wTrim
-  Assert.AreEqual (enum2_txt, diff)
+  Assert.AreEqual (enum2txt, diff)
 
 [<Test>]
 let ``enum vs enum3`` () =
@@ -25,11 +25,21 @@ let ``enum vs enum3`` () =
             |> nlJoin
             |> wTrim
   //System.Console.WriteLine( diff)
-  Assert.AreEqual (enum3_txt, diff)
+  Assert.AreEqual (enum3txt, diff)
 
 [<Test>]
 let ``fsharp vs fsharp2`` () =
   let diff = SurfaceArea.diffAsStrings fsharp fsharp2
             |> nlJoin
             |> wTrim
-  Assert.AreEqual (fsharp2_txt, diff)
+  Assert.AreEqual (fsharp2txt, diff)
+
+(* Should attributes be considered part of the signature?
+[<Test>]
+let ``csharp with attributes`` () =
+  let res = SurfaceArea.raw csharpWithAttribute
+            |> Set.toArray
+            |> Array.iter(fun (prefix, body) -> printfn "%s - %s" prefix body)
+
+  Assert.AreEqual ("", res)
+*)

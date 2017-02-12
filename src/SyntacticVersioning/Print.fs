@@ -28,7 +28,7 @@ module Print=
               | fields ->
                 fields
                 |> List.map(fun pi -> pi.FullName)
-                |> List.fold(fun a x -> a + x) ""
+                |> String.concat ""
           match System.String.IsNullOrEmpty ps with
             | true -> x.Name
             | false -> sprintf "%s of %s" x.Name ps
