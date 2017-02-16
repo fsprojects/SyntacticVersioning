@@ -3,6 +3,13 @@
 open SyntacticVersioning
 open NUnit.Framework
 open System.Reflection
+[<Test>]
+let ``Tag net type NetType`` () =
+  let t = typeof<NetType>
+  Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
+  let n = NetType.UnionTags
+  let nt = n.GetType()
+  Assert.AreEqual(NetType.SumType, Reflect.tagNetType nt)
 
 type Union = FooBar | Foo | Bar 
 [<Test>]

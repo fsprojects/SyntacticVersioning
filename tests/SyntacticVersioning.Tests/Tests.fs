@@ -11,6 +11,8 @@ let ``csharp vs csharp2`` () =
             |> nlJoin
             |> wTrim
   Assert.AreEqual ("", diff)
+  let bump = Compare.bump "1.0.0" csharp csharp2
+  Assert.AreEqual ( ("1.0.1", Patch), bump)
 
 [<Test>]
 let ``enum vs enum2`` () =
@@ -18,14 +20,17 @@ let ``enum vs enum2`` () =
             |> nlJoin
             |> wTrim
   Assert.AreEqual (enum2txt, diff)
+  let bump = Compare.bump "1.0.0" enum enum2
+  Assert.AreEqual ( ("2.0.0", Major), bump)
 
 [<Test>]
 let ``enum vs enum3`` () =
   let diff = Compare.diffAsStrings enum enum3
             |> nlJoin
             |> wTrim
-  //System.Console.WriteLine( diff)
   Assert.AreEqual (enum3txt, diff)
+  let bump = Compare.bump "1.0.0" enum enum3
+  Assert.AreEqual ( ("2.0.0", Major), bump)
 
 [<Test>]
 let ``fsharp vs fsharp2`` () =

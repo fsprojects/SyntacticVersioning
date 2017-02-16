@@ -8,43 +8,23 @@ open Microsoft.FSharp.Reflection
 module Reflect =
   type private CAtDat = CustomAttributeData
   open Microsoft.FSharp.Core
-  let private tagNetHlp (t: Type) : (string option * SourceConstructFlags option) =
-      let debuggerAttr (a:CAtDat) = a.AttributeType.Name.Contains("Debugger")
-      let serializableAttr (a:CAtDat) = a.AttributeType = typeof<System.SerializableAttribute>
-      let compilationMappingAttr (a:CAtDat) = a.AttributeType = typeof<CompilationMappingAttribute>
-      let attrName (a:CAtDat) = a.AttributeType.Name
 
-      if t.FullName.EndsWith("+Tags") then 
-         (Some "UnionTags", None)
-      else
-          let attrs = t.CustomAttributes
-                        |> Seq.filter( debuggerAttr >> not )
-                        |> Seq.filter( serializableAttr >> not )
-          
-          let compilationAttr = attrs |> Seq.tryFind compilationMappingAttr
-          match compilationAttr with
-          | Some attr-> 
-                (None, 
-                 attr.ConstructorArguments
-                    |> Seq.map(fun x -> x.Value) 
-                    |> Seq.cast<SourceConstructFlags>
-                    |> Seq.head 
-                    |> Some)
-          | None ->
-              (Seq.map (attrName >> (fun (x) ->(Some x), None)) attrs)
-              |> fun xs ->
-                if Seq.isEmpty xs then (None,None) else Seq.head xs
-  
   [<CompiledName("TagNetType")>]
   let tagNetType (t: Type) : NetType =
-      // TODO: Active/Partial Patterns, MeasureOfUnits? Any other?
-      match tagNetHlp t with
-        | Some "UnionTags"       , _________________ -> NetType.UnionTags
-        | Some "StructAttribute" , _________________ -> NetType.Struct
-        | ______________________ , Some SourceConstructFlags.Module     -> NetType.Module
-        | ______________________ , Some SourceConstructFlags.RecordType -> NetType.RecordType
-        | ______________________ , Some SourceConstructFlags.SumType    -> NetType.SumType
-        | ______________________ ,__________________ ->
+      let attrType (a:CAtDat)= a.AttributeType
+      let attrName a= (attrType a).Name
+      let debuggerAttr a=(attrName a).Contains("Debugger")
+      let serializableAttr a = attrType a = typeof<System.SerializableAttribute>
+      let compilationMappingAttr a = attrType a = typeof<CompilationMappingAttribute>
+      let structAttr a = attrType a = typeof<StructAttribute>
+      let attrs = t.CustomAttributes
+                    |> Seq.filter( debuggerAttr >> not )
+                    |> Seq.filter( serializableAttr >> not )
+      
+      let compilationAttr = attrs |> Seq.tryFind compilationMappingAttr
+      let structAttr = attrs |> Seq.tryFind structAttr
+
+      let fromTypeFlags ()=
           match t with
             | _ when t.IsInterface ->
               NetType.Interface
@@ -57,6 +37,22 @@ module Reflect =
             | _ when t.IsAbstract ->
               NetType.Abstract
             | _ -> NetType.Class
+
+      match compilationAttr, structAttr with
+      | Some attr, _-> 
+          let h = 
+            attr.ConstructorArguments
+              |> Seq.map(fun x -> x.Value) 
+              |> Seq.cast<SourceConstructFlags>
+              |> Seq.head 
+          match h with
+          | SourceConstructFlags.Module     -> NetType.Module
+          | SourceConstructFlags.RecordType -> NetType.RecordType
+          | SourceConstructFlags.SumType    -> NetType.SumType
+          | _ -> fromTypeFlags()
+      | _ , Some _ ->NetType.Struct
+      | _ , _ -> fromTypeFlags()
+
   [<CompiledName("ExportedTypes")>]
   let exportedTypes (asm: Assembly): Type list =
       let ts =
@@ -90,6 +86,7 @@ module Reflect =
 
       let guid = Guid.NewGuid().ToString()
       fullname.Replace("+Tags",guid).Replace('+','.').Replace(guid,"+Tags")
+
   [<CompiledName("TypeToTyp")>]
   let typeToTyp (t:Type):Typ={ FullName=typeFullName t }
   [<AutoOpen>]
