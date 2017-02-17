@@ -24,3 +24,11 @@ let fsharp = exampleProjectsLibPath </> "Fsharp.dll" |> Assembly.LoadFile
 let fsharp2 = exampleProjectsLibPath </> "Fsharp2.dll" |> Assembly.LoadFile
 let fsharp2txt = exampleProjectsPath </> "src" </> "Fsharp2.txt" |> File.ReadAllLines |>nlJoin |> wTrim
 
+module Types=
+  type UnionCaseWithName = Foo of num: int * diff:float | Bar of diff:float
+  type Union = FooBar | Foo | Bar 
+  type UnionWithParam = Foo of (int * float) | Bar of float
+  [<System.FlagsAttribute>]
+  type EnumType = FooBar=0 | Foo=1 | Bar =2
+  type RecordType = { Foo:int}
+  type UnionWithParamNames = Foo of num: int * diff:float | Bar of diff:float

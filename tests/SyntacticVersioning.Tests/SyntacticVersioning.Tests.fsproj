@@ -63,6 +63,7 @@
     <Compile Include="TestHelper.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="SurfaceAreaTests.fs" />
+    <Compile Include="NetTypeTests.fs" />
     <None Include="paket.references" />
     <Content Include="App.config" />
   </ItemGroup>
