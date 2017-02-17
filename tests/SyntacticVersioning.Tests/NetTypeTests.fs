@@ -41,3 +41,12 @@ let ``Tag net type enum`` () =
 let ``Tag net type record`` () =
   let t = typeof<RecordType>
   Assert.AreEqual(NetType.RecordType, Reflect.tagNetType t)
+
+[<Test>]
+let ``Tag net type csharp struct`` ()=
+  Assert.AreEqual(NetType.Struct, Reflect.tagNetType CSharpStructType)
+
+[<Test>]
+let ``Tag net type fsharp struct`` ()=
+  let t = typeof<FsharpStruct>
+  Assert.AreEqual(NetType.Struct, Reflect.tagNetType t)

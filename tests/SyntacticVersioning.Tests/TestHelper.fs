@@ -32,3 +32,9 @@ module Types=
   type EnumType = FooBar=0 | Foo=1 | Bar =2
   type RecordType = { Foo:int}
   type UnionWithParamNames = Foo of num: int * diff:float | Bar of diff:float
+  let CSharpStructType = csharp.ExportedTypes |> Seq.find (fun t-> t.Name= "Struct")
+
+  type FsharpStruct =
+   struct
+      val x: float
+   end
