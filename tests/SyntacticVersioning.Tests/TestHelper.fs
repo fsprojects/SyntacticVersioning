@@ -38,3 +38,5 @@ module Types=
    struct
       val x: float
    end
+  
+  let ModuleT= fsharp.ExportedTypes |> Seq.find (fun t-> t.Name="Module")

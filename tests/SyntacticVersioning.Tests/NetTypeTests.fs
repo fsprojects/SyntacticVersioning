@@ -50,3 +50,7 @@ let ``Tag net type csharp struct`` ()=
 let ``Tag net type fsharp struct`` ()=
   let t = typeof<FsharpStruct>
   Assert.AreEqual(NetType.Struct, Reflect.tagNetType t)
+
+[<Test>]
+let ``Tag net type module`` ()=
+  Assert.AreEqual(NetType.Module, Reflect.tagNetType ModuleT)
