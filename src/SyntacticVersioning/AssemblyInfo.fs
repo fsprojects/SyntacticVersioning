@@ -8,7 +8,6 @@ open System.Reflection
 [<assembly: AssemblyVersionAttribute("1.0")>]
 [<assembly: AssemblyFileVersionAttribute("1.0")>]
 [<assembly: AssemblyConfigurationAttribute("Release")>]
-[<assembly: InternalsVisibleTo("SyntacticVersioning.Tests")>]
 do ()
 
 module internal AssemblyVersionInformation =

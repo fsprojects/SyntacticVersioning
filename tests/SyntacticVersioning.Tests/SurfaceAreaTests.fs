@@ -102,3 +102,10 @@ let ``Enum surface area`` () =
   Assert.AreEqual(expected, area.Enum.Value.Values)
   Assert.IsTrue(area.UnionCases.IsNone)
 
+
+type RecordT = { Foo:int}
+
+[<Test>]
+let ``Tag net type record`` () =
+  let t = typeof<RecordT>
+  Assert.AreEqual(NetType.RecordType, Reflect.tagNetType t)

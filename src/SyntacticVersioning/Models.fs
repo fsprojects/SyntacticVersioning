@@ -38,12 +38,12 @@ type Member=
     |Property of Typ *InstanceOrStatic * Name * Typ
     |UnionConstructor of Typ*Constructor
     with
-       static member internal whenStatic (flag:InstanceOrStatic) (typ:Typ) : string =
+       static member private WhenStatic (flag:InstanceOrStatic) (typ:Typ) : string =
           match flag with
             | Static -> typ.FullName
             | Instance -> sprintf "(Instance/Inheritance of %s)" typ.FullName
 
-       static member internal parameters (prms:Parameter list) : string =
+       static member private Parameters (prms:Parameter list) : string =
           match prms with
             | [] -> "System.Void"
             | _  ->
@@ -63,38 +63,38 @@ type Member=
           | RecordConstructor (typ,prms)->
             sprintf "{ %s.%s } -> %s" 
               typ.FullName
-              (Member.parameters prms)
+              (Member.Parameters prms)
               typ.FullName
           | Constructor (typ,prms)-> 
               sprintf "new %s : %s -> %s" 
                 typ.FullName
-                (Member.parameters prms)
+                (Member.Parameters prms)
                 typ.FullName
           | UnionConstructor (typ,(typ',prms))->
               sprintf "%s : %s -> %s"
                 typ.FullName
-                (Member.parameters prms)
+                (Member.Parameters prms)
                 typ'.FullName
           | Event (typ,isStatic,name,prms,rtyp)->
             sprintf "%s.%s : %s -> %s"
-              (Member.whenStatic isStatic typ)
+              (Member.WhenStatic isStatic typ)
               (sprintf "%s.Add" name)
-              (Member.parameters prms)
+              (Member.Parameters prms)
               (rtyp.FullName)           
           | Field (typ,isStatic,name,rtyp) -> 
               sprintf "%s.%s : %s"
-                (Member.whenStatic isStatic typ)
+                (Member.WhenStatic isStatic typ)
                 name
                 (rtyp.FullName)
           | Method (typ,isStatic,name,prms,rtyp) -> 
               sprintf "%s.%s : %s -> %s"
-                (Member.whenStatic isStatic typ)
+                (Member.WhenStatic isStatic typ)
                 name
-                (Member.parameters prms)
+                (Member.Parameters prms)
                 (rtyp.FullName)
           | Property (typ,isStatic,name,ptyp) ->
               sprintf "%s.%s : %s"
-                (Member.whenStatic isStatic typ)
+                (Member.WhenStatic isStatic typ)
                 name
                 ptyp.FullName
 
