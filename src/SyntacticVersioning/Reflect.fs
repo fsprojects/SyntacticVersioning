@@ -9,8 +9,7 @@ module Reflect =
   type private CAtDat = CustomAttributeData
   open Microsoft.FSharp.Core
 
-  [<CompiledName("TagNetType")>]
-  let tagNetType (t: Type) : NetType =
+  let private _tagNetType (t: Type) : NetType =
       let attrType (a:CAtDat)= a.AttributeType
       let attrName a= (attrType a).Name
       let debuggerAttr a=(attrName a).Contains("Debugger")
@@ -52,6 +51,18 @@ module Reflect =
           | _ -> fromTypeFlags()
       | _ , Some _ ->NetType.Struct
       | _ , _ -> fromTypeFlags()
+  let private memoize f =    
+    let cache = new System.Collections.Generic.Dictionary<_, _>()
+    (fun x ->
+        match cache.TryGetValue(x) with
+        | true, v -> v
+        | false, _ ->
+          let v = f(x) 
+          cache.Add(x, v)
+          v)
+
+  [<CompiledName("TagNetType")>]
+  let tagNetType = memoize _tagNetType
 
   [<CompiledName("ExportedTypes")>]
   let exportedTypes (asm: Assembly): Type list =
@@ -124,48 +135,71 @@ module Reflect =
     let unionConstructors' t ctors :Member list=
       ctors|> List.map (fun ctor-> UnionConstructor (t,ctor))
 
-  let private getTypeMember (t:Typ) (m:MemberInfo) : Member list=
-    let tag = tagNetType m.ReflectedType
+    let toUnionCases (t:Type) : Member list=
+      let tp = typeToTyp t
+      FSharpType.GetUnionCases(t)
+      |> Array.map(
+        fun x ->
+          let ps = x.GetFields()
+                |> Array.map(fun pi ->
+                      { 
+                        Type= typeToTyp pi.PropertyType
+                        Name= if String.IsNullOrEmpty pi.Name || pi.Name = "Item" then 
+                                null
+                              else
+                                pi.Name
+                      })
+                |> Array.toList
+          UnionCase(tp, x.Name, ps) //{ Name=x.Name; Fields=ps }
+      )
+      |> List.ofArray
 
-    // Handle cases like the Fsharp.Core does (and a bit more):
-    //
-    // https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/
-    //   FSharp.Core.Unittests/LibraryTestFx.fs#L103-L110
-    //
-    match m.MemberType with
-      | MemberTypes.Constructor ->
-        let nameInfo = (m :?> ConstructorInfo)
-        match tag with
-          | RecordType ->[ (recordConstructor nameInfo)]
-          | __________ ->[ (constructor' nameInfo) ]
-      | MemberTypes.Event ->
-        [ (event' (m :?> EventInfo))]
-      | MemberTypes.Field -> 
-        [ (field (m :?> FieldInfo))]
-      | MemberTypes.Method ->
-        [ (method' (m :?> MethodInfo))]
-      | MemberTypes.NestedType ->
-        let nt = (m :?> Type)
-        match tag with
-          | SumType ->
-            [| nt |]
-            |> Array.collect (constructors [BindingFlags.NonPublic])
-            |> Array.toList
-            |> unionConstructors' t
-          | _ ->
-            // Already handled in `let types = ...`
-             []
-      | MemberTypes.Property ->
-        [ (property (m :?> PropertyInfo))]
-      | _ ->
-        let fullname = m.ReflectedType.FullName
-        failwith
-          (sprintf "not handled: (%A,%s,%A)" tag fullname m.MemberType)
+    let getTypeMember (t:Typ) (m:MemberInfo) : Member list=
+      let tag = tagNetType m.ReflectedType
+
+      // Handle cases like the Fsharp.Core does (and a bit more):
+      //
+      // https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/
+      //   FSharp.Core.Unittests/LibraryTestFx.fs#L103-L110
+      //
+      match m.MemberType with
+        | MemberTypes.Constructor ->
+          let nameInfo = (m :?> ConstructorInfo)
+          match tag with
+            | RecordType ->[ (recordConstructor nameInfo)]
+            | __________ ->[ (constructor' nameInfo) ]
+        | MemberTypes.Event ->
+          [ (event' (m :?> EventInfo))]
+        | MemberTypes.Field -> 
+          [ (field (m :?> FieldInfo))]
+        | MemberTypes.Method ->
+          [ (method' (m :?> MethodInfo))]
+        | MemberTypes.NestedType ->
+          let nt = (m :?> Type)
+          match tag with
+            | SumType ->
+              [| nt |]
+              |> Array.collect (constructors [BindingFlags.NonPublic])
+              |> Array.toList
+              |> unionConstructors' t
+            | _ ->
+              // Already handled in `let types = ...`
+              []
+        | MemberTypes.Property ->
+          [ (property (m :?> PropertyInfo))]
+        | _ ->
+          let fullname = m.ReflectedType.FullName
+          failwith
+            (sprintf "not handled: (%A,%s,%A)" tag fullname m.MemberType)
 
   [<CompiledName("GetTypeMembers")>]
   let getTypeMembers (t:Type) : Member list=
     let t' = typeToTyp t
-    List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
+    let netT = tagNetType t
+    let l= List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
+    match netT with
+    | SumType -> l @ toUnionCases t
+    | _ -> l
 
   /// Concrete type of a SumType, i.e. Foo and Bar when 
   /// type SumType=Foo|Bar
@@ -190,24 +224,4 @@ module Reflect =
        FullName= typeFullName t
        Values= enumHlp t
     }
-    
-  [<CompiledName("ToUnionCases")>]
-  let toUnionCases (t:Type) : UnionCases=
-    let cases = 
-      FSharpType.GetUnionCases(t)
-      |> Array.map(
-        fun x ->
-          let ps = x.GetFields()
-                |> Array.map(fun pi ->
-                      { 
-                        Type= typeToTyp pi.PropertyType
-                        Name= if String.IsNullOrEmpty pi.Name || pi.Name = "Item" then 
-                                null
-                              else
-                                pi.Name
-                      })
-                |> Array.toList
-          { Name=x.Name; Fields=ps }
-      )
-      |> List.ofArray
-    { Type=typeToTyp t; Cases =cases }
+

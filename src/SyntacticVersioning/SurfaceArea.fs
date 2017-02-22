@@ -12,12 +12,11 @@ module SurfaceArea =
     let s = SurfaceOfType.Create typ netType members
     match netType with
     | Enum -> {s with Enum=toEnumTyp t |> Some }
-    | SumType -> { s with UnionCases = Reflect.toUnionCases t |> Some}
     | _ -> s
 
   /// Get the surface of an assembly
   [<CompiledName("ExportedTypes")>]
-  let exportedTypes assembly =
+  let exportedTypes assembly : Package=
     let types = exportedTypes assembly
     let toNs (ns,ts) ={
                         Name = (if ns <> null then ns else "")

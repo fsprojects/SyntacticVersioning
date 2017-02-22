@@ -37,6 +37,7 @@ type Member=
     |Method of Typ *InstanceOrStatic * Name * Parameter list * Typ
     |Property of Typ *InstanceOrStatic * Name * Typ
     |UnionConstructor of Typ*Constructor
+    |UnionCase of Typ* Name * Parameter list
     with
        static member private WhenStatic (flag:InstanceOrStatic) (typ:Typ) : string =
           match flag with
@@ -57,7 +58,22 @@ type Member=
               
               ps'
               |> String.concat " -> "
-
+        static member internal isUnionCase = function | UnionCase(_)-> true | _ -> false
+        static member internal UnionCaseToString case
+            =
+            match case with
+            |  UnionCase (_, name, fields) ->
+                let ps =
+                    match fields with
+                        | [] -> ""
+                        | fields ->
+                        fields
+                        |> List.map Parameter.ToString
+                        |> String.concat ""
+                match System.String.IsNullOrEmpty ps with
+                    | true -> sprintf "%s" name
+                    | false -> sprintf "%s of %s" name ps
+            | _ -> failwith "Expected union case!"
         override m.ToString ()=
           match m with
           | RecordConstructor (typ,prms)->
@@ -97,7 +113,8 @@ type Member=
                 (Member.WhenStatic isStatic typ)
                 name
                 ptyp.FullName
-
+          | UnionCase (typ, _, _) ->
+             sprintf "%s.%s" typ.FullName (Member.UnionCaseToString m)
 
 type EnumTyp =
     {
@@ -107,49 +124,26 @@ type EnumTyp =
     with
       override x.ToString()=sprintf "%A" x
 
-
-
-type UnionCase =
-    {
-        Name: string
-        Fields: Parameter list
-    }
-    with
-      static member ToString x=
-        let ps =
-          match x.Fields with
-            | [] -> ""
-            | fields ->
-              fields
-              |> List.map(Parameter.ToString)
-              |> String.concat ""
-        match System.String.IsNullOrEmpty ps with
-          | true -> x.Name
-          | false -> sprintf "%s of %s" x.Name ps
-
-      override x.ToString()=UnionCase.ToString x
-
 type UnionCases =
-    {
-        Type:Typ
-        Cases:UnionCase list
-    }
-    with
-      override t.ToString()=
-          t.Cases
-          |> List.map(UnionCase.ToString)
-          |> List.sort
-          |> String.concat " | "
-          |> fun s ->
-            let t' = t.Type.FullName
-            sprintf "%s values: [ %s ]" t' s
+     {
+         Type:Typ
+         Cases:Member list
+     }
+     with
+       override t.ToString()=
+           t.Cases
+           |> List.map Member.UnionCaseToString
+           |> List.sort
+           |> String.concat " | "
+           |> fun s ->
+             let t' = t.Type.FullName
+             sprintf "%s values: [ %s ]" t' s
 
 type SurfaceOfType =
     { 
         Type:Typ
         NetType: NetType
         Members: Member list
-        UnionCases: UnionCases option
         Enum: EnumTyp option
     }
     with
@@ -157,8 +151,16 @@ type SurfaceOfType =
     static member Create t netType members=
       {
         Type=t; NetType=netType;Members=members
-        UnionCases=None;Enum=None
+        Enum=None
       }
+    member this.UnionCases 
+            = if this.NetType = SumType then
+                let cases =
+                    this.Members
+                    |>List.filter Member.isUnionCase
+                Some { Type=this.Type; Cases= cases}
+              else
+                None
     override x.ToString()=sprintf "%A" x
 
 type Namespace=
@@ -172,6 +174,31 @@ type Namespace=
 type Package=
     {
         Namespaces: Namespace list
+    }
+    with
+      override x.ToString()=sprintf "%A" x
+
+
+type 'a AddedAndRemoved when 'a:comparison=
+    {
+        Added: Set<'a>
+        Removed: Set<'a>
+    }
+    with
+      override x.ToString()=sprintf "%A" x
+
+type NamespaceChanges=
+    {
+        Types: AddedAndRemoved<Typ>
+        TypeChanges: Map<Typ,AddedAndRemoved<Member>>
+    }
+    with
+      override x.ToString()=sprintf "%A" x
+
+type PackageChanges=
+    { 
+        Namespaces : AddedAndRemoved<string>
+        NamespacesChanged: Map<string,NamespaceChanges>
     }
     with
       override x.ToString()=sprintf "%A" x
