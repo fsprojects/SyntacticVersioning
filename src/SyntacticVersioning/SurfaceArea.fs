@@ -9,10 +9,7 @@ module SurfaceArea =
     let typ = typeToTyp t
     let netType = tagNetType t
     let members = getTypeMembers t
-    let s = SurfaceOfType.Create typ netType members
-    match netType with
-    | Enum -> {s with Enum=toEnumTyp t |> Some }
-    | _ -> s
+    SurfaceOfType.Create typ netType members
 
   /// Get the surface of an assembly
   [<CompiledName("ExportedTypes")>]

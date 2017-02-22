@@ -38,6 +38,7 @@ type Member=
     |Property of Typ *InstanceOrStatic * Name * Typ
     |UnionConstructor of Typ*Constructor
     |UnionCase of Typ* Name * Parameter list
+    |EnumValue of Typ* Name * string
     with
        static member private WhenStatic (flag:InstanceOrStatic) (typ:Typ) : string =
           match flag with
@@ -59,9 +60,10 @@ type Member=
               ps'
               |> String.concat " -> "
         static member internal isUnionCase = function | UnionCase(_)-> true | _ -> false
-        static member internal UnionCaseToString case
+        static member internal isEnumValue = function | EnumValue(_)-> true | _ -> false
+        static member internal UnionCaseToString m
             =
-            match case with
+            match m with
             |  UnionCase (_, name, fields) ->
                 let ps =
                     match fields with
@@ -74,6 +76,12 @@ type Member=
                     | true -> sprintf "%s" name
                     | false -> sprintf "%s of %s" name ps
             | _ -> failwith "Expected union case!"
+        static member internal EnumValueToString m
+            =
+            match m with
+            | EnumValue (_,name,value) ->
+                sprintf "%s:%s" name value
+            | _ -> failwith "Expected enum value!"
         override m.ToString ()=
           match m with
           | RecordConstructor (typ,prms)->
@@ -116,10 +124,10 @@ type Member=
           | UnionCase (typ, _, _) ->
              sprintf "%s.%s" typ.FullName (Member.UnionCaseToString m)
 
-type EnumTyp =
+type EnumValues =
     {
-        FullName: string
-        Values: (string*string) list
+         Type:Typ
+         Values: (Name*string) list
     }
     with
       override x.ToString()=sprintf "%A" x
@@ -144,15 +152,24 @@ type SurfaceOfType =
         Type:Typ
         NetType: NetType
         Members: Member list
-        Enum: EnumTyp option
     }
     with
     /// Create an instance of Surface of type with the required members set
     static member Create t netType members=
       {
         Type=t; NetType=netType;Members=members
-        Enum=None
       }
+    member this.Enum
+            = if this.NetType = Enum then
+                let enumV =
+                    this.Members
+                    |>List.filter Member.isEnumValue
+                    |>List.map (function 
+                                | EnumValue (_,name,value)->(name,value) 
+                                | _ -> failwith "!")
+                Some { Type=this.Type; Values= enumV }
+              else
+                None
     member this.UnionCases 
             = if this.NetType = SumType then
                 let cases =

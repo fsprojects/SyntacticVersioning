@@ -191,6 +191,16 @@ module Reflect =
           let fullname = m.ReflectedType.FullName
           failwith
             (sprintf "not handled: (%A,%s,%A)" tag fullname m.MemberType)
+   
+  let enumValues (t:Type) =
+      let typ = typeToTyp t
+      t.IsEnum |> function
+        | false -> []
+        | true ->
+          t.GetFields()
+          |> Array.filter(fun x -> x.FieldType.IsEnum)
+          |> Array.map(fun x -> EnumValue(typ, x.Name, sprintf "%A" (x.GetRawConstantValue())))
+          |> List.ofArray
 
   [<CompiledName("GetTypeMembers")>]
   let getTypeMembers (t:Type) : Member list=
@@ -199,6 +209,7 @@ module Reflect =
     let l= List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
     match netT with
     | SumType -> l @ toUnionCases t
+    | Enum -> l @ (enumValues t)
     | _ -> l
 
   /// Concrete type of a SumType, i.e. Foo and Bar when 
@@ -209,19 +220,5 @@ module Reflect =
         (t.BaseType |> function
            | null  -> false
            | type' -> (tagNetType type') = SumType)
-   
-  [<CompiledName("ToEnumTyp")>]
-  let toEnumTyp (t:Type) : EnumTyp=
-    let enumHlp : Type -> (string * string) list =
-      fun t -> t.IsEnum |> function
-        | false -> []
-        | true ->
-          t.GetFields()
-          |> Array.filter(fun x -> x.FieldType.IsEnum)
-          |> Array.map(fun x -> x.Name, sprintf "%A" (x.GetRawConstantValue()))
-          |> List.ofArray
-    {
-       FullName= typeFullName t
-       Values= enumHlp t
-    }
+
 
