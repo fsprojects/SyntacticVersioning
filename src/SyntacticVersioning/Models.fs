@@ -123,14 +123,8 @@ type Member=
                 ptyp.FullName
           | UnionCase (typ, _, _) ->
              sprintf "%s.%s" typ.FullName (Member.UnionCaseToString m)
-
-type EnumValues =
-    {
-         Type:Typ
-         Values: (Name*string) list
-    }
-    with
-      override x.ToString()=sprintf "%A" x
+          | EnumValue (typ,_,_) ->
+             sprintf "%s.%s" typ.FullName (Member.EnumValueToString m)
 
 type UnionCases =
      {

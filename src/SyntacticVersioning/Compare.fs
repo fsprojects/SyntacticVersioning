@@ -7,15 +7,6 @@ module Compare =
   [<AutoOpen>]
   module private Print=
 
-    let enumValues (values: EnumValues) : (string * string) list =
-          values.Values
-          |> List.map(fun (name,value) -> sprintf "%s:%s" name value)
-          |> List.sort
-          |> List.reduce(fun x y -> sprintf "%s; %s" x y)
-          |> fun s ->
-            let t' =values.Type.FullName
-            [ t',(sprintf "%s values: [ %s ]" t' s) ]
-
     let typeInfo : Type -> string =
       fun x ->
         let bt : Type -> string =
@@ -38,14 +29,6 @@ module Compare =
      |> List.filter(isSumType >> not)
      |> List.map (fun x -> (typeFullName x,typeInfo x))
 
-   let enums' = ts
-               |> List.filter (Reflect.tagNetType >> ((=) NetType.Enum))
-               |> List.map (fun t->
-                  let s = SurfaceArea.surfaceOfType t
-                  s.Enum.Value
-               )
-   let enumValues =
-     List.collect Print.enumValues enums'
    let nonSumTypes =ts|> List.filter (not << isSumType)
    let sumTypes = ts|> List.filter (Reflect.tagNetType >> (=) SumType)
    let members =
@@ -53,7 +36,6 @@ module Compare =
         let surface = SurfaceArea.surfaceOfType t
         surface.Members 
         |> List.filter (not << Member.isUnionCase)
-        |> List.filter (not << Member.isEnumValue)
         |> List.map (fun m-> (surface.Type.FullName, m.ToString()))) nonSumTypes)
    let unionValues =
      (List.map (fun t->
@@ -67,7 +49,6 @@ module Compare =
    members
    |> List.append namespaces
    |> List.append types
-   |> List.append enumValues
    |> List.append unionValues
    |> List.distinct
    |> List.filter (fun (_,x) -> System.String.IsNullOrEmpty x |> not)
