@@ -7,27 +7,6 @@ module Compare =
   [<AutoOpen>]
   module private Print=
 
-    let enumValues (t: EnumTyp) : (string * string) list =
-          t.Values
-          |> List.map(fun (name,value) -> sprintf "%s:%s" name value)
-          |> List.sort
-          |> List.reduce(fun x y -> sprintf "%s; %s" x y)
-          |> fun s ->
-            let t' = t.FullName
-            [ t',(sprintf "%s values: [ %s ]" t' s) ]
-      
-    let enums (t: EnumTyp) : (string * string) list =
-          t.Values
-          |> List.map(
-            fun (name,_) ->
-              let t' = t.FullName
-              t',(sprintf "%s.%s : %s" t' name t')
-            )
-
-    let unionValues (t:UnionCases)=
-        let t' = t.Type.FullName
-        [ t', t.ToString() ] 
-
     let typeInfo : Type -> string =
       fun x ->
         let bt : Type -> string =
@@ -50,31 +29,26 @@ module Compare =
      |> List.filter(isSumType >> not)
      |> List.map (fun x -> (typeFullName x,typeInfo x))
 
-   let enums' = ts
-               |> List.filter (Reflect.tagNetType >> ((=) NetType.Enum))
-               |> List.map toEnumTyp
-   let enums =
-     List.collect (Print.enums) enums'
-   let enumValues =
-     List.collect (Print.enumValues) enums'
-   let unionValues =
-     List.collect Print.unionValues (ts
-     |> List.filter (Reflect.tagNetType >> ((=) SumType))
-     |> List.map Reflect.toUnionCases)
-
-   let nonSumTypes =(ts|> List.filter(isSumType >> not))
-
+   let nonSumTypes =ts|> List.filter (not << isSumType)
+   let sumTypes = ts|> List.filter (Reflect.tagNetType >> (=) SumType)
    let members =
      (List.collect (fun t->
-           let fullName = typeFullName t
-           let members = getTypeMembers t
-           members |> List.map (fun m-> (fullName, m.ToString()))) nonSumTypes)
+        let surface = SurfaceArea.surfaceOfType t
+        surface.Members 
+        |> List.filter (not << Member.isUnionCase)
+        |> List.map (fun m-> (surface.Type.FullName, m.ToString()))) nonSumTypes)
+   let unionValues =
+     (List.map (fun t->
+          let surface = SurfaceArea.surfaceOfType t
+          match surface.UnionCases with
+          | Some v ->
+              (surface.Type.FullName, v.ToString() )
+          | None -> failwithf "Expected %s to have union cases" surface.Type.FullName    
+     ) sumTypes)
 
    members
    |> List.append namespaces
    |> List.append types
-   |> List.append enums
-   |> List.append enumValues
    |> List.append unionValues
    |> List.distinct
    |> List.filter (fun (_,x) -> System.String.IsNullOrEmpty x |> not)

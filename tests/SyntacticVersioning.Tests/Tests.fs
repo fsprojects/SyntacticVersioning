@@ -30,7 +30,7 @@ let ``enum vs enum3`` () =
             |> wTrim
   Assert.AreEqual (enum3txt, diff)
   let bump = Compare.bump "1.0.0" enum enum3
-  Assert.AreEqual ( ("2.0.0", Major), bump)
+  Assert.AreEqual ( ("1.1.0", Minor), bump)
 
 [<Test>]
 let ``fsharp vs fsharp2`` () =
