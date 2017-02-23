@@ -153,7 +153,7 @@ type SurfaceOfType =
       {
         Type=t; NetType=netType;Members=members
       }
-    member this.Enum
+    member public this.Enum
             = if this.NetType = Enum then
                 let enumV =
                     this.Members
@@ -161,10 +161,10 @@ type SurfaceOfType =
                     |>List.map (function 
                                 | EnumValue (_,name,value)->(name,value) 
                                 | _ -> failwith "!")
-                Some { Type=this.Type; Values= enumV }
+                Some enumV 
               else
                 None
-    member this.UnionCases 
+    member public this.UnionCases 
             = if this.NetType = SumType then
                 let cases =
                     this.Members

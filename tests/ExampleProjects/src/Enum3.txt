@@ -1,11 +1,12 @@
 * SpiseMisu.Enum
 
-        Added: SpiseMisu.Enum values: [ Bar:42; Baz:4; Foo:0; Qux:2 ]
-
-        Removed: SpiseMisu.Enum values: [ Bar:42; Foo:0 ]
-
         + SpiseMisu.Enum.Baz : 
                 SpiseMisu.Enum
 
+        Added: SpiseMisu.Enum.Baz:4
+
         + SpiseMisu.Enum.Qux : 
                 SpiseMisu.Enum
+
+        Added: SpiseMisu.Enum.Qux:2
+                

@@ -1,5 +1,9 @@
 * SpiseMisu.Enum
 
-        Added: SpiseMisu.Enum values: [ Bar:0; Foo:42 ]
+        Added: SpiseMisu.Enum.Bar:0
 
-        Removed: SpiseMisu.Enum values: [ Bar:42; Foo:0 ]
+        Removed: SpiseMisu.Enum.Bar:42
+
+        Removed: SpiseMisu.Enum.Foo:0
+
+        Added: SpiseMisu.Enum.Foo:42

@@ -54,5 +54,5 @@ let ``Enum surface area`` () =
   let area = SurfaceArea.surfaceOfType t
   let expected = [("FooBar","0"); ("Foo","1"); ("Bar","2")]
 
-  Assert.AreEqual(expected, area.Enum.Value.Values)
+  Assert.AreEqual(expected, area.Enum.Value)
   Assert.IsTrue(area.UnionCases.IsNone)
