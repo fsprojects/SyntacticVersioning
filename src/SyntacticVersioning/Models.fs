@@ -197,20 +197,13 @@ type 'a AddedAndRemoved when 'a:comparison=
     }
     with
       override x.ToString()=sprintf "%A" x
+      member this.IsEmpty=this.Added.IsEmpty && this.Removed.IsEmpty
 
-type NamespaceChanges=
+type Changes<'t,'m when 't:comparison>=
     {
-        Types: AddedAndRemoved<Typ>
-        TypeChanges: Map<Typ,AddedAndRemoved<Member>>
+        Diff: AddedAndRemoved<'t>
+        Changes: Map<'t,'m>
     }
     with
       override x.ToString()=sprintf "%A" x
-
-type PackageChanges=
-    { 
-        Namespaces : AddedAndRemoved<string>
-        NamespacesChanged: Map<string,NamespaceChanges>
-    }
-    with
-      override x.ToString()=sprintf "%A" x
-
+      member this.IsEmpty=this.Diff.IsEmpty && this.Changes.IsEmpty

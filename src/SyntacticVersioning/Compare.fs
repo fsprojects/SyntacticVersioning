@@ -154,3 +154,68 @@ module Compare =
      |> Array.concat
      |> Array.map (fun x -> x |> prettyPrint 8)
 
+  open SurfaceArea  
+  type private Ns = Namespace
+  type private T = SurfaceOfType
+  type private M = Member
+  let private diffSet source target =
+    { 
+      Added=Set.difference target source
+      Removed=Set.difference source target
+    }
+
+  [<CompiledName("Members")>]
+  let members (source:M list) (target: M list) =
+    let sourceSet = source |> set
+    let targetSet = target |> set
+    diffSet sourceSet targetSet
+
+  [<CompiledName("Types")>]
+  let types (source:T list) (target: T list) =
+    let typ (t:T) = t.Type 
+    let setOfNames = List.map typ >> set
+    let sourceSet = source |> setOfNames
+    let targetSet = target |> setOfNames
+    let maybeChanged = Set.intersect targetSet sourceSet
+    let compareMemberWithTyp t=
+      let withTyp = List.find (typ >> (=) t)
+      let sourceT = source |> withTyp
+      let targetT = target |> withTyp
+      members sourceT.Members targetT.Members
+    let changed = maybeChanged 
+                |> Seq.map (fun t->t, compareMemberWithTyp t ) 
+                |> Seq.filter (fun (_,c)-> not c.IsEmpty)
+                |> Map.ofSeq
+    {
+        Diff=diffSet sourceSet targetSet
+        Changes= changed
+    }
+  [<CompiledName("Namespaces")>]
+  let namespaces (source:Ns list) (target:Ns list) =
+    let nameOf (ns:Ns) = ns.Name 
+    let setOfNames = List.map nameOf >> set
+    let sourceSet = source |> setOfNames
+    let targetSet = target |> setOfNames
+
+    let maybeChanged = Set.intersect targetSet sourceSet
+    let compareTypesWithName t=
+      let withName = List.find (nameOf >> (=) t)
+      let sourceT = source |> withName
+      let targetT = target |> withName
+      types sourceT.Types targetT.Types
+
+    let changed = maybeChanged 
+                |> Seq.map (fun t->t, compareTypesWithName t ) 
+                |> Seq.filter (fun (_,c)-> not c.IsEmpty)
+                |> Map.ofSeq
+    {
+        Diff=diffSet sourceSet targetSet
+        Changes=changed
+    }
+    /// Return differences as Package Canges
+  [<CompiledName("Assemblies")>]
+  let assemblies (source: Assembly) (target:Assembly)=
+    let pub = exportedTypes source
+    let dev = exportedTypes target
+
+    namespaces pub.Namespaces dev.Namespaces
