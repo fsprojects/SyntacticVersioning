@@ -1,4 +1,7 @@
 namespace SyntacticVersioning
+open Chiron
+open Operators
+
 type Version = Major | Minor | Patch
     with
         override m.ToString ()=sprintf "%A" m
@@ -18,6 +21,11 @@ type Name = string
 type Typ = { FullName:string }
     with
         override m.ToString ()= m.FullName
+        static member ToJson (x:Typ) =
+          Json.write "typ" x.FullName
+        static member FromJson (x:Typ) =
+            fun n -> { FullName = n}
+          <!> Json.read "typ"
 
 type Parameter = { Type:Typ; Name:Name }
     with
@@ -61,6 +69,7 @@ type Member=
               |> String.concat " -> "
         static member internal isUnionCase = function | UnionCase(_)-> true | _ -> false
         static member internal isEnumValue = function | EnumValue(_)-> true | _ -> false
+
         static member internal UnionCaseToString m
             =
             match m with
@@ -76,12 +85,14 @@ type Member=
                     | true -> sprintf "%s" name
                     | false -> sprintf "%s of %s" name ps
             | _ -> failwith "Expected union case!"
+
         static member internal EnumValueToString m
             =
             match m with
             | EnumValue (_,name,value) ->
                 sprintf "%s:%s" name value
             | _ -> failwith "Expected enum value!"
+
         override m.ToString ()=
           match m with
           | RecordConstructor (typ,prms)->
