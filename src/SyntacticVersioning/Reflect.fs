@@ -106,29 +106,44 @@ module Reflect =
     type CatArg = CustomAttributeTypedArgument
 
 
-    let parameterToParameter (p:ParameterInfo) = { Type=typeToTyp p.ParameterType; Name=p.Name }
+    let parameterToParameter (p:ParameterInfo) :Parameter= { Type=typeToTyp p.ParameterType; Name=p.Name }
     let parametersToParameter prms= prms |>Seq.map parameterToParameter |> List.ofSeq
-    let deconstructConstructor (ctr:ConstructorInfo) =
+    let deconstructConstructor (ctr:ConstructorInfo) :ConstructorLike =
       let params' = ctr.GetParameters() |> parametersToParameter
-      (typeToTyp ctr.ReflectedType, params')
+      {Type=typeToTyp ctr.ReflectedType;Parameters=params'}
     let recordConstructor ctr : Member=
       RecordConstructor (deconstructConstructor ctr)
     let constructor' ctr : Member=
       Constructor (deconstructConstructor ctr)
-    let isStatic b = match b with | true -> Static | false -> Instance
+    let isStatic b = match b with | true -> InstanceOrStatic.Static | false -> InstanceOrStatic.Instance
 
     let event' (ei:EventInfo) : Member=
       let mi = ei.EventHandlerType.GetMethod("Invoke")
       let params' = mi.GetParameters() |> parametersToParameter
-      Event (typeToTyp mi.ReflectedType,isStatic mi.IsStatic, ei.Name, params',typeToTyp mi.ReturnType)
+      Event {Type=typeToTyp mi.ReflectedType
+             Instance= isStatic mi.IsStatic 
+             Name= ei.Name
+             Parameters= params'
+             Result= typeToTyp mi.ReturnType}
     let field (fi:FieldInfo) : Member=
-      Field (typeToTyp fi.ReflectedType,isStatic fi.IsStatic, fi.Name, typeToTyp fi.FieldType)
+      Field {Type=typeToTyp fi.ReflectedType
+             Instance=isStatic fi.IsStatic
+             Name= fi.Name
+             Result= typeToTyp fi.FieldType}
     let method' (mi:MethodInfo) : Member= 
       let params' = mi.GetParameters() |> parametersToParameter
-      Method (typeToTyp mi.ReflectedType,isStatic mi.IsStatic, mi.Name, params', typeToTyp mi.ReturnType)
+      Method {Type=typeToTyp mi.ReflectedType
+              Instance= isStatic mi.IsStatic 
+              Name= mi.Name
+              Parameters= params'
+              Result= typeToTyp mi.ReturnType}
     let property (pi:PropertyInfo) : Member= 
-      Property (typeToTyp pi.ReflectedType, isStatic (pi.GetGetMethod().IsStatic), pi.Name, typeToTyp pi.PropertyType)
-    let constructors (bfs: BindingFlags list) (t: Type): (Constructor) array=
+      Property {Type=typeToTyp pi.ReflectedType
+                Instance=isStatic (pi.GetGetMethod().IsStatic)
+                Name= pi.Name
+                Result= typeToTyp pi.PropertyType}
+
+    let constructors (bfs: BindingFlags list) (t: Type): (ConstructorLike) array=
         t.GetConstructors(bfs |> List.fold(( ||| )) BindingFlags.Instance)
         |> Array.sortBy(fun x -> x.Name, x.GetParameters() |> Array.length)
         |> Array.map(deconstructConstructor)
@@ -137,20 +152,19 @@ module Reflect =
 
     let toUnionCases (t:Type) : Member list=
       let tp = typeToTyp t
+      let mapNullOrItemToNull n = 
+              if String.IsNullOrEmpty n || n = "Item" then 
+                null
+              else
+                n
       FSharpType.GetUnionCases(t)
       |> Array.map(
         fun x ->
           let ps = x.GetFields()
-                |> Array.map(fun pi ->
-                      { 
-                        Type= typeToTyp pi.PropertyType
-                        Name= if String.IsNullOrEmpty pi.Name || pi.Name = "Item" then 
-                                null
-                              else
-                                pi.Name
-                      })
+                |> Array.map(fun pi -> 
+                      Parameter.Create(typeToTyp pi.PropertyType, mapNullOrItemToNull pi.Name))
                 |> Array.toList
-          UnionCase(tp, x.Name, ps) //{ Name=x.Name; Fields=ps }
+          UnionCase (tp, x.Name, ps) //{ Name=x.Name; Fields=ps }
       )
       |> List.ofArray
 
@@ -166,7 +180,7 @@ module Reflect =
         | MemberTypes.Constructor ->
           let nameInfo = (m :?> ConstructorInfo)
           match tag with
-            | RecordType ->[ (recordConstructor nameInfo)]
+            | NetType.RecordType ->[ (recordConstructor nameInfo)]
             | __________ ->[ (constructor' nameInfo) ]
         | MemberTypes.Event ->
           [ (event' (m :?> EventInfo))]
@@ -177,7 +191,7 @@ module Reflect =
         | MemberTypes.NestedType ->
           let nt = (m :?> Type)
           match tag with
-            | SumType ->
+            | NetType.SumType ->
               [| nt |]
               |> Array.collect (constructors [BindingFlags.NonPublic])
               |> Array.toList
@@ -208,8 +222,8 @@ module Reflect =
     let netT = tagNetType t
     let l= List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
     match netT with
-    | SumType -> l @ toUnionCases t
-    | Enum -> l @ (enumValues t)
+    | NetType.SumType -> l @ toUnionCases t
+    | NetType.Enum -> l @ (enumValues t)
     | _ -> l
 
   /// Concrete type of a SumType, i.e. Foo and Bar when 
@@ -219,6 +233,6 @@ module Reflect =
         t.IsNested &&
         (t.BaseType |> function
            | null  -> false
-           | type' -> (tagNetType type') = SumType)
+           | type' -> (tagNetType type') = NetType.SumType)
 
 

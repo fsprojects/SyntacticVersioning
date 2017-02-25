@@ -16,7 +16,7 @@ module SurfaceArea =
   let exportedTypes assembly : Package=
     let types = exportedTypes assembly
     let toNs (ns,ts) ={
-                        Name = (if ns <> null then ns else "")
+                        Namespace = (if ns <> null then ns else "")
                         Types= ts
                       }
     let actual =

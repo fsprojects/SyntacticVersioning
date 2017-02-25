@@ -30,7 +30,7 @@ module Compare =
      |> List.map (fun x -> (typeFullName x,typeInfo x))
 
    let nonSumTypes =ts|> List.filter (not << isSumType)
-   let sumTypes = ts|> List.filter (Reflect.tagNetType >> (=) SumType)
+   let sumTypes = ts|> List.filter (Reflect.tagNetType >> (=) NetType.SumType)
    let members =
      (List.collect (fun t->
         let surface = SurfaceArea.surfaceOfType t
@@ -177,13 +177,13 @@ module Compare =
     let sourceSet = source |> setOfNames
     let targetSet = target |> setOfNames
     let maybeChanged = Set.intersect targetSet sourceSet
-    let compareMemberWithTyp t=
+    let compareMembersForTyp t=
       let withTyp = List.find (typ >> (=) t)
       let sourceT = source |> withTyp
       let targetT = target |> withTyp
       members sourceT.Members targetT.Members
     let changed = maybeChanged 
-                |> Seq.map (fun t->t, compareMemberWithTyp t ) 
+                |> Seq.map (fun t->t, compareMembersForTyp t ) 
                 |> Seq.filter (fun (_,c)-> not c.IsEmpty)
                 |> Map.ofSeq
     {
@@ -192,20 +192,20 @@ module Compare =
     }
   [<CompiledName("Namespaces")>]
   let namespaces (source:Ns list) (target:Ns list) =
-    let nameOf (ns:Ns) = ns.Name 
+    let nameOf (ns:Ns) = ns.Namespace 
     let setOfNames = List.map nameOf >> set
     let sourceSet = source |> setOfNames
     let targetSet = target |> setOfNames
 
     let maybeChanged = Set.intersect targetSet sourceSet
-    let compareTypesWithName t=
+    let compareTypesForNsWithName t=
       let withName = List.find (nameOf >> (=) t)
       let sourceT = source |> withName
       let targetT = target |> withName
       types sourceT.Types targetT.Types
 
     let changed = maybeChanged 
-                |> Seq.map (fun t->t, compareTypesWithName t ) 
+                |> Seq.map (fun t->t, compareTypesForNsWithName t ) 
                 |> Seq.filter (fun (_,c)-> not c.IsEmpty)
                 |> Map.ofSeq
     {
