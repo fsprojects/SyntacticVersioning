@@ -280,8 +280,8 @@ with
 
 type Namespace=
     {
-        Namespace:string
-        Types: SurfaceOfType list
+      Namespace:string
+      Types: SurfaceOfType list
     }
 with
   override x.ToString()=sprintf "%A" x
@@ -296,16 +296,19 @@ with
 
 type Package=
     {
-        Namespaces: Namespace list
+      Sha256:string      
+      Namespaces: Namespace list
     }
 with
   override x.ToString()=sprintf "%A" x
   static member FromJson (_:Package) =
-          fun n -> { Namespaces = n }
+          fun n sh -> { Namespaces = n; Sha256=sh }
       <!> Json.read "namespaces"
+      <*> Json.read "sha256"
 
   static member ToJson (x:Package) =
           Json.write "namespaces" x.Namespaces
+       *> Json.write "sha256" x.Sha256
 
 type 'a AddedAndRemoved when 'a:comparison=
     {
