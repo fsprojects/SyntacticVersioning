@@ -12,7 +12,7 @@ type InstanceOrStatic = | Static=0 | Instance=1
 
 type Name = string
 
-module Json =
+module private Json =
   let fromEnum (e : 'e when 'e :> System.Enum and 'e : (new:unit->'e) and 'e : struct) =
       e.ToString "G"
       |> String
@@ -239,12 +239,13 @@ type SurfaceOfType =
         Type:Typ
         NetType: NetType
         Members: Member list
+        SumType: bool
     }
 with
   /// Create an instance of Surface of type with the required members set
-  static member Create t netType members=
+  static member Create t netType members sumType=
     {
-      Type=t; NetType=netType;Members=members
+      Type=t; NetType=netType;Members=members; SumType=sumType
     }
   member public this.Enum
           = if this.NetType = NetType.Enum then
@@ -268,15 +269,17 @@ with
   override x.ToString()=sprintf "%A" x
 
   static member FromJson (_:SurfaceOfType) =
-          fun t n m -> { Type = t; NetType=n; Members=m }
+          fun t n m s-> { Type = t; NetType=n; Members=m; SumType=s }
       <!> Json.read "typ"
       <*> Json.readWith Json.toEnum<NetType> "netType"
       <*> Json.read "members"
+      <*> Json.read "sumtype"
 
   static member ToJson (x:SurfaceOfType) =
           Json.write "typ" x.Type
        *> Json.writeWith Json.fromEnum "netType" x.NetType
        *> Json.write "members" x.Members
+       *> Json.write "sumtype" x.SumType
 
 type Namespace=
     {

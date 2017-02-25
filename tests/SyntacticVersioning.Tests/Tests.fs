@@ -7,7 +7,7 @@ open System.Reflection
 open TestHelper
 [<Test>]
 let ``csharp vs csharp2`` () =
-  let diff = Compare.diffAsStrings csharp csharp2
+  let diff = Compare.describe csharp csharp2
             |> nlJoin
             |> wTrim
   Assert.AreEqual ("", diff)
@@ -16,7 +16,7 @@ let ``csharp vs csharp2`` () =
 
 [<Test>]
 let ``enum vs enum2`` () =
-  let diff = Compare.diffAsStrings enum enum2
+  let diff = Compare.describe enum enum2
             |> nlJoin
             |> wTrim
   Assert.AreEqual (enum2txt, diff)
@@ -25,7 +25,7 @@ let ``enum vs enum2`` () =
 
 [<Test>]
 let ``enum vs enum3`` () =
-  let diff = Compare.diffAsStrings enum enum3
+  let diff = Compare.describe enum enum3
             |> nlJoin
             |> wTrim
   Assert.AreEqual (enum3txt, diff)
@@ -34,7 +34,7 @@ let ``enum vs enum3`` () =
 
 [<Test>]
 let ``fsharp vs fsharp2`` () =
-  let diff = Compare.diffAsStrings fsharp fsharp2
+  let diff = Compare.describe fsharp fsharp2
             |> nlJoin
             |> wTrim
   Assert.AreEqual (fsharp2txt, diff)

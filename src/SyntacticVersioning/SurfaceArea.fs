@@ -11,7 +11,7 @@ module SurfaceArea =
     let typ = typeToTyp t
     let netType = tagNetType t
     let members = getTypeMembers t
-    SurfaceOfType.Create typ netType members
+    SurfaceOfType.Create typ netType members (isSumType t)
 
   /// Get the surface of an assembly
   [<CompiledName("ExportedTypes")>]

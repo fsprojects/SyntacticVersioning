@@ -15,17 +15,17 @@ module Compare =
         sprintf "%s (.NET type: %A and base: %s)"
           (typeFullName x) (tagNetType x) (bt x.BaseType)
 
-  let internal raw (asm:Assembly) : (string * string) Set =
-   let ts = Reflect.exportedTypes asm
+  let internal raw (ts:Package) : (string * string) Set =
 
    let namespaces =
-     ts
+     ts.Namespaces
      |> List.map(fun x -> x.Namespace)
      |> List.distinct
      |> List.map (fun x -> x,(sprintf "%s (Namespace)" x))
 
    let types =
-     ts
+     ts.Namespaces
+     |> List.collect (fun x -> x.Types)
      |> List.filter(isSumType >> not)
      |> List.map (fun x -> (typeFullName x,typeInfo x))
 
@@ -127,8 +127,8 @@ module Compare =
       .Replace("{ ", System.String.Empty)
 
   /// Return differences as a string array, use String.Join(Environment.NewLine, diff) to present the information
-  [<CompiledName("DiffAsStrings")>]
-  let diffAsStrings : Assembly -> Assembly -> string array =
+  [<CompiledName("Describe")>]
+  let describe : Assembly -> Assembly -> string array =
    fun source target ->
      let pub = raw source
      let dev = raw target
@@ -212,7 +212,8 @@ module Compare =
         Diff=diffSet sourceSet targetSet
         Changes=changed
     }
-    /// Return differences as Package Canges
+
+  /// Return differences as Package Canges
   [<CompiledName("Assemblies")>]
   let assemblies (source: Assembly) (target:Assembly)=
     let pub = exportedTypes source
