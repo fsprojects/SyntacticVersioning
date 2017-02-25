@@ -5,9 +5,9 @@ open NUnit.Framework
 open TestHelper.Types
 [<Test>]
 let ``Tag net type NetType`` () =
-  let t = typeof<NetType>
+  let t = typeof<Version>
   Assert.AreEqual(NetType.SumType, Reflect.tagNetType t)
-  let n = NetType.UnionTags
+  let n = Version.Major
   let nt = n.GetType()
   Assert.AreEqual(NetType.SumType, Reflect.tagNetType nt)
 

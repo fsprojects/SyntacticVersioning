@@ -1,5 +1,6 @@
 source https://nuget.org/api/v2
 
+nuget Chiron
 nuget FSharp.Core redirects: force
 
 group Build
