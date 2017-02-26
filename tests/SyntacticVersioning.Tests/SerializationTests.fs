@@ -1,12 +1,12 @@
 ﻿module SyntacticVersioning.SerializationTests
-
 open SyntacticVersioning
 open NUnit.Framework
 open TestHelper
 open Chiron
+
 let assertCanSerializeAndDeserialize assembly
   =
-    let surface = SurfaceArea.exportedTypes assembly
+    let surface = SurfaceArea.ofAssembly assembly
     let deserialized 
         = surface
           |> Json.serialize

@@ -1,8 +1,8 @@
 ﻿module SyntacticVersioning.NetTypeTests
-
 open SyntacticVersioning
 open NUnit.Framework
 open TestHelper.Types
+
 [<Test>]
 let ``Tag net type NetType`` () =
   let t = typeof<Version>

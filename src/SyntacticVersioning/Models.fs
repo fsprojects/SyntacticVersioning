@@ -12,7 +12,7 @@ type InstanceOrStatic = | Static=0 | Instance=1
 
 type Name = string
 
-module Json =
+module private Json =
   let fromEnum (e : 'e when 'e :> System.Enum and 'e : (new:unit->'e) and 'e : struct) =
       e.ToString "G"
       |> String
@@ -239,12 +239,14 @@ type SurfaceOfType =
         Type:Typ
         NetType: NetType
         Members: Member list
+        SumType: bool
+        BaseType: Typ option
     }
 with
   /// Create an instance of Surface of type with the required members set
-  static member Create t netType members=
+  static member internal Create t netType members sumType parent=
     {
-      Type=t; NetType=netType;Members=members
+      Type=t; NetType=netType;Members=members; SumType=sumType; BaseType =parent
     }
   member public this.Enum
           = if this.NetType = NetType.Enum then
@@ -267,16 +269,23 @@ with
               None
   override x.ToString()=sprintf "%A" x
 
+  static member IsSumType (x:SurfaceOfType) = x.SumType
+  static member GetNetType (x:SurfaceOfType) = x.NetType
+
   static member FromJson (_:SurfaceOfType) =
-          fun t n m -> { Type = t; NetType=n; Members=m }
+          fun t n m s p-> { Type = t; NetType=n; Members=m; SumType=s; BaseType=p }
       <!> Json.read "typ"
       <*> Json.readWith Json.toEnum<NetType> "netType"
       <*> Json.read "members"
+      <*> Json.read "sumtype"
+      <*> Json.read "baseTyp"
 
   static member ToJson (x:SurfaceOfType) =
           Json.write "typ" x.Type
        *> Json.writeWith Json.fromEnum "netType" x.NetType
        *> Json.write "members" x.Members
+       *> Json.write "sumtype" x.SumType
+       *> Json.write "baseTyp" x.BaseType
 
 type Namespace=
     {
