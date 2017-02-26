@@ -69,7 +69,6 @@
     <None Include="paket.references" />
     <Content Include="App.config" />
     <Compile Include="SerializationTests.fs" />
-    <Compile Include="Assemblies.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

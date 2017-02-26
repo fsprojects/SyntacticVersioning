@@ -1,5 +1,4 @@
 ﻿module SyntacticVersioning.SurfaceAreaTests
-
 open SyntacticVersioning
 open NUnit.Framework
 open TestHelper.Types
@@ -7,7 +6,7 @@ open TestHelper.Types
 [<Test>]
 let ``Union surface area`` () =
   let t = typeof<Union>
-  let area = SurfaceArea.surfaceOfType t
+  let area = SurfaceArea.ofType t
   let typ= area.Type
   let expected =[ UnionCase (typ,"FooBar", [])
                   UnionCase (typ,"Foo",[])
@@ -19,7 +18,7 @@ let ``Union surface area`` () =
 [<Test>]
 let ``Union with params surface area`` () =
   let t = typeof<UnionWithParam>
-  let area = SurfaceArea.surfaceOfType t
+  let area = SurfaceArea.ofType t
   let typ= area.Type
   let expected = [
                   UnionCase (typ, "Foo",
@@ -34,7 +33,7 @@ let ``Union with params surface area`` () =
 [<Test>]
 let ``Union with names surface area`` () =
   let t = typeof<UnionCaseWithName>
-  let area = SurfaceArea.surfaceOfType t
+  let area = SurfaceArea.ofType t
   let typ= area.Type
   let expected = [
                   UnionCase (typ, "Foo",
@@ -51,7 +50,7 @@ let ``Union with names surface area`` () =
 [<Test>]
 let ``Enum surface area`` () =
   let t = typeof<EnumType>
-  let area = SurfaceArea.surfaceOfType t
+  let area = SurfaceArea.ofType t
   let expected = [("FooBar","0"); ("Foo","1"); ("Bar","2")]
 
   Assert.AreEqual(expected, area.Enum.Value)
