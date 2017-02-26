@@ -97,3 +97,27 @@ let get (apiUrl:string option) (packageID:string) (versionNumber:string option) 
       with ex -> failwith ex.Message
       
     | Choice2Of2 ex -> failwith ex.Message
+
+
+let bump (apiUrl:string option) (packageID:string) (dotnet: dotNet) (modified:Assembly) =
+  get apiUrl packageID None dotnet
+  |> function
+    | Choice1Of2 ( verNr, latestStable ) ->
+      fst (Assemblies.bump verNr latestStable modified)
+    | Choice2Of2 ex ->
+      ex.Message
+
+let diff (apiUrl1:string option)
+         (packageID1:string) (dotnet1:dotNet) (verNr1:string option)
+         (apiUrl2:string option)
+         (packageID2:string) dotnet2 verNr2 =
+    let v1 = get apiUrl1 packageID1 verNr1 dotnet1
+    let v2 = get apiUrl2 packageID2 verNr2 dotnet2
+
+    match v1,v2 with
+      | (Choice1Of2 (_,asm1)), (Choice1Of2 (_,asm2)) ->
+        Assemblies.diff asm1 asm2
+      | Choice2Of2 ex1, Choice2Of2 ex2 ->
+        [| ex1.Message; ex2.Message |]
+      | Choice2Of2 ex, _ | _, Choice2Of2 ex ->
+        [| ex.Message |]
