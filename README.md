@@ -3,6 +3,14 @@
 
 # SyntacticVersioning
 
+## Goal
+
+Be able to get an idea about the semantic version changes based on the surface area changes of a .net assembly.
+
+Developers should be able to use the tool to give a magnitude of any API changes. This is helpful when pushing NuGet-packages from a continuous integration server. Internally used NuGet packages of a .net developer organisation often focus on delivering on business goals; the versioning is easily forgotten. I.e. we want to be able to use this from [TeamCity](https://www.jetbrains.com/teamcity/) and others.
+
+When upgrading a package you want to know the magnitude of the changes. In many cases the easiest way right now is to upgrade and look at the compilation errors. Having more information directly in NuGet helps.
+
 ## Requirements
 
 SyntacticVersioning requires a local git installation. You can download git from [Git Downloads](https://git-scm.com/downloads).
