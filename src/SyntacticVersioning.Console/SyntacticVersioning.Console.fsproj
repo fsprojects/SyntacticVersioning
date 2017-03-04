@@ -1,86 +1,60 @@
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>26d49ae5-f879-4321-a1aa-e7c35b60c874</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>SyntacticVersioning.Tests</RootNamespace>
-    <AssemblyName>SyntacticVersioning.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
-    <Name>SyntacticVersioning.Tests</Name>
-    <TargetFrameworkProfile />
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\..\</SolutionDir>
+    <ProjectGuid>{1B3E522B-739C-48FA-B2A7-9599CDFC5748}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SyntacticVersioning.Console</RootNamespace>
+    <AssemblyName>SyntacticVersioning.Console</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <Tailcalls>false</Tailcalls>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <WarningLevel>3</WarningLevel>
-    <StartAction>Project</StartAction>
-    <StartProgram>
-    </StartProgram>
-    <StartArguments>
-    </StartArguments>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <ExternalConsole>true</ExternalConsole>
+    <PlatformTarget></PlatformTarget>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
     <Optimize>true</Optimize>
-    <Tailcalls>true</Tailcalls>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <WarningLevel>3</WarningLevel>
+    <OutputPath>bin\Release</OutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <ExternalConsole>true</ExternalConsole>
+    <GenerateTailCalls>true</GenerateTailCalls>
+    <PlatformTarget></PlatformTarget>
+    <DocumentationFile></DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
   </PropertyGroup>
-  <Choose>
-    <When Condition="'$(VisualStudioVersion)' == '11.0'">
-      <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')">
-        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
-      </PropertyGroup>
-    </When>
-    <Otherwise>
-      <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets')">
-        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
-      </PropertyGroup>
-    </Otherwise>
-  </Choose>
-  <Import Project="$(FSharpTargetsPath)" />
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
-  <Import Project="..\..\.paket\paket.targets" />
-  <ItemGroup>
-    <Compile Include="TestHelper.fs" />
-    <Compile Include="Tests.fs" />
-    <Compile Include="SurfaceAreaTests.fs" />
-    <Compile Include="NetTypeTests.fs" />
-    <None Include="paket.references" />
-    <Content Include="App.config" />
-    <Compile Include="SerializationTests.fs" />
-  </ItemGroup>
+  <PropertyGroup Condition="'$(VisualStudioVersion)' == '10.0' OR '$(VisualStudioVersion)' == '11.0'">
+    <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\..\src\SyntacticVersioning\SyntacticVersioning.fsproj">
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="Program.fs" />
+    <None Include="paket.references" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SyntacticVersioning\SyntacticVersioning.fsproj">
+      <Project>{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}</Project>
       <Name>SyntacticVersioning</Name>
-      <Project>{ee8b6b01-f243-4dbf-a3b6-9feb7e151f70}</Project>
-      <Private>True</Private>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="$(FSharpTargetsPath)" />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v3.5' Or $(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
       <ItemGroup>
@@ -95,6 +69,35 @@
       <ItemGroup>
         <Reference Include="Aether">
           <HintPath>..\..\packages\Aether\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Aether.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v3.5'">
+      <ItemGroup>
+        <Reference Include="Argu">
+          <HintPath>..\..\packages\Argu\lib\net35\Argu.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And ($(TargetFrameworkVersion) == 'v4.0' Or $(TargetFrameworkVersion) == 'v4.5' Or $(TargetFrameworkVersion) == 'v4.5.1' Or $(TargetFrameworkVersion) == 'v4.5.2' Or $(TargetFrameworkVersion) == 'v4.5.3' Or $(TargetFrameworkVersion) == 'v4.6' Or $(TargetFrameworkVersion) == 'v4.6.1' Or $(TargetFrameworkVersion) == 'v4.6.2' Or $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="Argu">
+          <HintPath>..\..\packages\Argu\lib\net40\Argu.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="($(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6') Or ($(TargetFrameworkIdentifier) == '.NETCoreApp' And $(TargetFrameworkVersion) == 'v1.0')">
+      <ItemGroup>
+        <Reference Include="Argu">
+          <HintPath>..\..\packages\Argu\lib\netstandard1.6\Argu.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -219,6 +222,48 @@
       <ItemGroup>
         <Reference Include="FSharp.Core">
           <HintPath>..\..\packages\FSharp.Core\lib\portable-net45+sl5+netcore45\FSharp.Core.dll</HintPath>
+          <Private>True</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Win32.Primitives">
+          <HintPath>..\..\packages\Microsoft.Win32.Primitives\ref\net46\Microsoft.Win32.Primitives.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="Microsoft.Win32.Primitives">
+          <HintPath>..\..\packages\Microsoft.Win32.Primitives\ref\netstandard1.3\Microsoft.Win32.Primitives.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
+      <ItemGroup>
+        <Reference Include="System.AppContext">
+          <HintPath>..\..\packages\System.AppContext\ref\net463\System.AppContext.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.Buffers">
+          <HintPath>..\..\packages\System.Buffers\lib\netstandard1.1\System.Buffers.dll</HintPath>
           <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
@@ -421,6 +466,49 @@
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
       <ItemGroup>
+        <Reference Include="System.IO.Compression">
+          <HintPath>..\..\packages\System.IO.Compression\ref\net46\System.IO.Compression.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.IO.Compression">
+          <HintPath>..\..\packages\System.IO.Compression\ref\netstandard1.3\System.IO.Compression.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
+      <ItemGroup>
+        <Reference Include="System.IO.Compression.ZipFile">
+          <HintPath>..\..\packages\System.IO.Compression.ZipFile\ref\net46\System.IO.Compression.ZipFile.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+        <Reference Include="System.IO.Compression.FileSystem">
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.IO.Compression.ZipFile">
+          <HintPath>..\..\packages\System.IO.Compression.ZipFile\ref\netstandard1.3\System.IO.Compression.ZipFile.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
+      <ItemGroup>
         <Reference Include="System.IO.FileSystem">
           <HintPath>..\..\packages\System.IO.FileSystem\ref\net46\System.IO.FileSystem.dll</HintPath>
           <Private>False</Private>
@@ -527,6 +615,26 @@
       <ItemGroup>
         <Reference Include="System.Net.Requests">
           <HintPath>..\..\packages\System.Net.Requests\ref\netstandard1.3\System.Net.Requests.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
+      <ItemGroup>
+        <Reference Include="System.Net.Sockets">
+          <HintPath>..\..\packages\System.Net.Sockets\ref\net46\System.Net.Sockets.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.Net.Sockets">
+          <HintPath>..\..\packages\System.Net.Sockets\ref\netstandard1.3\System.Net.Sockets.dll</HintPath>
           <Private>False</Private>
           <Paket>True</Paket>
         </Reference>
@@ -754,6 +862,17 @@
     </When>
   </Choose>
   <Choose>
+    <When Condition="($(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6') Or ($(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3')">
+      <ItemGroup>
+        <Reference Include="System.Runtime.InteropServices.RuntimeInformation">
+          <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation\ref\netstandard1.1\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
       <ItemGroup>
         <Reference Include="System.Runtime.Numerics">
@@ -900,6 +1019,17 @@
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
       <ItemGroup>
+        <Reference Include="System.Text.Encoding.Extensions">
+          <HintPath>..\..\packages\System.Text.Encoding.Extensions\ref\netstandard1.3\System.Text.Encoding.Extensions.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
         <Reference Include="System.Text.RegularExpressions">
           <HintPath>..\..\packages\System.Text.RegularExpressions\ref\netstandard1.6\System.Text.RegularExpressions.dll</HintPath>
           <Private>False</Private>
@@ -934,6 +1064,17 @@
         <Reference Include="System.Threading.Tasks">
           <HintPath>..\..\packages\System.Threading.Tasks\ref\netstandard1.3\System.Threading.Tasks.dll</HintPath>
           <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.Threading.Tasks.Extensions">
+          <HintPath>..\..\packages\System.Threading.Tasks.Extensions\lib\netstandard1.0\System.Threading.Tasks.Extensions.dll</HintPath>
+          <Private>True</Private>
           <Paket>True</Paket>
         </Reference>
       </ItemGroup>
@@ -1003,11 +1144,33 @@
       </ItemGroup>
     </When>
   </Choose>
-  <ItemGroup>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\packages\test\NUnit\lib\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-      <Paket>True</Paket>
-    </Reference>
-  </ItemGroup>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.Xml.ReaderWriter">
+          <HintPath>..\..\packages\System.Xml.ReaderWriter\ref\netstandard1.3\System.Xml.ReaderWriter.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
+  <Choose>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.3'">
+      <ItemGroup>
+        <Reference Include="System.Xml.Linq">
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+    <When Condition="$(TargetFrameworkIdentifier) == '.NETStandard' And $(TargetFrameworkVersion) == 'v1.6'">
+      <ItemGroup>
+        <Reference Include="System.Xml.XDocument">
+          <HintPath>..\..\packages\System.Xml.XDocument\ref\netstandard1.3\System.Xml.XDocument.dll</HintPath>
+          <Private>False</Private>
+          <Paket>True</Paket>
+        </Reference>
+      </ItemGroup>
+    </When>
+  </Choose>
 </Project>

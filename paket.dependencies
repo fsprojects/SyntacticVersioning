@@ -2,6 +2,7 @@ source https://nuget.org/api/v2
 
 nuget Chiron
 nuget FSharp.Core redirects: force
+nuget Argu
 
 group Build
   source https://nuget.org/api/v2

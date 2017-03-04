@@ -19,7 +19,7 @@ type dotNet =
 | Netcore451
 | NetStandard1Dot0
 | PortableDashNet40 | PortableDashNet45
-
+// TODO: Look into using paket to download NuGet
 let [<Literal>] private nuget = @"https://www.nuget.org"
 let [<Literal>] private api = nuget + @"/api/v2/package"
 
@@ -36,10 +36,12 @@ let package (url: string) : Async<Choice<ZipArchive,exn>> =
     use! rsp = req.AsyncGetResponse()
     use stream = rsp.GetResponseStream()
     
-    return new ZipArchive(stream) } |> Async.Catch
+    return new ZipArchive(stream) 
+  } 
+  |> Async.Catch
 
 let get (apiUrl:string option) (packageID:string) (versionNumber:string option) (dotnet:dotNet)
-  :Choice<string * Assembly,exn>
+  :Result<string * Assembly,string>
   =
   let versionNumber' = defaultArg versionNumber (String.Empty)
   
@@ -48,8 +50,9 @@ let get (apiUrl:string option) (packageID:string) (versionNumber:string option) 
   let url = sprintf ("%s/%s/%s") apiUrl' packageID versionNumber'
   let dotnet' =
     (sprintf "lib/%A" dotnet).Replace("Dot",".").Replace("Dash","-")
-  let maybeZip = package url |> Async.RunSynchronously
-  
+  let maybeZip = package url
+                  |> Async.RunSynchronously
+
   maybeZip
   |> function
     | Choice1Of2 zip ->
@@ -81,7 +84,7 @@ let get (apiUrl:string option) (packageID:string) (versionNumber:string option) 
             
           match Seq.isEmpty dll with
             | true ->
-              failwith
+               Error
                 (sprintf "No (%s) file present in NuGet package." dotnet')
             | false ->
               dll
@@ -90,22 +93,21 @@ let get (apiUrl:string option) (packageID:string) (versionNumber:string option) 
                 use stream = x.Open()
                 use memstream = new MemoryStream()
                 stream.CopyTo(memstream)
-                Assembly.Load(rawAssembly = memstream.ToArray())
+                Ok (version, Assembly.Load(rawAssembly = memstream.ToArray()) )
+        assembly
         
-        (version, assembly) |> Choice1Of2
-        
-      with ex -> failwith ex.Message
+      with ex -> Result.Error ex.Message
       
-    | Choice2Of2 ex -> failwith ex.Message
+    | Choice2Of2 ex -> Result.Error ex.Message
 
 
 let bump (apiUrl:string option) (packageID:string) (dotnet: dotNet) (modified:Assembly) =
   get apiUrl packageID None dotnet
   |> function
-    | Choice1Of2 ( verNr, latestStable ) ->
+    | Ok ( verNr, latestStable ) ->
       fst (Assemblies.bump verNr latestStable modified)
-    | Choice2Of2 ex ->
-      ex.Message
+    | Error msg ->
+      msg
 
 let diff (apiUrl1:string option)
          (packageID1:string) (dotnet1:dotNet) (verNr1:string option)
@@ -115,9 +117,9 @@ let diff (apiUrl1:string option)
     let v2 = get apiUrl2 packageID2 verNr2 dotnet2
 
     match v1,v2 with
-      | (Choice1Of2 (_,asm1)), (Choice1Of2 (_,asm2)) ->
+      | (Ok (_,asm1)), (Ok (_,asm2)) ->
         Assemblies.diff asm1 asm2
-      | Choice2Of2 ex1, Choice2Of2 ex2 ->
-        [| ex1.Message; ex2.Message |]
-      | Choice2Of2 ex, _ | _, Choice2Of2 ex ->
-        [| ex.Message |]
+      | Error ex1, Error ex2 ->
+        [| ex1; ex2 |]
+      | Error ex, _ | _, Error ex ->
+        [| ex |]
