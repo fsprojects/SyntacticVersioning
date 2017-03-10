@@ -63,7 +63,6 @@
     <Compile Include="Reflect.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
-    <Compile Include="Assemblies.fs" />
     <Compile Include="NuGet.fs" />
     <None Include="paket.template" />
     <None Include="paket.references" />
