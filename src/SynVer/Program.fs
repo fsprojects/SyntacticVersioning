@@ -1,7 +1,7 @@
-﻿module SyntacticVersioning.Tool
+module SynVer.Tool
 open System
 open Argu
-open SyntacticVersioning
+open SynVer
 open System.Reflection
 open System.IO
 open Chiron
@@ -20,11 +20,11 @@ with
             | Output _-> "Send output to file"
             | Diff _ -> "Get the difference between two .net binaries"
 
-let (|AssemblyFile|JsonFile|Empty|) (maybeFile:string) =
+let (|AssemblyFile|JsonFile|Other|) (maybeFile:string) =
   match maybeFile, File.Exists(maybeFile) with
   | f, true when f.EndsWith(".json") -> JsonFile
   | f, true when f.EndsWith(".dll") -> AssemblyFile
-  | f, _    when String.IsNullOrEmpty f -> Empty
+  | f, _  -> Other
 
 let getSurfaceAreaOf (f:string): Choice<Package,string>=
   match f with
@@ -37,7 +37,7 @@ let getSurfaceAreaOf (f:string): Choice<Package,string>=
               Assembly.LoadFile f
               |> SurfaceArea.ofAssembly 
               |> Choice1Of2
-  | Empty -> Choice2Of2 "No package id, dll or json specified"
+  | Other -> Choice2Of2 "No dll or json specified"
 
 
 let getDiff released modified : Choice<string,string>=
@@ -71,7 +71,7 @@ let getMagnitude released modified : Choice<string,string>=
 
 [<EntryPoint>]
 let main argv = 
-    let parser = ArgumentParser.Create<CLIArguments>(programName = "SyntacticVersioning.Tool.exe")
+    let parser = ArgumentParser.Create<CLIArguments>(programName = "SynVer.Tool.exe")
 
     let results = parser.Parse argv
     let writeResult (res:Choice<string,string>)=

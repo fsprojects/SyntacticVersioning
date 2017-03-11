@@ -1,5 +1,5 @@
-module SyntacticVersioning.Tests
-open SyntacticVersioning
+module SynVer.Tests
+open SynVer
 open NUnit.Framework
 
 open TestHelper

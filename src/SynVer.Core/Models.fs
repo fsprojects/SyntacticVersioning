@@ -1,4 +1,4 @@
-namespace SyntacticVersioning
+namespace SynVer
 open Chiron
 open Operators
 open Patterns

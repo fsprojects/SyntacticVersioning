@@ -1,5 +1,5 @@
-﻿module SyntacticVersioning.TestHelper
-open SyntacticVersioning
+module SynVer.TestHelper
+open SynVer
 open System.Reflection
 
 open System.IO

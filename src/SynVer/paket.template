@@ -1,16 +1,16 @@
 type project
 title
-    SyntacticVersioning
+    SynVer
 owners
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 authors 
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 projectUrl
-    https://github.com/fsprojects/SyntacticVersioning
+    https://github.com/fsprojects/SynVer
 iconUrl
-    https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png
+    https://raw.githubusercontent.com/fsprojects/SynVer/master/docs/files/img/logo.png
 licenseUrl
-    https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt
+    https://github.com/fsprojects/SynVer/blob/master/LICENSE.txt
 requireLicenseAcceptance
     false
 copyright

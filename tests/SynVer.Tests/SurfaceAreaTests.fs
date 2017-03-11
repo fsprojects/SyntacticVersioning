@@ -1,5 +1,5 @@
-﻿module SyntacticVersioning.SurfaceAreaTests
-open SyntacticVersioning
+module SynVer.SurfaceAreaTests
+open SynVer
 open NUnit.Framework
 open TestHelper.Types
 
