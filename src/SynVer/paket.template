@@ -1,16 +1,18 @@
 type project
+id
+    SynVer
 title
-    SyntacticVersioning
+    Syntactic Versioning Tool
 owners
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 authors 
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 projectUrl
-    https://github.com/fsprojects/SyntacticVersioning
+    https://github.com/fsprojects/SynVer
 iconUrl
-    https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png
+    https://raw.githubusercontent.com/fsprojects/SynVer/master/docs/files/img/logo.png
 licenseUrl
-    https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt
+    https://github.com/fsprojects/SynVer/blob/master/LICENSE.txt
 requireLicenseAcceptance
     false
 copyright
@@ -21,5 +23,4 @@ summary
     Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)
 description
     Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)
-
 

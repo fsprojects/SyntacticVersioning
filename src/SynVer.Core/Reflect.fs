@@ -1,4 +1,4 @@
-namespace SyntacticVersioning
+namespace SynVer.Core
 
 open Microsoft.FSharp.Reflection
 open System

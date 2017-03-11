@@ -1,5 +1,5 @@
-﻿module SyntacticVersioning.TestHelper
-open SyntacticVersioning
+module SynVer.TestHelper
+open SynVer.Core
 open System.Reflection
 
 open System.IO
@@ -40,3 +40,16 @@ module Types=
    end
   
   let ModuleT= fsharp.ExportedTypes |> Seq.find (fun t-> t.Name="Module")
+
+module Assemblies=
+  [<CompiledName("Bump")>]
+  let bump verNr released modified =
+    SurfaceArea.bump verNr 
+      (SurfaceArea.ofAssembly released) 
+      (SurfaceArea.ofAssembly modified)   
+
+  [<CompiledName("Diff")>]
+  let diff released modified =
+    SurfaceArea.diff  
+      (SurfaceArea.ofAssembly released) 
+      (SurfaceArea.ofAssembly modified)

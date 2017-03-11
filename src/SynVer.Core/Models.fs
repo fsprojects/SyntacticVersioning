@@ -1,4 +1,4 @@
-namespace SyntacticVersioning
+namespace SynVer.Core
 open Chiron
 open Operators
 open Patterns
@@ -305,19 +305,16 @@ with
 
 type Package=
     {
-      Sha256:string      
       Namespaces: Namespace list
     }
 with
   override x.ToString()=sprintf "%A" x
   static member FromJson (_:Package) =
-          fun n sh -> { Namespaces = n; Sha256=sh }
+          fun n -> { Namespaces = n }
       <!> Json.read "namespaces"
-      <*> Json.read "sha256"
 
   static member ToJson (x:Package) =
           Json.write "namespaces" x.Namespaces
-       *> Json.write "sha256" x.Sha256
 
 type 'a AddedAndRemoved when 'a:comparison=
     {

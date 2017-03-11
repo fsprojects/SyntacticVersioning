@@ -1,5 +1,5 @@
-﻿module SyntacticVersioning.SerializationTests
-open SyntacticVersioning
+module SynVer.SerializationTests
+open SynVer.Core
 open NUnit.Framework
 open TestHelper
 open Chiron

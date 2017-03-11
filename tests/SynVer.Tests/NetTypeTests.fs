@@ -1,5 +1,5 @@
-﻿module SyntacticVersioning.NetTypeTests
-open SyntacticVersioning
+module SynVer.NetTypeTests
+open SynVer.Core
 open NUnit.Framework
 open TestHelper.Types
 

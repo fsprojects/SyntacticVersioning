@@ -1,4 +1,4 @@
-module SyntacticVersioning.SurfaceArea
+module SynVer.Core.SurfaceArea
 open System
 open Reflect
 open System.IO
@@ -25,12 +25,7 @@ let ofAssembly assembly : Package=
       List.map ((fun (ns,ns_ts)-> (ns,ns_ts |> List.map snd)) >> toNs) (types 
         |> List.map (fun t-> (t.Namespace, ofType t ))
         |> List.groupBy (fun (ns,_)->ns))
-  use sha256 = SHA256Managed.Create()
-  use f = new FileStream(assembly.Location, FileMode.Open, FileAccess.Read, FileShare.ReadWrite)
-  use ms =  new MemoryStream(sha256.ComputeHash f)
-  use r = new StreamReader(ms)
-  let hash = r.ReadToEnd()
-  { Namespaces = actual; Sha256 = hash }
+  { Namespaces = actual }
 [<AutoOpen>]
 module private Print=
   let typeInfo : SurfaceOfType -> string =
@@ -80,7 +75,7 @@ let internal raw (p:Package) : (string * string) Set =
   |> List.fold(fun a xy -> a |> Set.add xy) Set.empty
 
 [<CompiledName("Bump")>]
-let bump (verNr:string) (released: Package) (modified: Package) : (string* SyntacticVersioning.Version) =
+let bump (verNr:string) (released: Package) (modified: Package) : (string* SynVer.Core.Version) =
   let pub = raw released
   let dev = raw modified
  

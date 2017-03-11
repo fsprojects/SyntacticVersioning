@@ -75,10 +75,11 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\..\src\SyntacticVersioning\SyntacticVersioning.fsproj">
-      <Name>SyntacticVersioning</Name>
-      <Project>{ee8b6b01-f243-4dbf-a3b6-9feb7e151f70}</Project>
-      <Private>True</Private>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\SynVer.Core\SynVer.Core.fsproj">
+      <Project>{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}</Project>
+      <Name>SynVer.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>
