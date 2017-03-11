@@ -71,7 +71,7 @@ let getMagnitude released modified : Choice<string,string>=
 
 [<EntryPoint>]
 let main argv = 
-    let parser = ArgumentParser.Create<CLIArguments>(programName = "SynVer.Tool.exe")
+    let parser = ArgumentParser.Create<CLIArguments>(programName = "synver.exe")
 
     let results = parser.Parse argv
     let writeResult (res:Choice<string,string>)=
