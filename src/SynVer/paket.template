@@ -1,6 +1,8 @@
 type project
-title
+id
     SynVer
+title
+    Syntactic Versioning Tool
 owners
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 authors 

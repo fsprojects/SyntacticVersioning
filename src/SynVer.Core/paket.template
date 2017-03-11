@@ -1,6 +1,8 @@
 type project
+id
+    SynVer.Core
 title
-    SynVer
+    Syntactic Versioning Core
 owners
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 authors 
