@@ -9,7 +9,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{63297B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}"
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SyntacticVersioning", "src\SyntacticVersioning\SyntacticVersioning.fsproj", "{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer.Core", "src\SynVer.Core\SynVer.Core.fsproj", "{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60BC93-E09B-4E5F-9D85-95A519479D54}"
 	ProjectSection(SolutionItems) = preProject
@@ -53,7 +53,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B448E2FC-484
 		tests\ExampleProjects\src\CsharpWithAttribute.cs = tests\ExampleProjects\src\CsharpWithAttribute.cs
 	EndProjectSection
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SyntacticVersioning.Console", "src\SyntacticVersioning.Console\SyntacticVersioning.Console.fsproj", "{1B3E522B-739C-48FA-B2A7-9599CDFC5748}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer", "src\SynVer\SynVer.fsproj", "{1B3E522B-739C-48FA-B2A7-9599CDFC5748}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

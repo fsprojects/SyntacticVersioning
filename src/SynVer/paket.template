@@ -1,6 +1,6 @@
 type project
 title
-    SyntacticVersioning Console
+    SyntacticVersioning
 owners
     Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)
 authors 
