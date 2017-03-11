@@ -27,7 +27,7 @@ open SourceLink
 
 // The name of the project
 // (used by attributes in AssemblyInfo, name of a NuGet package and directory in 'src')
-let project = "SyntacticVersioning"
+let project = "SynVer"
 
 // Short summary of the project
 // (used as description in AssemblyInfo and as a short summary for NuGet package)
@@ -44,7 +44,7 @@ let authors = [ "Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)" ]
 let tags = "syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff"
 
 // File system information
-let solutionFile  = "SyntacticVersioning.sln"
+let solutionFile  = "SynVer.sln"
 
 // Default target configuration
 let configuration = "Release"
