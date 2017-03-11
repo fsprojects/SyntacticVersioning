@@ -6,8 +6,8 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>ee8b6b01-f243-4dbf-a3b6-9feb7e151f70</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>SyntacticVersioning</RootNamespace>
-    <AssemblyName>SyntacticVersioning</AssemblyName>
+    <RootNamespace>SynVer.Core</RootNamespace>
+    <AssemblyName>SynVer.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.3.0.0</TargetFSharpCoreVersion>
     <Name>SyntacticVersioning</Name>
@@ -21,7 +21,7 @@
     <OutputPath>.\bin\Debug</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\SyntacticVersioning.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\SynVer.Core.XML</DocumentationFile>
     <OtherFlags>--warnon:1182</OtherFlags>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

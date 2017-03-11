@@ -4,8 +4,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{1B3E522B-739C-48FA-B2A7-9599CDFC5748}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SyntacticVersioning.Console</RootNamespace>
-    <AssemblyName>SyntacticVersioning.Console</AssemblyName>
+    <RootNamespace>SynVer</RootNamespace>
+    <AssemblyName>synver</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -57,7 +57,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SyntacticVersioning\SyntacticVersioning.fsproj">
       <Project>{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}</Project>
-      <Name>SyntacticVersioning</Name>
+      <Name>SynVer.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
