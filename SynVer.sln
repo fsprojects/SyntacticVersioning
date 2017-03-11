@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8E6D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED8079DD-2B06-4030-9F0F-DC548F98E1C4}"
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SyntacticVersioning.Tests", "tests\SyntacticVersioning.Tests\SyntacticVersioning.Tests.fsproj", "{26D49AE5-F879-4321-A1AA-E7C35B60C874}"
+Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer.Tests", "tests\SynVer.Tests\SynVer.Tests.fsproj", "{26D49AE5-F879-4321-A1AA-E7C35B60C874}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleProjects", "ExampleProjects", "{346C49A0-8F00-4D70-8FE0-28EDFEAB06A4}"
 EndProject

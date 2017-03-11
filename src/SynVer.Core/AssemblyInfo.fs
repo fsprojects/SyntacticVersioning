@@ -2,7 +2,7 @@
 namespace System
 open System.Reflection
 
-[<assembly: AssemblyTitleAttribute("SyntacticVersioning")>]
+[<assembly: AssemblyTitleAttribute("SynVer.Core")>]
 [<assembly: AssemblyProductAttribute("SyntacticVersioning")>]
 [<assembly: AssemblyDescriptionAttribute("Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)")>]
 [<assembly: AssemblyVersionAttribute("0.0.1")>]
@@ -11,7 +11,7 @@ open System.Reflection
 do ()
 
 module internal AssemblyVersionInformation =
-    let [<Literal>] AssemblyTitle = "SyntacticVersioning"
+    let [<Literal>] AssemblyTitle = "SynVer.Core"
     let [<Literal>] AssemblyProduct = "SyntacticVersioning"
     let [<Literal>] AssemblyDescription = "Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)"
     let [<Literal>] AssemblyVersion = "0.0.1"
