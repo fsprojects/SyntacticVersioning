@@ -55,7 +55,9 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\SyntacticVersioning\SyntacticVersioning.fsproj">
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SynVer.Core\SynVer.Core.fsproj">
       <Project>{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}</Project>
       <Name>SynVer.Core</Name>
     </ProjectReference>
