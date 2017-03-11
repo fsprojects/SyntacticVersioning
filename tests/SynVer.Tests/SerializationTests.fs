@@ -1,5 +1,5 @@
 module SynVer.SerializationTests
-open SynVer
+open SynVer.Core
 open NUnit.Framework
 open TestHelper
 open Chiron

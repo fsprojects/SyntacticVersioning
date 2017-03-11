@@ -1,15 +1,17 @@
-module SynVer.Tool
+module SynVer
 open System
 open Argu
 open SynVer
 open System.Reflection
 open System.IO
 open Chiron
+open SynVer.Core
 
 type CLIArguments =
     | Surface_of of path:string
     | Output of path:string
     | Diff of source:string * target:string
+    | Bump of version:string * source:string * target:string
     | Magnitude of source:string * target:string
 with
     interface IArgParserTemplate with
@@ -19,6 +21,7 @@ with
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
             | Output _-> "Send output to file"
             | Diff _ -> "Get the difference between two .net binaries"
+            | Bump _ -> "Get the next version based on the difference between two .net binaries"
 
 let (|AssemblyFile|JsonFile|Other|) (maybeFile:string) =
   match maybeFile, File.Exists(maybeFile) with
@@ -54,12 +57,13 @@ let getDiff released modified : Choice<string,string>=
             |> List.toArray
         
         Choice2Of2 (String.Join(Environment.NewLine, errors) )
-let getMagnitude released modified : Choice<string,string>=
+
+let getBump version released modified : Choice<string*Version,string>=
     let maybeReleased,maybeModified= getSurfaceAreaOf released, getSurfaceAreaOf modified
     match maybeReleased,maybeModified with
     | Choice1Of2 released, Choice1Of2 modified ->
-        let (_,magnitude) =  SurfaceArea.bump "0.0.0" released modified
-        magnitude.ToString() |> Choice1Of2
+        SurfaceArea.bump version released modified
+        |> Choice1Of2
     | _, _ ->
         let errors = 
             [maybeReleased;maybeModified] 
@@ -67,7 +71,6 @@ let getMagnitude released modified : Choice<string,string>=
             |> List.toArray
         
         Choice2Of2 (String.Join(Environment.NewLine, errors) )
-
 
 [<EntryPoint>]
 let main argv = 
@@ -87,21 +90,30 @@ let main argv =
     else
         let maybeFile = results.TryGetResult(<@ Surface_of @>)
         let maybeDiff = results.TryGetResult(<@ Diff @>)
+        let maybeBump = results.TryGetResult(<@ Bump @>)
         let maybeMagnitude = results.TryGetResult(<@ Magnitude @>)
         let maybeOutput = results.TryGetResult(<@ Output @>)
 
-        match maybeFile, maybeDiff, maybeMagnitude with
-        | Some file, None, None ->
+        match maybeFile, maybeDiff, maybeMagnitude, maybeBump with
+        | Some file, None, None, None ->
             let assembly = Assembly.LoadFrom(file)
             (SurfaceArea.ofAssembly assembly)
             |> Json.serialize
             |> Json.formatWith JsonFormattingOptions.Pretty
             |> Choice1Of2
-        | None, Some (released, modified), None ->
+        | None, Some (released, modified), None, None ->
             getDiff released modified
-        | None, None, Some (released,modified) ->
-            getMagnitude released modified
-        | _,_,_ ->
+        | None, None, Some (released,modified), None ->
+            getBump "0.0.0" released modified
+            |> function 
+                | Choice1Of2 (_,version)->version.ToString() |>Choice1Of2
+                | Choice2Of2 a->Choice2Of2 a
+        | None, None, None, Some (version,released,modified) ->
+            getBump version released modified
+            |> function 
+                | Choice1Of2 (version,_)->version |>Choice1Of2
+                | Choice2Of2 a->Choice2Of2 a
+        | _,_,_,_ ->
             Choice2Of2(parser.PrintUsage())
         |> (fun res-> 
             match res, maybeOutput with

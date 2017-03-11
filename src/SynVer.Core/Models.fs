@@ -1,4 +1,4 @@
-namespace SynVer
+namespace SynVer.Core
 open Chiron
 open Operators
 open Patterns

@@ -1,5 +1,5 @@
 module SynVer.Tests
-open SynVer
+open SynVer.Core
 open NUnit.Framework
 
 open TestHelper

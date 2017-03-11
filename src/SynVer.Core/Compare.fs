@@ -1,4 +1,4 @@
-module SynVer.Compare
+module SynVer.Core.Compare
 open System.Reflection
 open System
 type private Ns = Namespace
