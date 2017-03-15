@@ -6,7 +6,7 @@ NUGET
       Aether (>= 6.0)
       FParsec (>= 1.0.1)
       FSharp.Core (>= 3.1.2.1)
-    FAKE.Lib (3.37.1)
+    FAKE.Lib (4.55)
     FParsec (1.0.1)
     FSharp.Core (4.0.0.1)
     SynVer.Core (0.0.2)

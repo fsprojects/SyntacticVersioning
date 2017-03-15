@@ -1,6 +1,6 @@
 source https://api.nuget.org/v3/index.json
 framework >= net451
 
-nuget FAKE.Lib ~> 3
+nuget FAKE.Lib ~> 4
 nuget FSharp.Core ~> 4
 nuget SynVer.Core 0.0.2
