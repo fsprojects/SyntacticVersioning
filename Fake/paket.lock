@@ -1,0 +1,14 @@
+FRAMEWORK: >= NET451
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    Aether (6.0)
+    Chiron (1.0)
+      Aether (>= 6.0)
+      FParsec (>= 1.0.1)
+      FSharp.Core (>= 3.1.2.1)
+    FAKE.Lib (3.37.1)
+    FParsec (1.0.1)
+    FSharp.Core (4.0.0.1)
+    SynVer.Core (0.0.2)
+      Chiron
+      FSharp.Core (>= 4.0 < 4.1)
