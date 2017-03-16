@@ -1,9 +1,10 @@
-source https://nuget.org/api/v2
+source https://api.nuget.org/v3/index.json
 redirects on
 
 nuget Chiron
 nuget Argu
 nuget FSharp.Core ~> 4.0.0 redirects: force
+nuget FAKE.Lib ~> 4
 
 group Build
   source https://nuget.org/api/v2
