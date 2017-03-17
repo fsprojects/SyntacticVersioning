@@ -1,5 +1,5 @@
 module SynVer.TestHelper
-open SynVer.Core
+open SynVer
 open System.Reflection
 
 open System.IO

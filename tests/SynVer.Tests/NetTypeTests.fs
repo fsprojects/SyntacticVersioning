@@ -1,5 +1,5 @@
 module SynVer.NetTypeTests
-open SynVer.Core
+open SynVer
 open NUnit.Framework
 open TestHelper.Types
 

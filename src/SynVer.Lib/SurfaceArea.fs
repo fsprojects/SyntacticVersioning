@@ -1,4 +1,4 @@
-module SynVer.Core.SurfaceArea
+module SynVer.SurfaceArea
 open System
 open Reflect
 open System.IO
@@ -75,7 +75,7 @@ let internal raw (p:Package) : (string * string) Set =
   |> List.fold(fun a xy -> a |> Set.add xy) Set.empty
 
 [<CompiledName("Bump")>]
-let bump (verNr:string) (released: Package) (modified: Package) : (string* SynVer.Core.Version) =
+let bump (verNr:string) (released: Package) (modified: Package) : (string* SynVer.Version) =
   let pub = raw released
   let dev = raw modified
  

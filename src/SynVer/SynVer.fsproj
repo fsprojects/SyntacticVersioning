@@ -57,9 +57,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SynVer.Core\SynVer.Core.fsproj">
+    <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj">
       <Project>{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}</Project>
-      <Name>SynVer.Core</Name>
+      <Name>SynVer.Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <Choose>

@@ -1,5 +1,5 @@
 module SynVer.SurfaceAreaTests
-open SynVer.Core
+open SynVer
 open NUnit.Framework
 open TestHelper.Types
 

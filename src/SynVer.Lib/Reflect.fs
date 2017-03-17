@@ -1,4 +1,4 @@
-namespace SynVer.Core
+namespace SynVer
 
 open Microsoft.FSharp.Reflection
 open System
