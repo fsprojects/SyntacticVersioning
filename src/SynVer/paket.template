@@ -1,4 +1,4 @@
-type project
+type file
 id
     SynVer
 title
@@ -23,4 +23,7 @@ summary
     Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)
 description
     Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)
-
+files
+    bin/Release/*.dll ==> tools
+    bin/Release/*.exe ==> tools
+    bin/Release/*.exe.config ==> tools
