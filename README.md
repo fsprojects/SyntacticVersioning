@@ -15,7 +15,7 @@ When upgrading a package you want to know the magnitude of the changes. In many 
 ## Integration
 
 - You can use the SynVer.Lib found on NuGet [![NuGet Status](https://img.shields.io/nuget/v/SynVer.Lib.svg?style=flat)](https://www.nuget.org/packages/SynVer.Lib/)
-- In order to integrate with FAKE you can either use the NuGet [![NuGet Status](https://img.shields.io/nuget/v/SynVer.FAKE.svg?style=flat)](https://www.nuget.org/packages/SynVer.FAKE/)
+- In order to integrate with FAKE you can use the NuGet [![NuGet Status](https://img.shields.io/nuget/v/SynVer.FAKE.svg?style=flat)](https://www.nuget.org/packages/SynVer.FAKE/)
 
 ## Requirements
 
