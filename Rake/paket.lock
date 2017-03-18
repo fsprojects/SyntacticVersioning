@@ -1,0 +1,3 @@
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    SynVer (0.0.6)
