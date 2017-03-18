@@ -6,3 +6,5 @@
 #### 0.0.3 - March 18 2017
 * Renamed SynVer.Core to SynVer.Lib
 * Should have all DLL dependencies included in SynVer Tool
+#### 0.0.4 - March 18 2017
+* Small bug fixes
