@@ -46,16 +46,17 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="SynVerHelpers.fs" />
-    <None Include="paket.template" />
-    <None Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj">
       <Project>{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}</Project>
       <Name>SynVer.Lib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="SynVerHelpers.fs" />
+    <None Include="paket.template" />
+    <None Include="paket.references" />
+    <Content Include="App.config" />
   </ItemGroup>
   <Import Project="$(FSharpTargetsPath)" />
   <Choose>
