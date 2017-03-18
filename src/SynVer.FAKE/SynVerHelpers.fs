@@ -2,7 +2,7 @@
 open Fake
 open Fake.NuGetVersion
 open Fake.SemVerHelper
-open SynVer.Core
+open SynVer
 [<AutoOpen>]
 module SynVerHelpers=
   let bump (version:SemVerInfo) released modified =

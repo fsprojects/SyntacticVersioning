@@ -5,7 +5,6 @@ open SynVer
 open System.Reflection
 open System.IO
 open Chiron
-open SynVer.Core
 
 type CLIArguments =
     | Surface_of of path:string
