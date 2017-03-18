@@ -3,6 +3,9 @@ open Chiron
 open Operators
 open Patterns
 type Version = Major | Minor | Patch
+with
+    override m.ToString ()= match m with | Major -> "Major" | Minor -> "Minor" | Patch -> "Patch"
+
 type NetType =
   | Abstract=0 | Class=1 | Enum=2 | Interface=3 | Static=4 | Struct=5
   (* | Primitive | ValueType *)

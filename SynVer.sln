@@ -1,6 +1,7 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{63297B98-5CED-492C-A5B7-A5B4F73CF142}"
 	ProjectSection(SolutionItems) = preProject
 		paket.dependencies = paket.dependencies
@@ -9,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{63297B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{A6A6AF7D-D6E3-442D-9B1E-58CC91879BE1}"
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer.Lib", "src\SynVer.Lib\SynVer.Lib.fsproj", "{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SynVer.Lib", "src\SynVer.Lib\SynVer.Lib.fsproj", "{EE8B6B01-F243-4DBF-A3B6-9FEB7E151F70}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "project", "project", "{BF60BC93-E09B-4E5F-9D85-95A519479D54}"
 	ProjectSection(SolutionItems) = preProject
@@ -32,7 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "content", "content", "{8E6D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{ED8079DD-2B06-4030-9F0F-DC548F98E1C4}"
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer.Tests", "tests\SynVer.Tests\SynVer.Tests.fsproj", "{26D49AE5-F879-4321-A1AA-E7C35B60C874}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SynVer.Tests", "tests\SynVer.Tests\SynVer.Tests.fsproj", "{26D49AE5-F879-4321-A1AA-E7C35B60C874}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleProjects", "ExampleProjects", "{346C49A0-8F00-4D70-8FE0-28EDFEAB06A4}"
 EndProject
@@ -42,6 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B448E2FC-484
 		tests\ExampleProjects\src\AssemblyInfo.fs = tests\ExampleProjects\src\AssemblyInfo.fs
 		tests\ExampleProjects\src\Csharp.cs = tests\ExampleProjects\src\Csharp.cs
 		tests\ExampleProjects\src\Csharp2.cs = tests\ExampleProjects\src\Csharp2.cs
+		tests\ExampleProjects\src\CsharpWithAttribute.cs = tests\ExampleProjects\src\CsharpWithAttribute.cs
 		tests\ExampleProjects\src\Enum.cs = tests\ExampleProjects\src\Enum.cs
 		tests\ExampleProjects\src\Enum2.cs = tests\ExampleProjects\src\Enum2.cs
 		tests\ExampleProjects\src\Enum2.txt = tests\ExampleProjects\src\Enum2.txt
@@ -50,12 +52,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B448E2FC-484
 		tests\ExampleProjects\src\Fsharp.fs = tests\ExampleProjects\src\Fsharp.fs
 		tests\ExampleProjects\src\Fsharp2.fs = tests\ExampleProjects\src\Fsharp2.fs
 		tests\ExampleProjects\src\Fsharp2.txt = tests\ExampleProjects\src\Fsharp2.txt
-		tests\ExampleProjects\src\CsharpWithAttribute.cs = tests\ExampleProjects\src\CsharpWithAttribute.cs
 	EndProjectSection
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer", "src\SynVer\SynVer.fsproj", "{1B3E522B-739C-48FA-B2A7-9599CDFC5748}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SynVer", "src\SynVer\SynVer.fsproj", "{1B3E522B-739C-48FA-B2A7-9599CDFC5748}"
 EndProject
-Project("{f2a71f9b-5d33-465a-a702-920d77279786}") = "SynVer.FAKE", "src\SynVer.FAKE\SynVer.FAKE.fsproj", "{599210FF-184C-474A-952F-9ADF91060C51}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "SynVer.FAKE", "src\SynVer.FAKE\SynVer.FAKE.fsproj", "{599210FF-184C-474A-952F-9ADF91060C51}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FE814481-EA18-4DF6-BBA7-0D037E600210}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

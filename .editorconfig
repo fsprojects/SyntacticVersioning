@@ -1,0 +1,10 @@
+[*]
+end_of_line = crlf
+
+[*.xml]
+indent_style = space
+
+[*.fs*]
+tab_width = 2
+indent_style = space
+

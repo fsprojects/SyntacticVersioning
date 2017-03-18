@@ -109,6 +109,9 @@ module Reflect =
     type 'a Roc = System.Collections.ObjectModel.ReadOnlyCollection<'a>
     type CatArg = CustomAttributeTypedArgument
 
+    let notNull value = 
+      if obj.ReferenceEquals(value, null) then None 
+      else Some value
 
     let parameterToParameter (p:ParameterInfo) :Parameter= { Type=typeToTyp p.ParameterType; Name=p.Name }
     let parametersToParameter prms= prms |>Seq.map parameterToParameter |> List.ofSeq
@@ -142,8 +145,15 @@ module Reflect =
               Parameters= params'
               Result= typeToTyp mi.ReturnType}
     let property (pi:PropertyInfo) : Member= 
+      let static' =
+          match notNull (pi.GetGetMethod()), notNull (pi.GetSetMethod()) with
+          |  Some getMethod, _ -> getMethod.IsStatic
+          | _, Some setMethod -> setMethod.IsStatic
+          | _, _ -> true
+          
+
       Property {Type=typeToTyp pi.ReflectedType
-                Instance=isStatic (pi.GetGetMethod().IsStatic)
+                Instance=isStatic static'
                 Name= pi.Name
                 Result= typeToTyp pi.PropertyType}
 
