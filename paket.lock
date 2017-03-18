@@ -1,14 +1,75 @@
 REDIRECTS: ON
+FRAMEWORK: >= NET451
 NUGET
   remote: https://api.nuget.org/v3/index.json
     Aether (8.1.2)
-    Argu (3.2)
+    Argu (3.7)
+      FSharp.Core (>= 4.0.1.7-alpha) - framework: >= net463
+      NETStandard.Library (>= 1.6) - framework: >= net463
+      System.Xml.XDocument (>= 4.0.11) - framework: >= net463
     Chiron (6.2.1)
       Aether (>= 8.0.2 < 9.0)
       FParsec (>= 1.0 < 2.0)
     FAKE.Lib (4.56)
     FParsec (1.0.2)
-    FSharp.Core (4.0.0.1) - redirects: force
+    FSharp.Core (4.1.0.2) - redirects: force
+      System.ValueTuple (>= 4.3)
+    Microsoft.Win32.Primitives (4.3) - framework: >= net463
+    NETStandard.Library (1.6.1) - framework: >= net463
+      Microsoft.Win32.Primitives (>= 4.3) - framework: >= net46
+      System.AppContext (>= 4.3) - framework: >= net46
+      System.Collections.Concurrent (>= 4.3)
+      System.Console (>= 4.3) - framework: >= net46
+      System.Diagnostics.Tracing (>= 4.3)
+      System.Globalization.Calendars (>= 4.3) - framework: >= net46
+      System.IO.Compression (>= 4.3)
+      System.IO.Compression.ZipFile (>= 4.3) - framework: >= net46
+      System.IO.FileSystem (>= 4.3) - framework: >= net46
+      System.IO.FileSystem.Primitives (>= 4.3) - framework: >= net46
+      System.Net.Http (>= 4.3)
+      System.Net.Sockets (>= 4.3) - framework: >= net46
+      System.Runtime.Handles (>= 4.3) - framework: >= net46
+      System.Runtime.InteropServices (>= 4.3)
+      System.Runtime.InteropServices.RuntimeInformation (>= 4.3)
+      System.Runtime.Numerics (>= 4.3)
+      System.Security.Cryptography.Algorithms (>= 4.3) - framework: >= net46
+      System.Security.Cryptography.Encoding (>= 4.3) - framework: >= net46
+      System.Security.Cryptography.Primitives (>= 4.3) - framework: >= net46
+      System.Security.Cryptography.X509Certificates (>= 4.3) - framework: >= net46
+      System.Threading.Timer (>= 4.3)
+    System.AppContext (4.3) - framework: >= net463
+    System.Collections.Concurrent (4.3) - framework: >= net463
+    System.Console (4.3) - framework: >= net463
+    System.Diagnostics.Tracing (4.3) - framework: >= net463
+    System.Globalization.Calendars (4.3) - framework: >= net463
+    System.IO (4.3) - framework: >= net463
+    System.IO.Compression (4.3) - framework: >= net463
+    System.IO.Compression.ZipFile (4.3) - framework: >= net463
+    System.IO.FileSystem (4.3) - framework: >= net463
+      System.IO.FileSystem.Primitives (>= 4.3) - framework: >= net46
+    System.IO.FileSystem.Primitives (4.3)
+    System.Net.Http (4.3.1) - framework: >= net463
+      System.Security.Cryptography.X509Certificates (>= 4.3) - framework: >= net46
+    System.Net.Sockets (4.3) - framework: >= net463
+    System.Runtime (4.3)
+    System.Runtime.Handles (4.3) - framework: >= net463
+    System.Runtime.InteropServices (4.3) - framework: >= net463
+      System.Runtime (>= 4.3) - framework: >= net462
+    System.Runtime.InteropServices.RuntimeInformation (4.3) - framework: >= net463
+    System.Runtime.Numerics (4.3) - framework: >= net463
+    System.Security.Cryptography.Algorithms (4.3)
+      System.IO (>= 4.3) - framework: >= net463
+      System.Runtime (>= 4.3) - framework: >= net463
+      System.Security.Cryptography.Encoding (>= 4.3) - framework: >= net463
+      System.Security.Cryptography.Primitives (>= 4.3) - framework: net46, net461, >= net463
+    System.Security.Cryptography.Encoding (4.3)
+    System.Security.Cryptography.Primitives (4.3)
+    System.Security.Cryptography.X509Certificates (4.3)
+      System.Security.Cryptography.Algorithms (>= 4.3) - framework: >= net46
+      System.Security.Cryptography.Encoding (>= 4.3) - framework: >= net46
+    System.Threading.Timer (4.3) - framework: >= net463
+    System.ValueTuple (4.3) - redirects: force
+    System.Xml.XDocument (4.3) - framework: >= net463
 
 GROUP Build
 NUGET

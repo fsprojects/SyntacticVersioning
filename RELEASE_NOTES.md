@@ -8,3 +8,5 @@
 * Should have all DLL dependencies included in SynVer Tool
 #### 0.0.4 - March 18 2017
 * Small bug fixes
+#### 0.0.5 - March 18 2017
+* Upgrade to FSharp.Core 4.1
