@@ -34,4 +34,10 @@ let ``fsharp`` () =
 [<Test>]
 let ``fsharp2`` () =
   assertCanSerializeAndDeserialize fsharp2
+[<Test>]
+let ``argu`` () =
+  assertCanSerializeAndDeserialize arguAssembly
+[<Test>]
+let ``chiron`` () =
+  assertCanSerializeAndDeserialize chironAssembly
 

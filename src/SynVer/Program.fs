@@ -28,6 +28,18 @@ let (|AssemblyFile|JsonFile|Other|) (maybeFile:string) =
   | f, true when f.EndsWith(".dll") -> AssemblyFile
   | f, _  -> Other
 
+let loadAssembly f =
+  try
+    Assembly.LoadFile (Path.GetFullPath f)
+    |> Choice1Of2
+  with ex ->
+    (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 
+    |> Choice2Of2
+    
+let mapFirst f= function
+                | Choice1Of2 a -> Choice1Of2 (f a)
+                | Choice2Of2 err -> Choice2Of2 err
+
 let getSurfaceAreaOf (f:string): Choice<Package,string>=
   match f with
   | JsonFile ->
@@ -36,9 +48,8 @@ let getSurfaceAreaOf (f:string): Choice<Package,string>=
               |> Json.tryDeserialize
 
   | AssemblyFile -> 
-              Assembly.LoadFile f
-              |> SurfaceArea.ofAssembly 
-              |> Choice1Of2
+        loadAssembly f
+            |> mapFirst SurfaceArea.ofAssembly
   | Other -> Choice2Of2 "No dll or json specified"
 
 
@@ -95,11 +106,12 @@ let main argv =
 
         match maybeFile, maybeDiff, maybeMagnitude, maybeBump with
         | Some file, None, None, None ->
-            let assembly = Assembly.LoadFrom(file)
-            (SurfaceArea.ofAssembly assembly)
-            |> Json.serialize
-            |> Json.formatWith JsonFormattingOptions.Pretty
-            |> Choice1Of2
+            loadAssembly file
+            |> mapFirst (
+                SurfaceArea.ofAssembly 
+                >> Json.serialize
+                >>(Json.formatWith JsonFormattingOptions.Pretty)
+            )
         | None, Some (released, modified), None, None ->
             getDiff released modified
         | None, None, Some (released,modified), None ->

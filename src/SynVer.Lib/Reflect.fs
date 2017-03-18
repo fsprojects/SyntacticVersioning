@@ -88,11 +88,15 @@ module Reflect =
               t.GetGenericArguments()
               |> Array.map typeFullName
               |> Array.reduce(sprintf "%s,%s")
+            let removeAfterTick (a:string)=
+                let i = a.IndexOf('`')
+                if i>1 then a.Substring(0, i)
+                else a
             let name = 
-                if t.Assembly <> fsharpCoreAssembly then
-                    (t.FullName.Substring(0,t.FullName.IndexOf('`'))) 
+                if t.Assembly <> fsharpCoreAssembly && (not << String.IsNullOrEmpty) ( t.FullName ) then
+                    removeAfterTick t.FullName 
                 else 
-                    (t.Name.Substring(0,t.Name.IndexOf('`'))) 
+                    removeAfterTick t.Name
             sprintf "%s<%s>" name args
 
       let guid = Guid.NewGuid().ToString()

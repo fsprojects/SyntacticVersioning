@@ -6,14 +6,14 @@ NUGET
     Chiron (6.2.1)
       Aether (>= 8.0.2 < 9.0)
       FParsec (>= 1.0 < 2.0)
-    FAKE.Lib (4.55)
+    FAKE.Lib (4.56)
     FParsec (1.0.2)
     FSharp.Core (4.0.0.1) - redirects: force
 
 GROUP Build
 NUGET
   remote: https://www.nuget.org/api/v2
-    FAKE (4.47)
+    FAKE (4.56)
     FSharp.Compiler.Service (2.0.0.6)
     FSharp.Formatting (2.14.4)
       FSharp.Compiler.Service (2.0.0.6)
@@ -26,12 +26,12 @@ NUGET
     Microsoft.Net.Http (2.2.29) - framework: net10, net11, net20, net30, net35, net40, net40-full
       Microsoft.Bcl (>= 1.1.10)
       Microsoft.Bcl.Build (>= 1.0.14)
-    Octokit (0.23)
+    Octokit (0.24)
       Microsoft.Net.Http  - framework: net10, net11, net20, net30, net35, net40, net40-full
     SourceLink.Fake (1.1)
 GITHUB
   remote: fsharp/FAKE
-    modules/Octokit/Octokit.fsx (954b349a91b815a707941dd0be0dfda124f51da9)
+    modules/Octokit/Octokit.fsx (0cca21da332895437de5785210610bd055a77ac2)
       Octokit (>= 0.20)
 GROUP Test
 NUGET

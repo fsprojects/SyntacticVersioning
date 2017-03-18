@@ -1,8 +1,8 @@
 source https://api.nuget.org/v3/index.json
 redirects on
 
-nuget Chiron
-nuget Argu
+nuget Chiron ~> 6
+nuget Argu 
 nuget FSharp.Core ~> 4.0.0 redirects: force
 nuget FAKE.Lib ~> 4
 
