@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>SynVer</RootNamespace>
     <AssemblyName>synver</AssemblyName>
-    <TargetFrameworks>netstandard2.0;net46</TargetFrameworks>
+    <TargetFrameworks>net461</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
