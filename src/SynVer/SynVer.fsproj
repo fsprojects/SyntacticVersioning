@@ -1,6 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{1B3E522B-739C-48FA-B2A7-9599CDFC5748}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>SynVer</RootNamespace>
     <AssemblyName>synver</AssemblyName>
@@ -28,7 +28,7 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj"/>
+    <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,7 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461</TargetFrameworks>
-    <ProjectGuid>ee8b6b01-f243-4dbf-a3b6-9feb7e151f70</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SynVer</RootNamespace>
     <AssemblyName>SynVer.Lib</AssemblyName>
@@ -26,7 +25,12 @@
   </Target>
   -->
   <ItemGroup>
+    <Compile Include="..\..\paket-files\wallymathieu\FSharp.SExpression\SExpression.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/SExpression.fs</Link>
+    </Compile>
     <Compile Include="Models.fs" />
+    <Compile Include="Serialization.fs" />
     <Compile Include="Reflect.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
