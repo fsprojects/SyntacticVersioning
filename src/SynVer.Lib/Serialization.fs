@@ -6,14 +6,24 @@ module private Enums =
   let serialize (e : 'e when 'e :> System.Enum and 'e : (new:unit->'e) and 'e : struct) =
       e.ToString "G"
       |> String
-  let deSerialize<'e when 'e :> System.Enum and 'e : (new:unit->'e) and 'e : struct> json =
-      match json with
+  let deSerialize<'e when 'e :> System.Enum and 'e : (new:unit->'e) and 'e : struct> v =
+      match v with
       | String s ->
           match System.Enum.TryParse<'e> s with
           | true, x -> Some x
           | _ -> None
       | _ -> None
-
+module private Bool =
+  let serialize (b:bool) =
+      b.ToString ()
+      |> String
+  let deSerialize v =
+      match v with
+      | String s ->
+          match System.Boolean.TryParse s with
+          | true, x -> Some x
+          | _ -> None
+      | _ -> None
 module Type=
   let serialize  (x:Typ) =
     E.List [ E.Symbol "typ" ; E.String x.FullName ]
@@ -38,7 +48,7 @@ module ConstructorLike=
        let deSerialize v : ConstructorLike option=
           match v with 
           | E.List (E.Symbol "typ" :: typ:: E.Symbol "params" :: [E.List parameters]) -> 
-            let p= parameters |> List.map Parameter.deSerialize  // eat the rest of paramet
+            let p= parameters |> List.map Parameter.deSerialize 
             if List.exists Option.isNone p then
               None
             else
@@ -95,7 +105,7 @@ module FieldLike=
             None
       | _ -> None
 
-  let serialize  (x:FieldLike) =
+  let serialize (x:FieldLike) =
       E.List (
         [
           E.Symbol "typ" ; Type.serialize x.Type
@@ -109,23 +119,36 @@ module Member=
   let deSerialize v : Member option =
     match v with
     |  E.List [ E.Symbol "RecordConstructor"; c] -> 
-        failwith "!"
-        //Json.init (RecordConstructor str) json
+        ConstructorLike.deSerialize c |> Option.map RecordConstructor
     | E.List [ E.Symbol "Constructor";c ]-> 
-        failwith "!"
-        //Json.init (Constructor str) json
-    | E.List [ E.Symbol "UnionConstructor"; c ]-> 
-        failwith "!"
-        //Json.init (UnionConstructor str) json
-(*
-    | Prop "Event" str as json -> Json.init (Event str) json
-    | Prop "Field" str as json -> Json.init (Field str) json
-    | Prop "Method" str as json -> Json.init (Method str) json
-    | Prop "Property" str as json -> Json.init (Property str) json
-    | Prop "UnionCase" str as json -> Json.init (UnionCase str) json
-    | Prop "EnumValue" str as json -> Json.init (EnumValue str) json
-    | json -> Json.error (sprintf "couldn't deserialise %A to Member" json) json
-*)
+        ConstructorLike.deSerialize c |> Option.map Constructor
+    | E.List [ E.Symbol "UnionConstructor"; typ; ctor ]-> 
+        match ( ConstructorLike.deSerialize ctor, Type.deSerialize typ) with
+        | (Some c, Some t) -> UnionConstructor (t,c) |> Some
+        | _ -> None
+    | E.List [ E.Symbol "Event";m ]-> MethodLike.deSerialize m |> Option.map Event
+    | E.List [ E.Symbol "Field";f ]-> FieldLike.deSerialize f |> Option.map Field
+    | E.List [ E.Symbol "Method";m ]-> MethodLike.deSerialize m |> Option.map Method
+    | E.List [ E.Symbol "Property";m ]-> FieldLike.deSerialize m |> Option.map Property
+    | E.List [ 
+              E.Symbol "UnionCase"; 
+              E.Symbol "type"; typ; 
+              E.Symbol "name"; E.String name;
+              E.Symbol "params"; E.List parameters
+             ]-> 
+        let p= parameters |> List.map Parameter.deSerialize 
+        if List.exists Option.isNone p then
+          None
+        else
+          Type.deSerialize typ |> Option.map ( fun t -> UnionCase (t,name, p |> List.map Option.get )) 
+    | E.List [ 
+              E.Symbol "EnumValue"; 
+              E.Symbol "type"; typ; 
+              E.Symbol "name"; E.String name;
+              E.Symbol "value"; E.String value
+             ]-> 
+        Type.deSerialize typ |> Option.map ( fun t -> EnumValue (t, name, value))
+    | _ -> None
   let serialize  (x: Member) =
       match x with
       | RecordConstructor c -> E.List [ E.Symbol "RecordConstructor"; ConstructorLike.serialize c ]
@@ -135,30 +158,51 @@ module Member=
       | Field e ->E.List [ E.Symbol "Field"; FieldLike.serialize e]
       | Method e ->E.List [ E.Symbol "Method"; MethodLike.serialize e]
       | Property e ->E.List [ E.Symbol "Property"; FieldLike.serialize e]
-      //| UnionCase (typ,name,param) ->Json.write "UnionCase" (typ,name,param)
-      //| EnumValue (typ,name,value) ->Json.write "EnumValue" (typ,name,value)
+      | UnionCase (typ,name,param) ->
+        E.List [
+          E.Symbol "UnionCase"
+          E.Symbol "type"; Type.serialize typ
+          E.Symbol "name"; E.String name
+          E.Symbol "params"; E.List (List.map Parameter.serialize param)
+        ]
+      | EnumValue (typ,name,value) ->
+          E.List [
+            E.Symbol "EnumValue"
+            E.Symbol "type"; Type.serialize typ
+            E.Symbol "name"; E.String name
+            E.Symbol "value"; E.String value
+          ]
 
 module SurfaceOfType=
-  let deSerialize v : SurfaceOfType =
-      failwith "!"
-    (*
-          fun t n m s p-> { Type = t; NetType=n; Members=m; SumType=s; BaseType=p }
-      <!> Json.read "typ"
-      <*> Json.readWith Json.toEnum<NetType> "netType"
-      <*> Json.read "members"
-      <*> Json.read "sumtype"
-      <*> Json.read "baseTyp"
-      *)
+  let deSerialize v : SurfaceOfType option=
+    match v with
+    | E.List [ 
+              E.Symbol "EnumValue"
+              E.Symbol "typ"; typ 
+              E.Symbol "netType"; netType
+              E.Symbol "members"; E.List members
+              E.Symbol "sumtype"; sumtype
+              E.Symbol "baseTyp"; baseTyp
+             ]-> 
+      match (Type.deSerialize typ, Enums.deSerialize netType, Bool.deSerialize sumtype ) with
+      | (Some t, Some n, Some s) ->
+        let m= members |> List.map Member.deSerialize 
+        if List.exists Option.isNone m then
+          None
+        else
+          Some { Type = t; NetType=n; Members=m |> List.map Option.get; SumType=s; BaseType=Type.deSerialize baseTyp }
+      | _ -> None
+    | _ -> None
 
-  let serialize  (x:SurfaceOfType) =
-      failwith "!"
-    (*
-          Json.write "typ" x.Type
-       *> Json.writeWith Json.fromEnum "netType" x.NetType
-       *> Json.write "members" x.Members
-       *> Json.write "sumtype" x.SumType
-       *> Json.write "baseTyp" x.BaseType
-    *)
+  let serialize (x:SurfaceOfType) =
+    E.List [ 
+              E.Symbol "EnumValue"
+              E.Symbol "typ"; Type.serialize x.Type
+              E.Symbol "netType"; Enums.serialize x.NetType
+              E.Symbol "members"; E.List <| List.map Member.serialize x.Members
+              E.Symbol "sumtype"; Bool.serialize x.SumType
+              E.Symbol "baseTyp"; (match x.BaseType with | Some b-> Type.serialize b | None -> E.List [])
+             ]
 
 module Namespace=
   let deSerialize v : Namespace option=
