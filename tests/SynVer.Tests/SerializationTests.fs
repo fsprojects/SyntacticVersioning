@@ -2,15 +2,14 @@ module SynVer.SerializationTests
 open SynVer
 open NUnit.Framework
 open TestHelper
-open Chiron
 
 let assertCanSerializeAndDeserialize assembly
   =
     let surface = SurfaceArea.ofAssembly assembly
     let deserialized 
         = surface
-          |> Json.serialize
-          |> Json.deserialize
+          |> Lson.serialize
+          |> Lson.deserialize
     let same = deserialized = surface
     Assert.IsTrue(same)
 [<Test>]

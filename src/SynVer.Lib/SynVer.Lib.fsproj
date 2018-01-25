@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>net461;netstandard1.6</TargetFrameworks>
     <OutputType>Library</OutputType>
     <RootNamespace>SynVer</RootNamespace>
     <AssemblyName>SynVer.Lib</AssemblyName>
@@ -34,6 +34,7 @@
     <Compile Include="Reflect.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
+    <Compile Include="Lson.fs" />
     <None Include="paket.template" />
     <None Include="paket.references" />
     <Content Include="App.config" />

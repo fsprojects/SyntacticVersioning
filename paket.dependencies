@@ -4,6 +4,7 @@ redirects on
 nuget FSharp.Core ~> 4.2 redirects: force
 nuget FAKE.Lib ~> 4
 github wallymathieu/FSharp.SExpression SExpression.fs
+nuget Argu 
 
 group Build
   source https://nuget.org/api/v2

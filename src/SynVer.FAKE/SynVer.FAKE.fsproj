@@ -4,7 +4,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SynVer.FAKE</RootNamespace>
     <AssemblyName>SynVer.FAKE</AssemblyName>
-    <TargetFrameworks>net461</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

@@ -4,7 +4,6 @@ open Argu
 open SynVer
 open System.Reflection
 open System.IO
-open Chiron
 
 type CLIArguments =
     | Surface_of of path:string
@@ -44,8 +43,7 @@ let getSurfaceAreaOf (f:string): Choice<Package,string>=
   match f with
   | JsonFile ->
               File.ReadAllText f
-              |> Json.parse
-              |> Json.tryDeserialize
+              |> Lson.tryDeserialize
 
   | AssemblyFile -> 
         loadAssembly f
@@ -109,8 +107,7 @@ let main argv =
             loadAssembly file
             |> mapFirst (
                 SurfaceArea.ofAssembly 
-                >> Json.serialize
-                >>(Json.formatWith JsonFormattingOptions.Pretty)
+                >> Lson.serialize
             )
         | None, Some (released, modified), None, None ->
             getDiff released modified

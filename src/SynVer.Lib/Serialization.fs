@@ -174,3 +174,18 @@ module Namespace=
           Json.write "namespace" x.Namespace
        *> Json.write "types" x.Types
       *)
+
+module Package=
+  let deSerialize v : Package option=
+      failwith "!"
+    (*
+          fun n ts -> { Namespace = n; Types=ts }
+      <!> Json.read "namespace"
+      <*> Json.read "types"
+    *)
+  let serialize  (x:Package) =
+      failwith "!"
+      (*
+          Json.write "namespace" x.Namespace
+       *> Json.write "types" x.Types
+      *)
