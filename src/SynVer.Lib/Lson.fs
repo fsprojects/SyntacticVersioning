@@ -2,7 +2,10 @@
 open SynVer.Serialization
 open FSharp.SExpression
 let serialize (p:Package) = Package.serialize p |> print
+let tryDeserialize v :Package option=
+  Package.deSerialize <| parse v
+
 let deserialize v :Package =
-  let res = Package.deSerialize <| parse v
-  if res.IsNone then failwith "expected serialized package !"
-  res.Value
+  match tryDeserialize v with
+  | None -> failwith "expected serialized package !"
+  | Some p -> p
