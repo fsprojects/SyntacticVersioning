@@ -378,7 +378,7 @@ Target "ReleaseDocs" (fun _ ->
     Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
     Branches.push tempDocsDir
 )
-
+#if FALSE
 #load "paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 open Octokit
 
@@ -411,7 +411,9 @@ Target "Release" (fun _ ->
     |> releaseDraft
     |> Async.RunSynchronously
 )
-
+#else
+Target "Release" DoNothing
+#endif
 Target "BuildPackage" DoNothing
 
 // --------------------------------------------------------------------------------------
