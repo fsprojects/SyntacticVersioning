@@ -1,8 +1,10 @@
 language: csharp
-
+dotnet: 2.0.0
 sudo: false  # use the new container-based Travis infrastructure 
 
 script:
+  - mono .paket/paket.bootstrapper.exe
+  - msbuild /t:restore
   - sh ./build.sh
 
 
