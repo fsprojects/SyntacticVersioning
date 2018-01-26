@@ -1,14 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <ProjectGuid>26d49ae5-f879-4321-a1aa-e7c35b60c874</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SyntacticVersioning.Tests</RootNamespace>
     <AssemblyName>SyntacticVersioning.Tests</AssemblyName>
     <Name>SyntacticVersioning.Tests</Name>
+    <IsWindows Condition="'$(OS)' == 'Windows_NT'">true</IsWindows>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(IsWindows)' != 'true'">netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(IsWindows)' == 'true'">net461;netcoreapp2.0</TargetFrameworks>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="TestHelper.fs" />
     <Compile Include="Tests.fs" />
