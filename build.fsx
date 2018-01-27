@@ -191,10 +191,7 @@ Target "Build" (fun _ ->
 
 Target "RunTests" (fun _ ->
     let run f = DotNetCli.RunCommand (fun p -> p |> f)
-
     run id ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll --summary")
-    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll","--summary")
-    |> fun r -> if r<>0 then failwith "SyntacticVersioning.Tests.dll failed"
 )
 
 #if MONO
