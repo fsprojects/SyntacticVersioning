@@ -15,11 +15,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <IsWindows Condition="'$(OS)' == 'Windows_NT'">true</IsWindows>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworks Condition="'$(IsWindows)' != 'true'">netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(IsWindows)' == 'true'">net461;netstandard2.0</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\wallymathieu\FSharp.SExpression\SExpression.fs">
@@ -34,7 +30,6 @@
     <Compile Include="Lson.fs" />
     <None Include="paket.template" />
     <None Include="paket.references" />
-    <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

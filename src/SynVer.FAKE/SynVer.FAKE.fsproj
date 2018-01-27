@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{599210FF-184C-474A-952F-9ADF91060C51}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>SynVer.FAKE</RootNamespace>
     <AssemblyName>SynVer.FAKE</AssemblyName>
@@ -12,11 +11,7 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <IsWindows Condition="'$(OS)' == 'Windows_NT'">true</IsWindows>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TargetFrameworks Condition="'$(IsWindows)' != 'true'">netstandard2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(IsWindows)' == 'true'">net461;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -25,14 +20,13 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj"/>
+    <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="SynVerHelpers.fs" />
     <None Include="paket.template" />
     <None Include="paket.references" />
-    <Content Include="App.config" />
   </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -1,8 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>26d49ae5-f879-4321-a1aa-e7c35b60c874</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks Condition="'$(IsWindows)' != 'true'">netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.0</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
@@ -20,7 +19,6 @@
     <Compile Include="SurfaceAreaTests.fs" />
     <Compile Include="NetTypeTests.fs" />
     <None Include="paket.references" />
-    <Content Include="App.config" />
     <Compile Include="SerializationTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
