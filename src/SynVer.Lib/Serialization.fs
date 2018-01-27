@@ -206,30 +206,36 @@ module SurfaceOfType=
 
 module Namespace=
   let deSerialize v : Namespace option=
-      failwith "!"
-    (*
-          fun n ts -> { Namespace = n; Types=ts }
-      <!> Json.read "namespace"
-      <*> Json.read "types"
-    *)
+    match v with 
+    | E.List [
+              E.Symbol "namespace" ; E.String namespace'
+              E.Symbol "types" ; E.List types
+             ] -> 
+         let ts= types |> List.map SurfaceOfType.deSerialize 
+         if List.exists Option.isNone ts then
+           None
+         else
+           Some { Namespace=namespace';Types=ts|>List.map Option.get }
+    | _ -> None
   let serialize  (x:Namespace) =
-      failwith "!"
-      (*
-          Json.write "namespace" x.Namespace
-       *> Json.write "types" x.Types
-      *)
+    E.List [
+             E.Symbol "namespace" ; E.String x.Namespace
+             E.Symbol "types" ; E.List <| List.map SurfaceOfType.serialize x.Types
+           ]
 
 module Package=
   let deSerialize v : Package option=
-      failwith "!"
-    (*
-          fun n ts -> { Namespace = n; Types=ts }
-      <!> Json.read "namespace"
-      <*> Json.read "types"
-    *)
+    match v with 
+    | E.List [
+              E.Symbol "namespaces" ; E.List namespaces
+             ] -> 
+         let ns= namespaces |> List.map Namespace.deSerialize 
+         if List.exists Option.isNone ns then
+           None
+         else
+           Some { Namespaces = ns|>List.map Option.get }
+    | _ -> None
   let serialize  (x:Package) =
-      failwith "!"
-      (*
-          Json.write "namespace" x.Namespace
-       *> Json.write "types" x.Types
-      *)
+    E.List [
+            E.Symbol "namespaces" ; E.List <| List.map Namespace.serialize x.Namespaces
+           ]
