@@ -10,7 +10,7 @@ let wTrim (str:string) = str.Trim([| '\n';'\t';' ';'\r' |])
 let asm = Assembly.GetExecutingAssembly()
 let testPath= Path.GetDirectoryName asm.Location
 let exampleProjectsPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</> ".."</> "ExampleProjects" )
-let packagesPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</>".."</> "packages")
+let packagesPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</>".."</> ".."</> "packages")
 let exampleProjectsLibPath = exampleProjectsPath </> "lib"
 // since all the dll-s have unique names, they can be loaded at the same time
 let csharp = exampleProjectsLibPath </> "Csharp.dll" |> Assembly.LoadFile
