@@ -7,4 +7,6 @@ script:
   - msbuild /t:restore
   - sh ./build.sh
 
-
+branches:
+  only: 
+    - master

@@ -7,3 +7,6 @@ version: 0.0.1.{build}
 artifacts:
   - path: bin
     name: bin
+branches:
+  only:
+  - master
