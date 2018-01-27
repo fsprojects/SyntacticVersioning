@@ -1,6 +1,6 @@
 module SynVer.SerializationTests
 open SynVer
-open NUnit.Framework
+open Expecto
 open TestHelper
 
 let assertCanSerializeAndDeserialize assembly
@@ -11,32 +11,36 @@ let assertCanSerializeAndDeserialize assembly
           |> Lson.serialize
           |> Lson.deserialize
     let same = deserialized = surface
-    Assert.IsTrue(same)
-[<Test>]
-let ``csharp`` () =
-  assertCanSerializeAndDeserialize csharp
-[<Test>]
-let ``csharp2`` () =
-  assertCanSerializeAndDeserialize csharp2
-[<Test>]
-let ``enum`` () =
-  assertCanSerializeAndDeserialize enum
-[<Test>]
-let ``enum2`` () =
-  assertCanSerializeAndDeserialize enum2
-[<Test>]
-let ``enum3`` () =
-  assertCanSerializeAndDeserialize enum3
-[<Test>]
-let ``fsharp`` () =
-  assertCanSerializeAndDeserialize fsharp
-[<Test>]
-let ``fsharp2`` () =
-  assertCanSerializeAndDeserialize fsharp2
-[<Test>]
-let ``argu`` () =
-  assertCanSerializeAndDeserialize arguAssembly
-[<Test>]
-let ``chiron`` () =
-  assertCanSerializeAndDeserialize chironAssembly
+    Expect.isTrue same (assembly.ToString())
+[<Tests>]
+let tests =
+  testList "Serialization tests" [    
+    test "csharp" {
+      assertCanSerializeAndDeserialize csharp
+    }
+    test "csharp2" {
+      assertCanSerializeAndDeserialize csharp2
+    }
+    test "enum" {
+      assertCanSerializeAndDeserialize enum
+    }
+    test "enum2" {
+      assertCanSerializeAndDeserialize enum2
+    }
+    test "enum3" {
+      assertCanSerializeAndDeserialize enum3
+    }
+    test "fsharp" {
+      assertCanSerializeAndDeserialize fsharp
+    }
+    test "fsharp2" {
+      assertCanSerializeAndDeserialize fsharp2
+    }
+    test "argu" {
+      assertCanSerializeAndDeserialize arguAssembly
+    }
+    test "chiron"{
+      assertCanSerializeAndDeserialize chironAssembly
+    }
+  ]
 

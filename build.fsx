@@ -190,12 +190,11 @@ Target "Build" (fun _ ->
 // Run the unit tests using test runner
 
 Target "RunTests" (fun _ ->
-    !! testAssemblies
-    |> NUnit (fun p ->
-        { p with
-            DisableShadowCopy = true
-            TimeOut = TimeSpan.FromMinutes 20.
-            OutputFile = "TestResults.xml" })
+    let run f = DotNetCli.RunCommand (fun p -> p |> f)
+
+    run id ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll --summary")
+    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll","--summary")
+    |> fun r -> if r<>0 then failwith "SyntacticVersioning.Tests.dll failed"
 )
 
 #if MONO

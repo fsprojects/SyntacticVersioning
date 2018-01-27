@@ -1,4 +1,3 @@
 FSharp.Core
-group Test
-NUnit
-NUnit.Runners
+Expecto
+Expecto.FsCheck

@@ -1,10 +1,15 @@
 source https://api.nuget.org/v3/index.json
 redirects on
 
-nuget FSharp.Core ~> 4.2 redirects: force
+nuget FSharp.Core ~> 4.3 redirects: force
 nuget FAKE.Lib ~> 4
 github wallymathieu/FSharp.SExpression SExpression.fs
 nuget Argu
+nuget Chiron
+
+nuget Expecto
+nuget Expecto.BenchmarkDotNet
+nuget Expecto.FsCheck
 
 group Build
   source https://nuget.org/api/v2
@@ -15,8 +20,4 @@ group Build
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx
 
-group Test
-  source https://nuget.org/api/v2
   
-  nuget NUnit ~> 2
-  nuget NUnit.Runners ~> 2
