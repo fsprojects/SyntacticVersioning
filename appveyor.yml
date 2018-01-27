@@ -2,6 +2,8 @@ image: Visual Studio 2017
 init:
   - git config --global core.autocrlf input
 build_script:
+  - cmd: .paket\paket.bootstrapper.exe
+  - cmd: msbuild /t:restore
   - cmd: build.cmd All
 test: off
 version: 0.0.1.{build}
