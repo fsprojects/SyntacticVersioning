@@ -1,9 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <RootNamespace>SynVer</RootNamespace>
-    <AssemblyName>SynVer.Lib</AssemblyName>
-    <Name>SyntacticVersioning</Name>
     <WarningLevel>3</WarningLevel>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OtherFlags Condition=" '$(TargetFramework)' == 'netstandard2.0'">--warnon:1182</OtherFlags>
@@ -30,12 +27,6 @@
     <Compile Include="Lson.fs" />
     <None Include="paket.template" />
     <None Include="paket.references" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

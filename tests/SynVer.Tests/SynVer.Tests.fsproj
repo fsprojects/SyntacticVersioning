@@ -8,12 +8,6 @@
     <ProjectReference Include="..\..\src\SynVer.Lib\SynVer.Lib.fsproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="TestHelper.fs" />
     <Compile Include="Tests.fs" />
     <Compile Include="SurfaceAreaTests.fs" />

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>SynVer</RootNamespace>
+    <Title>SynVer</Title>
     <AssemblyName>synver</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -19,12 +19,6 @@
     <Compile Include="Program.fs" />
     <None Include="paket.references" />
     <None Include="paket.template" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj" />
