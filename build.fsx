@@ -50,7 +50,7 @@ let solutionFile  = "SynVer.sln"
 let configuration = "Release"
 
 // Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = "tests/**/bin" </> configuration </> "*Tests*.dll"
+let testAssemblies = "tests/**/bin" </> configuration </> "**" </> "*Tests*.dll"
 
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
@@ -190,12 +190,8 @@ Target "Build" (fun _ ->
 // Run the unit tests using test runner
 
 Target "RunTests" (fun _ ->
-    !! testAssemblies
-    |> NUnit (fun p ->
-        { p with
-            DisableShadowCopy = true
-            TimeOut = TimeSpan.FromMinutes 20.
-            OutputFile = "TestResults.xml" })
+    let run f = DotNetCli.RunCommand (fun p -> p |> f)
+    run id ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll --summary")
 )
 
 #if MONO
@@ -378,7 +374,7 @@ Target "ReleaseDocs" (fun _ ->
     Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
     Branches.push tempDocsDir
 )
-
+#if FALSE
 #load "paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 open Octokit
 
@@ -411,7 +407,9 @@ Target "Release" (fun _ ->
     |> releaseDraft
     |> Async.RunSynchronously
 )
-
+#else
+Target "Release" DoNothing
+#endif
 Target "BuildPackage" DoNothing
 
 // --------------------------------------------------------------------------------------
