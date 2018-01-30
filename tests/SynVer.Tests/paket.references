@@ -1,5 +1,4 @@
 FSharp.Core
 Chiron
-group Test
-NUnit
-NUnit.Runners
+Expecto
+Expecto.FsCheck
