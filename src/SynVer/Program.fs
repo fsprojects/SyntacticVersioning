@@ -15,15 +15,15 @@ with
     interface IArgParserTemplate with
         member s.Usage =
             match s with
-            | Surface_of _ -> "Get the public api surface of the .net binary as json"
+            | Surface_of _ -> "Get the public api surface of the .net binary as lson"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
             | Output _-> "Send output to file"
             | Diff _ -> "Get the difference between two .net binaries"
             | Bump _ -> "Get the next version based on the difference between two .net binaries"
 
-let (|AssemblyFile|JsonFile|Other|) (maybeFile:string) =
+let (|AssemblyFile|LsonFile|Other|) (maybeFile:string) =
   match maybeFile, File.Exists(maybeFile) with
-  | f, true when f.EndsWith(".json") -> JsonFile
+  | f, true when f.EndsWith(".lson") -> LsonFile
   | f, true when f.EndsWith(".dll") -> AssemblyFile
   | f, _  -> Other
 
@@ -38,7 +38,7 @@ let loadAssembly f =
 
 let getSurfaceAreaOf (f:string): Result<Package,string>=
   match f with
-  | JsonFile ->
+  | LsonFile ->
     let res = File.ReadAllText f
               |> Lson.tryDeserialize
     match res with
@@ -47,7 +47,7 @@ let getSurfaceAreaOf (f:string): Result<Package,string>=
   | AssemblyFile -> 
         loadAssembly f
         |> Result.map SurfaceArea.ofAssembly
-  | Other -> Error "No dll or json specified"
+  | Other -> Error "No dll or lson specified"
 
 
 let getDiff released modified : Result<string,string>=
