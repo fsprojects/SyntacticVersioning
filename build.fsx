@@ -190,12 +190,8 @@ Target "Build" (fun _ ->
 // Run the unit tests using test runner
 
 Target "RunTests" (fun _ ->
-    !! testAssemblies
-    |> NUnit (fun p ->
-        { p with
-            DisableShadowCopy = true
-            TimeOut = TimeSpan.FromMinutes 20.
-            OutputFile = "TestResults.xml" })
+    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/SyntacticVersioning.Tests.exe","--summary")
+    |> fun r -> if r<>0 then failwith "SyntacticVersioning.Tests.exe failed"
 )
 
 #if MONO
@@ -378,7 +374,7 @@ Target "ReleaseDocs" (fun _ ->
     Git.Commit.Commit tempDocsDir (sprintf "Update generated documentation for version %s" release.NugetVersion)
     Branches.push tempDocsDir
 )
-
+#if !MONO
 #load "paket-files/build/fsharp/FAKE/modules/Octokit/Octokit.fsx"
 open Octokit
 
@@ -411,6 +407,9 @@ Target "Release" (fun _ ->
     |> releaseDraft
     |> Async.RunSynchronously
 )
+#else
+Target "Release" DoNothing
+#endif
 
 Target "BuildPackage" DoNothing
 
