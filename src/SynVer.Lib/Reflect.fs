@@ -51,15 +51,10 @@ module Reflect =
           | _ -> fromTypeFlags()
       | _ , Some _ ->NetType.Struct
       | _ , _ -> fromTypeFlags()
-  let private memoize f =    
-    let cache = new System.Collections.Generic.Dictionary<_, _>()
-    (fun x ->
-        match cache.TryGetValue(x) with
-        | true, v -> v
-        | false, _ ->
-          let v = f(x) 
-          cache.Add(x, v)
-          v)
+  let private memoize f =
+    let cache = new System.Collections.Concurrent.ConcurrentDictionary<'x, 'y>()
+    (fun (x:'x) ->
+        cache.GetOrAdd(x, System.Func<'x,'y>(f)))
 
   [<CompiledName("TagNetType")>]
   let tagNetType = memoize _tagNetType

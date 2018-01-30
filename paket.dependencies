@@ -3,6 +3,7 @@ redirects on
 framework >= net451
 
 nuget Chiron ~> 6
+github wallymathieu/FSharp.SExpression SExpression.fs
 nuget Argu 
 nuget FSharp.Core ~> 4 redirects: force
 nuget FAKE.Lib ~> 4
