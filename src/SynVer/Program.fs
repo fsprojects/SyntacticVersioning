@@ -4,7 +4,6 @@ open Argu
 open SynVer
 open System.Reflection
 open System.IO
-open Chiron
 
 type CLIArguments =
     | Surface_of of path:string
@@ -16,87 +15,85 @@ with
     interface IArgParserTemplate with
         member s.Usage =
             match s with
-            | Surface_of _ -> "Get the public api surface of the .net binary as json"
+            | Surface_of _ -> "Get the public api surface of the .net binary as lson"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
             | Output _-> "Send output to file"
             | Diff _ -> "Get the difference between two .net binaries"
             | Bump _ -> "Get the next version based on the difference between two .net binaries"
 
-let (|AssemblyFile|JsonFile|Other|) (maybeFile:string) =
+let (|AssemblyFile|LsonFile|Other|) (maybeFile:string) =
   match maybeFile, File.Exists(maybeFile) with
-  | f, true when f.EndsWith(".json") -> JsonFile
+  | f, true when f.EndsWith(".lson") -> LsonFile
   | f, true when f.EndsWith(".dll") -> AssemblyFile
   | f, _  -> Other
 
 let loadAssembly f =
   try
     Assembly.LoadFile (Path.GetFullPath f)
-    |> Choice1Of2
+    |> Ok
   with ex ->
     (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 
-    |> Choice2Of2
-    
-let mapFirst f= function
-                | Choice1Of2 a -> Choice1Of2 (f a)
-                | Choice2Of2 err -> Choice2Of2 err
+    |> Error
 
-let getSurfaceAreaOf (f:string): Choice<Package,string>=
+
+let getSurfaceAreaOf (f:string): Result<Package,string>=
   match f with
-  | JsonFile ->
-              File.ReadAllText f
-              |> Json.parse
-              |> Json.tryDeserialize
-
+  | LsonFile ->
+    let res = File.ReadAllText f
+              |> Lson.tryDeserialize
+    match res with
+    | Some p -> Ok p
+    | None -> Error "Couldn't deserialize"
   | AssemblyFile -> 
         loadAssembly f
-            |> mapFirst SurfaceArea.ofAssembly
-  | Other -> Choice2Of2 "No dll or json specified"
+        |> Result.map SurfaceArea.ofAssembly
+  | Other -> Error "No dll or lson specified"
 
 
-let getDiff released modified : Choice<string,string>=
+let getDiff released modified : Result<string,string>=
     let maybeReleased,maybeModified= getSurfaceAreaOf released, getSurfaceAreaOf modified
     match maybeReleased,maybeModified with
-    | Choice1Of2 released, Choice1Of2 modified ->
+    | Ok released, Ok modified ->
         let changes =  SurfaceArea.diff released modified
         String.Join(Environment.NewLine, changes)
-        |> Choice1Of2
+        |> Ok
     | _, _ ->
         let errors = 
             [maybeReleased;maybeModified] 
-            |> List.choose (function Choice2Of2 e-> Some e | _ -> None)
+            |> List.choose (function Error e-> Some e | _ -> None)
             |> List.toArray
         
-        Choice2Of2 (String.Join(Environment.NewLine, errors) )
+        Error (String.Join(Environment.NewLine, errors) )
 
-let getBump version released modified : Choice<string*Version,string>=
+let getBump version released modified : Result<string*Version,string>=
     let maybeReleased,maybeModified= getSurfaceAreaOf released, getSurfaceAreaOf modified
     match maybeReleased,maybeModified with
-    | Choice1Of2 released, Choice1Of2 modified ->
+    | Ok released, Ok modified ->
         SurfaceArea.bump version released modified
-        |> Choice1Of2
+        |> Ok
     | _, _ ->
         let errors = 
             [maybeReleased;maybeModified] 
-            |> List.choose (function Choice2Of2 err-> Some err | _ -> None)
+            |> List.choose (function Error err-> Some err | _ -> None)
             |> List.toArray
         
-        Choice2Of2 (String.Join(Environment.NewLine, errors) )
+        Error (String.Join(Environment.NewLine, errors) )
 
 [<EntryPoint>]
 let main argv = 
     let parser = ArgumentParser.Create<CLIArguments>(programName = "synver.exe")
 
     let results = parser.Parse argv
-    let writeResult (res:Choice<string,string>)=
+    let writeResult (res:Result<string,string>)=
         match res with
-        | Choice1Of2 msg-> Console.WriteLine msg ; 0
-        | Choice2Of2 msg->Console.Error.WriteLine msg ; 1
+        | Ok msg-> Console.WriteLine msg ; 0
+        | Error msg->Console.Error.WriteLine msg ; 1
 
     let all = results.GetAllResults()
     if List.isEmpty all then
-        Choice2Of2(parser.PrintUsage())
+        Error(parser.PrintUsage())
     elif results.IsUsageRequested then
-        Choice1Of2(parser.PrintUsage())
+        Ok(parser.PrintUsage())
     else
         let maybeFile = results.TryGetResult(<@ Surface_of @>)
         let maybeDiff = results.TryGetResult(<@ Diff @>)
@@ -107,28 +104,27 @@ let main argv =
         match maybeFile, maybeDiff, maybeMagnitude, maybeBump with
         | Some file, None, None, None ->
             loadAssembly file
-            |> mapFirst (
+            |> Result.map (
                 SurfaceArea.ofAssembly 
-                >> Json.serialize
-                >>(Json.formatWith JsonFormattingOptions.Pretty)
+                >> Lson.serialize
             )
         | None, Some (released, modified), None, None ->
             getDiff released modified
         | None, None, Some (released,modified), None ->
             getBump "0.0.0" released modified
             |> function 
-                | Choice1Of2 (_,version)->version.ToString() |>Choice1Of2
-                | Choice2Of2 a->Choice2Of2 a
+                | Ok (_,version)->version.ToString() |>Ok
+                | Error a->Error a
         | None, None, None, Some (version,released,modified) ->
             getBump version released modified
             |> function 
-                | Choice1Of2 (version,_)->version |>Choice1Of2
-                | Choice2Of2 a->Choice2Of2 a
+                | Ok (version,_)->version |>Ok
+                | Error a->Error a
         | _,_,_,_ ->
-            Choice2Of2(parser.PrintUsage())
+            Error(parser.PrintUsage())
         |> (fun res-> 
             match res, maybeOutput with
-            | Choice1Of2 content, Some output-> 
+            | Ok content, Some output-> 
                 File.WriteAllText(output, content)
                 res
             | _ -> res
