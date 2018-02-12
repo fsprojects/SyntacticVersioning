@@ -37,6 +37,6 @@
     <None Include="paket.template" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.2.*" />
+    <PackageReference Include="FSharp.Core" Version="4.3.*" />
   </ItemGroup>
 </Project>

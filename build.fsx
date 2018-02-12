@@ -196,7 +196,7 @@ Target "Build" (fun _ ->
 // Run the unit tests using test runner
 
 Target "RunTests" (fun _ ->
-    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/SyntacticVersioning.Tests.exe","--summary")
+    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/net461/SyntacticVersioning.Tests.exe","--summary")
     |> fun r -> if r<>0 then failwith "SyntacticVersioning.Tests.exe failed"
 )
 

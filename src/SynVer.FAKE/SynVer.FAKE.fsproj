@@ -28,5 +28,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FAKE.Lib" Version="4.*" />
+    <PackageReference Include="FSharp.Core" Version="4.3.*" />
   </ItemGroup>
 </Project>
