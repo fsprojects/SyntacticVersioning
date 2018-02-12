@@ -1,6 +1,5 @@
 source https://api.nuget.org/v3/index.json
 redirects on
-framework >= net451
 
 nuget Chiron ~> 6
 github wallymathieu/FSharp.SExpression SExpression.fs
@@ -15,7 +14,7 @@ group Build
   source https://nuget.org/api/v2
   
   nuget SourceLink.Fake
-  nuget FAKE
+  nuget FAKE ~> 4
   nuget FSharp.Formatting
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx

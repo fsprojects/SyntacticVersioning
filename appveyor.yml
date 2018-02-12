@@ -1,3 +1,4 @@
+image: Visual Studio 2017
 init:
   - git config --global core.autocrlf input
 build_script:
@@ -7,3 +8,6 @@ version: 0.0.1.{build}
 artifacts:
   - path: bin
     name: bin
+branches:
+  only:
+  - master
