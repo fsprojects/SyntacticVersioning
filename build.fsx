@@ -180,6 +180,12 @@ Target "Clean" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
+Target "Restore" (fun _ ->
+    !! solutionFile
+    |> MSBuildReleaseExt "" vsProjProps "Restore"
+    |> ignore
+)
+
 Target "Build" (fun _ ->
     !! solutionFile
     |> MSBuildReleaseExt "" vsProjProps "Rebuild"
@@ -419,6 +425,7 @@ Target "BuildPackage" DoNothing
 Target "All" DoNothing
 
 "AssemblyInfo"
+  ==> "Restore"
   ==> "Build"
   ==> "CopyBinaries"
   ==> "ExampleProjects"
