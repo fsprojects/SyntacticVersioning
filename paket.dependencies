@@ -7,10 +7,11 @@ nuget Argu
 nuget vswhere
 
 group Build
+  source https://api.nuget.org/v3/index.json
   source https://nuget.org/api/v2
   
   nuget SourceLink.Fake
-  nuget FAKE prerelease
+  nuget FAKE ~> 5 prerelease
   nuget FSharp.Formatting
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx
