@@ -11,7 +11,6 @@ group Build
   source https://nuget.org/api/v2
   source https://ci.appveyor.com/nuget/fsharp-formatting
 
-  nuget SourceLink.Fake
   nuget FAKE ~> 5 prerelease
   nuget FSharp.Formatting ~> 3 prerelease
 
