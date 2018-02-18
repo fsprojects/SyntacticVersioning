@@ -14,6 +14,8 @@ open System.IO
 #load "packages/build/SourceLink.Fake/tools/Fake.fsx"
 open SourceLink
 #endif
+let visualStudioInstallDir = getBuildParamOrDefault "VSInstallDir" @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\"
+
 // --------------------------------------------------------------------------------------
 // START TODO: Provide project-specific details below
 // --------------------------------------------------------------------------------------
@@ -112,6 +114,13 @@ Target "AssemblyInfo" (fun _ ->
         )
 )
 let exampleProjects = "tests/ExampleProjects/"
+#if MONO
+let extraCscParams = id
+#else
+let extraCscParams (parameters:CscHelper.CscParams) = 
+  { parameters with ToolPath = visualStudioInstallDir </> @"MSBuild\15.0\Bin\Roslyn\csc.exe" }
+#endif
+
 module create=
     open FscHelper
     let fsharpProjectFromFile fileName name=
@@ -125,14 +134,6 @@ module create=
         |> ignore
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
     open CscHelper
-
-    #if MONO
-    let extraCscParams = id
-    #else
-    let installDir = getBuildParamOrDefault "VSInstallDir" @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\"
-    let extraCscParams (parameters:CscParams) = { parameters with ToolPath = installDir </> @"MSBuild\15.0\Bin\Roslyn\csc.exe" }
-    #endif
-
     let csharpProjectFromFile fileName name=
         let dllName = sprintf "%s.dll" name
         let dll =  exampleProjects </> "lib"</> dllName
@@ -252,8 +253,14 @@ Target "PublishNuget" (fun _ ->
 let fakePath = "packages" </> "build" </> "FAKE" </> "tools" </> "FAKE.exe"
 let fakeStartInfo script workingDirectory args fsiargs environmentVars =
     (fun (info: System.Diagnostics.ProcessStartInfo) ->
+        #if MONO
+        info.FileName <- "mono"
+        let fullFakePath = System.IO.Path.GetFullPath fakePath
+        info.Arguments <- sprintf "%s %s --fsiargs -d:FAKE %s \"%s\"" fullFakePath args fsiargs script
+        #else
         info.FileName <- System.IO.Path.GetFullPath fakePath
         info.Arguments <- sprintf "%s --fsiargs -d:FAKE %s \"%s\"" args fsiargs script
+        #endif
         info.WorkingDirectory <- workingDirectory
         let setVar k v =
             info.EnvironmentVariables.[k] <- v

@@ -9,10 +9,11 @@ nuget vswhere
 group Build
   source https://api.nuget.org/v3/index.json
   source https://nuget.org/api/v2
-  
+  source https://ci.appveyor.com/nuget/fsharp-formatting
+
   nuget SourceLink.Fake
   nuget FAKE ~> 5 prerelease
-  nuget FSharp.Formatting
+  nuget FSharp.Formatting ~> 3 prerelease
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx
 
