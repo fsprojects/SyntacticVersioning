@@ -4,6 +4,7 @@ redirects on
 nuget Chiron ~> 6
 github wallymathieu/FSharp.SExpression SExpression.fs
 nuget Argu 
+nuget vswhere
 
 group Build
   source https://nuget.org/api/v2

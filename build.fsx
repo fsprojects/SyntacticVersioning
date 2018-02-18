@@ -124,15 +124,22 @@ module create=
                   Target Library ]
         |> ignore
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
-        
     open CscHelper
+
+    #if MONO
+    let extraCscParams = id
+    #else
+    let installDir = getBuildParamOrDefault "VSInstallDir" @"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\"
+    let extraCscParams (parameters:CscParams) = { parameters with ToolPath = installDir </> @"MSBuild\15.0\Bin\Roslyn\csc.exe" }
+    #endif
+
     let csharpProjectFromFile fileName name=
         let dllName = sprintf "%s.dll" name
         let dll =  exampleProjects </> "lib"</> dllName
         let assemblyInfo =  exampleProjects </> "src"</> "AssemblyInfo.cs"
         [fileName; assemblyInfo] |>
             csc (fun parameters ->
-                { parameters with Output = dll; Target = Library })
+                { parameters with Output = dll; Target = Library } |> extraCscParams)
         |> ignore
         //mcs -target:library -out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.cs"
 
