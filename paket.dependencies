@@ -4,17 +4,12 @@ redirects on
 nuget Chiron ~> 6
 github wallymathieu/FSharp.SExpression SExpression.fs
 nuget Argu 
-nuget FSharp.Core ~> 4 redirects: force
-nuget FAKE.Lib ~> 4
-nuget Expecto
-nuget Expecto.BenchmarkDotNet
-nuget Expecto.FsCheck
 
 group Build
   source https://nuget.org/api/v2
   
   nuget SourceLink.Fake
-  nuget FAKE ~> 4
+  nuget FAKE prerelease
   nuget FSharp.Formatting
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx

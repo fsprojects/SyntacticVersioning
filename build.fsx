@@ -49,9 +49,6 @@ let solutionFile  = "SynVer.sln"
 // Default target configuration
 let configuration = "Release"
 
-// Pattern specifying assemblies to be tested using NUnit
-let testAssemblies = "tests/**/bin" </> configuration </> "**" </> "*Tests*.dll"
-
 // Git configuration (used for publishing documentation in gh-pages branch)
 // The profile where the project is posted
 let gitOwner = "fsprojects"
@@ -196,8 +193,8 @@ Target "Build" (fun _ ->
 // Run the unit tests using test runner
 
 Target "RunTests" (fun _ ->
-    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/net461/SyntacticVersioning.Tests.exe","--summary")
-    |> fun r -> if r<>0 then failwith "SyntacticVersioning.Tests.exe failed"
+    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/net461/SynVer.Tests.exe","--summary")
+    |> fun r -> if r<>0 then failwith "SynVer.Tests.exe failed"
 )
 
 #if MONO
