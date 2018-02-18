@@ -7,7 +7,6 @@ open Fake
 open Fake.Git
 open Fake.AssemblyInfoFile
 open Fake.ReleaseNotesHelper
-open Fake.UserInputHelper
 open System
 open System.IO
 #if MONO
@@ -192,10 +191,16 @@ Target "Build" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 
-Target "RunTests" (fun _ ->
+Target "RunNet4Tests" (fun _ ->
     Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/net461/SynVer.Tests.exe","--summary")
     |> fun r -> if r<>0 then failwith "SynVer.Tests.exe failed"
 )
+
+Target "RunNetCoreTests" (fun _ ->
+  DotNetCli.RunCommand id ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll --summary")
+)
+
+Target "RunTests" DoNothing
 
 #if MONO
 #else
@@ -447,6 +452,9 @@ Target "All" DoNothing
 
 "Clean"
   ==> "Release"
+
+"RunNet4Tests" ==> "RunTests"
+"RunNetCoreTests" ==> "RunTests"
 
 "BuildPackage"
   ==> "PublishNuget"

@@ -45,7 +45,6 @@
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
     <Compile Include="Lson.fs" />
-    <None Include="paket.template" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.*" />

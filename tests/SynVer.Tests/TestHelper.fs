@@ -9,8 +9,8 @@ let nlJoin (lines:string seq)=System.String.Join("\n",lines)
 let wTrim (str:string) = str.Trim([| '\n';'\t';' ';'\r' |])
 let asm = Assembly.GetExecutingAssembly()
 let testPath= Path.GetDirectoryName asm.Location
-let exampleProjectsPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</> "ExampleProjects" )
-let packagesPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</>".."</> "packages")
+let exampleProjectsPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</> ".."</> "ExampleProjects")
+let packagesPath = Path.GetFullPath( testPath </> ".."</>".."</>".."</>".."</> ".."</> "packages")
 let exampleProjectsLibPath = exampleProjectsPath </> "lib"
 // since all the dll-s have unique names, they can be loaded at the same time
 let csharp = exampleProjectsLibPath </> "Csharp.dll" |> Assembly.LoadFile
@@ -24,7 +24,7 @@ let enum3txt = exampleProjectsPath </> "src" </> "Enum3.txt" |> File.ReadAllLine
 let fsharp = exampleProjectsLibPath </> "Fsharp.dll" |> Assembly.LoadFile
 let fsharp2 = exampleProjectsLibPath </> "Fsharp2.dll" |> Assembly.LoadFile
 let fsharp2txt = exampleProjectsPath </> "src" </> "Fsharp2.txt" |> File.ReadAllLines |>nlJoin |> wTrim
-let arguAssembly= packagesPath </>"Argu"</>"lib"</> "net40" </>"Argu.dll" |> Assembly.LoadFile
+let arguAssembly= packagesPath </>"Argu"</>"lib"</> "net45" </>"Argu.dll" |> Assembly.LoadFile
 let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net40" </>"Chiron.dll" |> Assembly.LoadFile
 
 module Types=
