@@ -3,6 +3,13 @@
     <OutputType>Library</OutputType>
     <RootNamespace>SynVer.FAKE</RootNamespace>
     <AssemblyName>SynVer.FAKE</AssemblyName>
+    <Title>Syntactic Versioning FAKE</Title>
+    <PackageLicenseUrl>https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/fsprojects/SyntacticVersioning/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/SyntacticVersioning/</PackageProjectUrl>
+    <PackageTags>syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png</PackageIconUrl>
+
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

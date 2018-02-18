@@ -2,8 +2,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <Title>SynVer</Title>
+    <Title>Syntactic Versioning Tool</Title>
     <AssemblyName>synver</AssemblyName>
+    <PackageId>SynVer</PackageId>
+    <Authors>Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)</Authors>
+    <Owners>Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)</Owners>
+    <Product>SynVer</Product>
+    <Description>Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)</Description>
+    <RootNamespace>SynVer</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageLicenseUrl>https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/fsprojects/SyntacticVersioning/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/SyntacticVersioning/</PackageProjectUrl>
+    <PackageTags>syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png</PackageIconUrl>
+
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -13,6 +26,7 @@
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
+
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />

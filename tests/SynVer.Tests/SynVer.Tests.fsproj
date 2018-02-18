@@ -4,17 +4,6 @@
     <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\SynVer.Lib\SynVer.Lib.fsproj" />
-    <Compile Include="TestHelper.fs" />
-    <Compile Include="Tests.fs" />
-    <Compile Include="SurfaceAreaTests.fs" />
-    <Compile Include="NetTypeTests.fs" />
-    <None Include="paket.references" />
-    <Compile Include="SerializationTests.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
-  <!-- for netstandard we don't want the below: -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461'">
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -30,8 +19,9 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-   <PackageReference Include="FSharp.Core" Version="4.3.*" />
-   <PackageReference Include="Expecto" Version="5.1.*" />
-   <PackageReference Include="Expecto.FsCheck" Version="5.1.*" />
+    <ProjectReference Include="..\..\src\SynVer.Lib\SynVer.Lib.fsproj" />
+    <PackageReference Include="FSharp.Core" Version="4.3.*" />
+    <PackageReference Include="Expecto" Version="5.1.*" />
+    <PackageReference Include="Expecto.FsCheck" Version="5.1.*" />
   </ItemGroup>
 </Project>
