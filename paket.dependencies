@@ -1,22 +1,18 @@
 source https://api.nuget.org/v3/index.json
 redirects on
-framework >= net451
 
 nuget Chiron ~> 6
 github wallymathieu/FSharp.SExpression SExpression.fs
 nuget Argu 
-nuget FSharp.Core ~> 4 redirects: force
-nuget FAKE.Lib ~> 4
-nuget Expecto
-nuget Expecto.BenchmarkDotNet
-nuget Expecto.FsCheck
+nuget vswhere
 
 group Build
+  source https://api.nuget.org/v3/index.json
   source https://nuget.org/api/v2
-  
-  nuget SourceLink.Fake
-  nuget FAKE
-  nuget FSharp.Formatting
+  source https://ci.appveyor.com/nuget/fsharp-formatting
+
+  nuget FAKE ~> 5 prerelease
+  nuget FSharp.Formatting ~> 3 prerelease
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx
 

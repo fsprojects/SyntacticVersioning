@@ -35,6 +35,7 @@ open System.IO
 open Fake.FileHelper
 open FSharp.Literate
 open FSharp.MetadataFormat
+open FSharp.Formatting.Razor
 
 // When called from 'build.fsx', use the public project URL as <root>
 // otherwise, use the current 'output' directory.
@@ -98,7 +99,7 @@ let libDirs =
 // Build API reference from XML comments
 let buildReference () =
   CleanDir (output @@ "reference")
-  MetadataFormat.Generate
+  RazorMetadataFormat.Generate
     ( binaries, output @@ "reference", layoutRootsAll.["en"],
       parameters = ("root", root)::info,
       sourceRepo = githubLink @@ "tree/master",
@@ -110,7 +111,7 @@ let buildDocumentation () =
 
   // First, process files which are placed in the content root directory.
 
-  Literate.ProcessDirectory
+  RazorLiterate.ProcessDirectory
     ( content, docTemplate, output, replacements = ("root", root)::info,
       layoutRoots = layoutRootsAll.["en"],
       generateAnchors = true,
@@ -130,7 +131,7 @@ let buildDocumentation () =
         | Some lang -> layoutRootsAll.[lang]
         | None -> layoutRootsAll.["en"] // "en" is the default language
 
-    Literate.ProcessDirectory
+    RazorLiterate.ProcessDirectory
       ( dir, docTemplate, output @@ dirname, replacements = ("root", root)::info,
         layoutRoots = layoutRoots,
         generateAnchors = true )
