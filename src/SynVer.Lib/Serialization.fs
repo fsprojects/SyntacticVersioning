@@ -1,6 +1,6 @@
 ﻿module internal SynVer.Serialization
-open FSharp.SExpression
-type E = Expression
+open LSON
+type E = SExpr
 
 module private Enums =
   let serialize (e : 'e when 'e :> System.Enum and 'e : (new:unit->'e) and 'e : struct) =
@@ -26,11 +26,11 @@ module private Bool =
       | _ -> None
 module Type=
   let serialize  (x:Typ) =
-    E.List [ E.Symbol "typ" ; E.String x.FullName ]
+    E.List [ E.Token "typ" ; E.String x.FullName ]
   let deSerialize v : Typ option=
       match v with 
       | E.List [ 
-                E.Symbol "typ"; E.String n
+                E.Token "typ"; E.String n
                ] -> Some { FullName = n}
       | _ -> None
 
@@ -38,16 +38,16 @@ module Type=
 module Parameter=
   let deSerialize v : Parameter option=
       match v with 
-      | E.List [ E.Symbol "typ"; typ; E.Symbol "name"; E.String n ] -> 
+      | E.List [ E.Token "typ"; typ; E.Token "name"; E.String n ] -> 
         Type.deSerialize typ |> Option.map ( fun t -> { Type = t; Name = n } )
       | _ -> None
   let serialize  (x:Parameter) =
-    E.List [ E.Symbol "typ" ; Type.serialize x.Type; E.Symbol "name"; E.String x.Name]
+    E.List [ E.Token "typ" ; Type.serialize x.Type; E.Token "name"; E.String x.Name]
 
 module ConstructorLike=
        let deSerialize v : ConstructorLike option=
           match v with 
-          | E.List (E.Symbol "typ" :: typ:: E.Symbol "params" :: [E.List parameters]) -> 
+          | E.List (E.Token "typ" :: typ:: E.Token "params" :: [E.List parameters]) -> 
             let p= parameters |> List.map Parameter.deSerialize 
             if List.exists Option.isNone p then
               None
@@ -56,17 +56,17 @@ module ConstructorLike=
           | _ -> None
 
        let serialize  (x:ConstructorLike) =
-          E.List [ E.Symbol "typ" ; Type.serialize x.Type; E.Symbol "params"; E.List (List.map Parameter.serialize x.Parameters)]
+          E.List [ E.Token "typ" ; Type.serialize x.Type; E.Token "params"; E.List (List.map Parameter.serialize x.Parameters)]
 
 module MethodLike=
   let deSerialize v : MethodLike option=
       match v with 
           | E.List [
-                    E.Symbol "typ" ; typ; 
-                    E.Symbol "instance" ; instance
-                    E.Symbol "name" ; E.String name
-                    E.Symbol "result"; result
-                    E.Symbol "params" ; E.List parameters
+                    E.Token "typ" ; typ; 
+                    E.Token "instance" ; instance
+                    E.Token "name" ; E.String name
+                    E.Token "result"; result
+                    E.Token "params" ; E.List parameters
                    ] -> 
             let p= parameters |> List.map Parameter.deSerialize  
             if List.exists Option.isNone p then
@@ -82,21 +82,21 @@ module MethodLike=
   let serialize  (x:MethodLike) =
       E.List (
         [
-          E.Symbol "typ" ; Type.serialize x.Type
-          E.Symbol "instance" ; Enums.serialize x.Instance
-          E.Symbol "name" ; String x.Name
-          E.Symbol "result" ; Type.serialize x.Result
-          E.Symbol "params" ; E.List (List.map Parameter.serialize x.Parameters)
+          E.Token "typ" ; Type.serialize x.Type
+          E.Token "instance" ; Enums.serialize x.Instance
+          E.Token "name" ; String x.Name
+          E.Token "result" ; Type.serialize x.Result
+          E.Token "params" ; E.List (List.map Parameter.serialize x.Parameters)
         ] )
 
 module FieldLike=
   let deSerialize v : FieldLike option=
       match v with 
       | E.List [
-                E.Symbol "typ" ; typ; 
-                E.Symbol "instance" ; instance
-                E.Symbol "name" ; E.String name
-                E.Symbol "result"; result
+                E.Token "typ" ; typ; 
+                E.Token "instance" ; instance
+                E.Token "name" ; E.String name
+                E.Token "result"; result
                ] -> 
           match (Enums.deSerialize instance, Type.deSerialize typ, Type.deSerialize result) with 
           | (Some i, Some t, Some r) ->
@@ -108,33 +108,33 @@ module FieldLike=
   let serialize (x:FieldLike) =
       E.List (
         [
-          E.Symbol "typ" ; Type.serialize x.Type
-          E.Symbol "instance" ; Enums.serialize x.Instance
-          E.Symbol "name" ; String x.Name
-          E.Symbol "result" ; Type.serialize x.Result
+          E.Token "typ" ; Type.serialize x.Type
+          E.Token "instance" ; Enums.serialize x.Instance
+          E.Token "name" ; String x.Name
+          E.Token "result" ; Type.serialize x.Result
         ] )
 
 
 module Member=
   let deSerialize v : Member option =
     match v with
-    |  E.List [ E.Symbol "RecordConstructor"; c] -> 
+    |  E.List [ E.Token "RecordConstructor"; c] -> 
         ConstructorLike.deSerialize c |> Option.map RecordConstructor
-    | E.List [ E.Symbol "Constructor";c ]-> 
+    | E.List [ E.Token "Constructor";c ]-> 
         ConstructorLike.deSerialize c |> Option.map Constructor
-    | E.List [ E.Symbol "UnionConstructor"; typ; ctor ]-> 
+    | E.List [ E.Token "UnionConstructor"; typ; ctor ]-> 
         match ( ConstructorLike.deSerialize ctor, Type.deSerialize typ) with
         | (Some c, Some t) -> UnionConstructor (t,c) |> Some
         | _ -> None
-    | E.List [ E.Symbol "Event";m ]-> MethodLike.deSerialize m |> Option.map Event
-    | E.List [ E.Symbol "Field";f ]-> FieldLike.deSerialize f |> Option.map Field
-    | E.List [ E.Symbol "Method";m ]-> MethodLike.deSerialize m |> Option.map Method
-    | E.List [ E.Symbol "Property";m ]-> FieldLike.deSerialize m |> Option.map Property
+    | E.List [ E.Token "Event";m ]-> MethodLike.deSerialize m |> Option.map Event
+    | E.List [ E.Token "Field";f ]-> FieldLike.deSerialize f |> Option.map Field
+    | E.List [ E.Token "Method";m ]-> MethodLike.deSerialize m |> Option.map Method
+    | E.List [ E.Token "Property";m ]-> FieldLike.deSerialize m |> Option.map Property
     | E.List [ 
-              E.Symbol "UnionCase"; 
-              E.Symbol "type"; typ; 
-              E.Symbol "name"; E.String name;
-              E.Symbol "params"; E.List parameters
+              E.Token "UnionCase"; 
+              E.Token "type"; typ; 
+              E.Token "name"; E.String name;
+              E.Token "params"; E.List parameters
              ]-> 
         let p= parameters |> List.map Parameter.deSerialize 
         if List.exists Option.isNone p then
@@ -142,47 +142,47 @@ module Member=
         else
           Type.deSerialize typ |> Option.map ( fun t -> UnionCase (t,name, p |> List.map Option.get )) 
     | E.List [ 
-              E.Symbol "EnumValue"; 
-              E.Symbol "type"; typ; 
-              E.Symbol "name"; E.String name;
-              E.Symbol "value"; E.String value
+              E.Token "EnumValue"; 
+              E.Token "type"; typ; 
+              E.Token "name"; E.String name;
+              E.Token "value"; E.String value
              ]-> 
         Type.deSerialize typ |> Option.map ( fun t -> EnumValue (t, name, value))
     | _ -> None
   let serialize  (x: Member) =
       match x with
-      | RecordConstructor c -> E.List [ E.Symbol "RecordConstructor"; ConstructorLike.serialize c ]
-      | Constructor c -> E.List [ E.Symbol "Constructor"; ConstructorLike.serialize c ]
-      | UnionConstructor (t,c) -> E.List [ E.Symbol "UnionConstructor"; Type.serialize t; ConstructorLike.serialize c ]
-      | Event e ->E.List [ E.Symbol "Event"; MethodLike.serialize e]
-      | Field e ->E.List [ E.Symbol "Field"; FieldLike.serialize e]
-      | Method e ->E.List [ E.Symbol "Method"; MethodLike.serialize e]
-      | Property e ->E.List [ E.Symbol "Property"; FieldLike.serialize e]
+      | RecordConstructor c -> E.List [ E.Token "RecordConstructor"; ConstructorLike.serialize c ]
+      | Constructor c -> E.List [ E.Token "Constructor"; ConstructorLike.serialize c ]
+      | UnionConstructor (t,c) -> E.List [ E.Token "UnionConstructor"; Type.serialize t; ConstructorLike.serialize c ]
+      | Event e ->E.List [ E.Token "Event"; MethodLike.serialize e]
+      | Field e ->E.List [ E.Token "Field"; FieldLike.serialize e]
+      | Method e ->E.List [ E.Token "Method"; MethodLike.serialize e]
+      | Property e ->E.List [ E.Token "Property"; FieldLike.serialize e]
       | UnionCase (typ,name,param) ->
         E.List [
-          E.Symbol "UnionCase"
-          E.Symbol "type"; Type.serialize typ
-          E.Symbol "name"; E.String name
-          E.Symbol "params"; E.List (List.map Parameter.serialize param)
+          E.Token "UnionCase"
+          E.Token "type"; Type.serialize typ
+          E.Token "name"; E.String name
+          E.Token "params"; E.List (List.map Parameter.serialize param)
         ]
       | EnumValue (typ,name,value) ->
           E.List [
-            E.Symbol "EnumValue"
-            E.Symbol "type"; Type.serialize typ
-            E.Symbol "name"; E.String name
-            E.Symbol "value"; E.String value
+            E.Token "EnumValue"
+            E.Token "type"; Type.serialize typ
+            E.Token "name"; E.String name
+            E.Token "value"; E.String value
           ]
 
 module SurfaceOfType=
   let deSerialize v : SurfaceOfType option=
     match v with
     | E.List [ 
-              E.Symbol "EnumValue"
-              E.Symbol "typ"; typ 
-              E.Symbol "netType"; netType
-              E.Symbol "members"; E.List members
-              E.Symbol "sumtype"; sumtype
-              E.Symbol "baseTyp"; baseTyp
+              E.Token "EnumValue"
+              E.Token "typ"; typ 
+              E.Token "netType"; netType
+              E.Token "members"; E.List members
+              E.Token "sumtype"; sumtype
+              E.Token "baseTyp"; baseTyp
              ]-> 
       match (Type.deSerialize typ, Enums.deSerialize netType, Bool.deSerialize sumtype ) with
       | (Some t, Some n, Some s) ->
@@ -196,20 +196,20 @@ module SurfaceOfType=
 
   let serialize (x:SurfaceOfType) =
     E.List [ 
-              E.Symbol "EnumValue"
-              E.Symbol "typ"; Type.serialize x.Type
-              E.Symbol "netType"; Enums.serialize x.NetType
-              E.Symbol "members"; E.List <| List.map Member.serialize x.Members
-              E.Symbol "sumtype"; Bool.serialize x.SumType
-              E.Symbol "baseTyp"; (match x.BaseType with | Some b-> Type.serialize b | None -> E.List [])
+              E.Token "EnumValue"
+              E.Token "typ"; Type.serialize x.Type
+              E.Token "netType"; Enums.serialize x.NetType
+              E.Token "members"; E.List <| List.map Member.serialize x.Members
+              E.Token "sumtype"; Bool.serialize x.SumType
+              E.Token "baseTyp"; (match x.BaseType with | Some b-> Type.serialize b | None -> E.List [])
              ]
 
 module Namespace=
   let deSerialize v : Namespace option=
     match v with 
     | E.List [
-              E.Symbol "namespace" ; E.String namespace'
-              E.Symbol "types" ; E.List types
+              E.Token "namespace" ; E.String namespace'
+              E.Token "types" ; E.List types
              ] -> 
          let ts= types |> List.map SurfaceOfType.deSerialize 
          if List.exists Option.isNone ts then
@@ -219,15 +219,15 @@ module Namespace=
     | _ -> None
   let serialize  (x:Namespace) =
     E.List [
-             E.Symbol "namespace" ; E.String x.Namespace
-             E.Symbol "types" ; E.List <| List.map SurfaceOfType.serialize x.Types
+             E.Token "namespace" ; E.String x.Namespace
+             E.Token "types" ; E.List <| List.map SurfaceOfType.serialize x.Types
            ]
 
 module Package=
   let deSerialize v : Package option=
     match v with 
     | E.List [
-              E.Symbol "namespaces" ; E.List namespaces
+              E.Token "namespaces" ; E.List namespaces
              ] -> 
          let ns= namespaces |> List.map Namespace.deSerialize 
          if List.exists Option.isNone ns then
@@ -237,5 +237,5 @@ module Package=
     | _ -> None
   let serialize  (x:Package) =
     E.List [
-            E.Symbol "namespaces" ; E.List <| List.map Namespace.serialize x.Namespaces
+            E.Token "namespaces" ; E.List <| List.map Namespace.serialize x.Namespaces
            ]

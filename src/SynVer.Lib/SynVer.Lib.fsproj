@@ -13,7 +13,6 @@
     <PackageProjectUrl>https://github.com/fsprojects/SyntacticVersioning/</PackageProjectUrl>
     <PackageTags>syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png</PackageIconUrl>
-
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OtherFlags Condition=" '$(TargetFramework)' == 'netstandard2.0'">--warnon:1182</OtherFlags>
     <OtherFlags Condition=" '$(TargetFramework)' == 'net461'">--warnon:1182</OtherFlags>
@@ -34,9 +33,9 @@
     <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\wallymathieu\FSharp.SExpression\SExpression.fs">
+    <Compile Include="..\..\paket-files\fsprojects\LSON\LSON.fs">
       <Paket>True</Paket>
-      <Link>paket-files/SExpression.fs</Link>
+      <Link>paket-files/LSON.fs</Link>
     </Compile>
     <Compile Include="Models.fs" />
     <Compile Include="Serialization.fs" />
