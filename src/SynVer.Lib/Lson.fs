@@ -1,13 +1,11 @@
 ﻿module SynVer.Lson
 open SynVer.Serialization
-open FSharp.SExpression
-let serialize (p:Package) = Package.serialize p |> print
+open LSON
+let serialize (p:Package) = Package.serialize p |> stringify
 let tryDeserialize v :Package option=
-  match parse v with
-  | [e] -> Package.deSerialize e
-  | _ -> None
+  Package.deSerialize (LSON.parse v)
 
-let deserialize v :Package =
+let deserialize (v:string) :Package =
   match tryDeserialize v with
   | None -> failwithf "expected serialized package ! %s" v
   | Some p -> p

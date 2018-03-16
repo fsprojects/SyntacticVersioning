@@ -2,7 +2,7 @@ source https://api.nuget.org/v3/index.json
 redirects on
 
 nuget Chiron ~> 6
-github wallymathieu/FSharp.SExpression SExpression.fs
+github fsprojects/LSON LSON.fs
 nuget Argu 
 nuget vswhere
 
