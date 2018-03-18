@@ -30,13 +30,18 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="../SynVer.Lib/Models.fs" />
+    <Compile Include="../SynVer.Lib/Serialization.fs" />
+    <Compile Include="../SynVer.Lib/Lson.fs" />
+    <Compile Include="../SynVer.Lib/Reflect.fs" />
+    <Compile Include="../SynVer.Lib/Compare.fs" />
+    <Compile Include="../SynVer.Lib/SurfaceArea.fs" />
+
     <Compile Include="Program.fs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Argu" Version="5.*" />
     <PackageReference Include="FSharp.Core" Version="4.3.*" />
+    <PackageReference Include="LSON" Version="0.1.*" />
   </ItemGroup>
 </Project>

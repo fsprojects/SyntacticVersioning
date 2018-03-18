@@ -1,4 +1,4 @@
-module SynVer
+module SynVer.Tool
 open System
 open Argu
 open SynVer
