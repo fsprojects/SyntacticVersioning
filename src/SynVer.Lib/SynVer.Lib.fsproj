@@ -43,7 +43,6 @@
     <Compile Include="Reflect.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
-    <Compile Include="Lson.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.*" />
