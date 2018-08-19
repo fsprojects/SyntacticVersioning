@@ -1,22 +1,23 @@
 module SynVer.SurfaceArea
 open System
-open Reflect
+//open Reflect
 open System.IO
 open System.Security.Cryptography
+open Mono.Cecil
 
 /// Get the surface of a type
 [<CompiledName("OfType")>]
 let ofType (t:Type) : SurfaceOfType=
-  let typ = typeToTyp t
-  let netType = tagNetType t
-  let members = getTypeMembers t
-  let baseT = t.BaseType |> Option.ofObj |> Option.map typeToTyp
-  SurfaceOfType.Create typ netType members (isSumType t) baseT
+  let typ = Reflect.typeToTyp t
+  let netType = Reflect.tagNetType t
+  let members = Reflect.getTypeMembers t
+  let baseT = t.BaseType |> Option.ofObj |> Option.map Reflect.typeToTyp
+  SurfaceOfType.Create typ netType members (Reflect.isSumType t) baseT
 
 /// Get the surface of an assembly
 [<CompiledName("OfAssembly")>]
 let ofAssembly assembly : Package=
-  let types = exportedTypes assembly
+  let types = Reflect.exportedTypes assembly
   let toNs (ns,ts) ={
                       Namespace = (if ns <> null then ns else "")
                       Types= ts
@@ -26,6 +27,28 @@ let ofAssembly assembly : Package=
         |> List.map (fun t-> (t.Namespace, ofType t ))
         |> List.groupBy (fun (ns,_)->ns))
   { Namespaces = actual }
+[<CompiledName("OfTypeDefinition")>]
+let ofTypeDefinition (t:TypeDefinition) : SurfaceOfType=
+  let typ = Decompile.typeToTyp t
+  let netType = Decompile.tagNetType t
+  let members = Decompile.getTypeMembers t
+  let baseT = t.BaseType |> Option.ofObj |> Option.map Decompile.typeToTyp
+  SurfaceOfType.Create typ netType members (Decompile.isSumType t) baseT
+
+/// Get the surface of an assembly definition (loaded by Mono Cecil)
+[<CompiledName("OfAssemblyDefinition")>]
+let ofAssemblyDefinition (assembly:AssemblyDefinition) : Package=
+  let types = Decompile.exportedTypes assembly
+  let toNs (ns,ts) ={
+                      Namespace = (if ns <> null then ns else "")
+                      Types= ts
+                    }
+  let actual =
+      List.map ((fun (ns,ns_ts)-> (ns,ns_ts |> List.map snd)) >> toNs) (types 
+        |> List.map (fun t-> (t.Namespace, ofTypeDefinition t ))
+        |> List.groupBy (fun (ns,_)->ns))
+  { Namespaces = actual }
+
 [<AutoOpen>]
 module private Print=
   let typeInfo : SurfaceOfType -> string =

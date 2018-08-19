@@ -1,8 +1,9 @@
 module SynVer.Tests
 open SynVer
 open Expecto
-
 open TestHelper
+open TestAssemblies
+
 [<Tests>]
 let tests =
   testList "assembly diff" [

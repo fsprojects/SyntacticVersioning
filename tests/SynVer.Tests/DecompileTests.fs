@@ -1,12 +1,13 @@
-module SynVer.SerializationTests
+module SynVer.DecompileTests
 open SynVer
 open Expecto
+
 open TestHelper
-open TestAssemblies
+open CecilTestAssemblies
 
 let assertCanSerializeAndDeserialize assembly
   =
-    let surface = SurfaceArea.ofAssembly assembly
+    let surface = SurfaceArea.ofAssemblyDefinition assembly
     let deserialized 
         = surface
           |> Lson.serialize
@@ -14,7 +15,7 @@ let assertCanSerializeAndDeserialize assembly
     Expect.equal surface deserialized (assembly.ToString())
 [<Tests>]
 let tests =
-  testList "Serialization tests" [    
+  testList "Serialization tests (Mono.Cecil)" [    
     test "csharp" {
       assertCanSerializeAndDeserialize csharp
     }

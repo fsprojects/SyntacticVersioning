@@ -41,6 +41,7 @@
     <Compile Include="Serialization.fs" />
     <Compile Include="Lson.fs" />
     <Compile Include="Reflect.fs" />
+    <Compile Include="FSharpType.fs" />
     <Compile Include="Decompile.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />

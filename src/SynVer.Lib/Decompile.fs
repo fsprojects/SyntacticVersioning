@@ -2,13 +2,8 @@ namespace SynVer
 
 open System
 open Mono.Cecil
-open Mono.Cecil
 
 module Decompile =
-  module CustomAttribute=
-    let typ (a:CustomAttribute)= a.AttributeType
-    let typeName a = (typ a).Name
-    let typeFullName a = (typ a).FullName
   open Microsoft.FSharp.Core
 
   let private _tagNetType (t: TypeDefinition) : NetType =
@@ -59,9 +54,9 @@ module Decompile =
   let tagNetType = memoize _tagNetType
 
   [<CompiledName("ExportedTypes")>]
-  let exportedTypes (filename:string) : TypeDefinition list =
-    let r = ReaderParameters() 
-    let a = AssemblyDefinition.ReadAssembly (filename, r)
+  let exportedTypes (a:AssemblyDefinition) : TypeDefinition list =
+    //let r = ReaderParameters() 
+    //let a = AssemblyDefinition.ReadAssembly (filename, r)
     a.Modules 
       |> Seq.map (fun m-> m.Types)
       |> Seq.concat
@@ -114,10 +109,10 @@ module Decompile =
       Constructor (deconstructConstructor t ctr)
     let isStatic b = match b with | true -> InstanceOrStatic.Static | false -> InstanceOrStatic.Instance
 
-    let event' (ei:EventDefinition) : Member=
-      let mi = ei.EventType.GetMethod("Invoke")
-      let params' = mi.GetParameters() |> parametersToParameter
-      Event {Type=typeToTyp mi.ReflectedType
+    let event' t (ei:EventDefinition) : Member=
+      let mi = ei.InvokeMethod //ei.EventType.GetMethod("Invoke")
+      let params' = mi.Parameters |> parametersToParameter
+      Event {Type=typeToTyp t
              Instance= isStatic mi.IsStatic 
              Name= ei.Name
              Parameters= params'
@@ -163,7 +158,7 @@ module Decompile =
                 null
               else
                 n
-      FSharpType.GetUnionCases(t)
+      FSharpType.GetUnionCases (t.Resolve())
       |> Array.map(
         fun x ->
           let ps = x.GetFields()
@@ -174,8 +169,8 @@ module Decompile =
       )
       |> List.ofArray
 
-    let getTypeMember (t:Typ) (m:MemberReference) : Member list=
-      //let tag = tagNetType m.ReflectedType
+    let getTypeMember (t:TypeDefinition) (m:MemberReference) : Member list=
+      let tag = tagNetType t
       let m' = m.Resolve()
       // Handle cases like the Fsharp.Core does (and a bit more):
       //
@@ -183,18 +178,17 @@ module Decompile =
       //   FSharp.Core.Unittests/LibraryTestFx.fs#L103-L110
       //
       match m with
-        | MemberTypes.Constructor ->
-          let nameInfo = (m :?> ConstructorInfo)
+        (*| :? ConstructorReference as nameInfo->
           match tag with
             | NetType.RecordType ->[ (recordConstructor nameInfo)]
-            | __________ ->[ (constructor' nameInfo) ]
-        | MemberTypes.Event ->
-          [ (event' (m :?> EventInfo))]
-        | MemberTypes.Field -> 
-          [ (field (m :?> FieldInfo))]
-        | MemberTypes.Method ->
-          [ (method' (m :?> MethodInfo))]
-        | MemberTypes.NestedType ->
+            | __________ ->[ (constructor' nameInfo) ] *)
+        | :? EventReference as m ->
+          [ (event' t (m.Resolve()))]
+        | :? FieldReference as m ->
+          [ (field t (m.Resolve()))]
+        | :? MethodReference as m ->
+          [ (method' t (m.Resolve()))]
+        (*| MemberTypes.NestedType ->
           let nt = (m :?> Type)
           match tag with
             | NetType.SumType ->
@@ -204,13 +198,13 @@ module Decompile =
               |> unionConstructors' t
             | _ ->
               // Already handled in `let types = ...`
-              []
-        | MemberTypes.Property ->
-          [ (property (m :?> PropertyInfo))]
+              [] *)
+        | :? PropertyReference as p ->
+          [ (property t (p.Resolve()))]
         | _ ->
-          let fullname = m.ReflectedType.FullName
+          let fullname = t.FullName
           failwith
-            (sprintf "not handled: (%A,%s,%A)" tag fullname m.MemberType)
+            (sprintf "not handled: (%A,%s,%A)" tag fullname (m.GetType().Name))
    
   let enumValues (t:TypeDefinition) =
       let typ = typeToTyp t
@@ -224,11 +218,11 @@ module Decompile =
 
   [<CompiledName("GetTypeMembers")>]
   let getTypeMembers (t:TypeDefinition) : Member list=
-    let t' = typeToTyp t
+    //let t' = typeToTyp t
     let netT = tagNetType t
     //t.Methods
-    let l= List.collect (getTypeMember t') (t.Properties |> Seq.toList)
-    let l2= List.collect (getTypeMember t') (t.Fields |> Seq.toList)
+    let l= List.collect (getTypeMember t) (t.Properties |> Seq.toList)
+    let l2= List.collect (getTypeMember t) (t.Fields |> Seq.toList)
     match netT with
     | NetType.SumType -> l @ l2 @ toUnionCases t
     | NetType.Enum -> l @ l2 @ (enumValues t)
