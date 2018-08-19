@@ -4,6 +4,7 @@ open Argu
 open SynVer
 open System.Reflection
 open System.IO
+open Mono.Cecil
 
 type CLIArguments =
     | Surface_of of path:string
@@ -29,7 +30,7 @@ let (|AssemblyFile|LsonFile|Other|) (maybeFile:string) =
 
 let loadAssembly f =
   try
-    Assembly.LoadFile (Path.GetFullPath f)
+    AssemblyDefinition.ReadAssembly (Path.GetFullPath f)
     |> Ok
   with ex ->
     (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 
@@ -46,7 +47,7 @@ let getSurfaceAreaOf (f:string): Result<Package,string>=
     | None -> Error "Couldn't deserialize"
   | AssemblyFile -> 
         loadAssembly f
-        |> Result.map SurfaceArea.ofAssembly
+        |> Result.map SurfaceArea.ofAssemblyDefinition
   | Other -> Error "No dll or lson specified"
 
 
@@ -105,7 +106,7 @@ let main argv =
         | Some file, None, None, None ->
             loadAssembly file
             |> Result.map (
-                SurfaceArea.ofAssembly 
+                SurfaceArea.ofAssemblyDefinition 
                 >> Lson.serialize
             )
         | None, Some (released, modified), None, None ->
