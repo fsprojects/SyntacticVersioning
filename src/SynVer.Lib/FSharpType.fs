@@ -26,6 +26,7 @@ module Impl=
 
 
     let isCompilationMappingAttr a = CustomAttribute.typeName a = "CompilationMappingAttribute"
+    let isCompilationRepresentationAttr a = CustomAttribute.typeName a = "CompilationRepresentationAttribute"
     let getGenericTypeDefinition (ty:TypeReference) = 
         failwithf "! %s" ty.FullName
     
@@ -41,9 +42,9 @@ module Impl=
     let fsharpAssembly =
         let f = (typeof< FSharp.Core.FSharpTypeFunc>)
         AssemblyDefinition.ReadAssembly f.Assembly.Location
-    let isOptionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typeof<int option>) fsharpAssembly 
-    let isFunctionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typeof<(int -> int)>) fsharpAssembly
-    let isListType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typeof<int list>) fsharpAssembly
+    let isOptionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<_ option>) fsharpAssembly 
+    let isFunctionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<(_-> _)>) fsharpAssembly
+    let isListType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<_ list>) fsharpAssembly
     let getInstancePropertyInfo (typ: TypeDefinition,propName,bindingFlags) = 
         typ.Properties |> Seq.tryFind (fun p->p.Name = propName && p.HasThis) //TODO: instancePropertyFlags ||| bindingFlags) 
     let getInstancePropertyInfos (typ,names,bindingFlags) = 
@@ -53,15 +54,23 @@ module Impl=
       match attrs with
       | null | [| |] -> None
       | [| res |] ->
-        let sourceConstructFlags = res.Properties |> Seq.find (fun p->p.Name = "SourceConstructFlags") 
-        let sequenceNumber = res.Properties |> Seq.find (fun p->p.Name = "SequenceNumber")
-        let variantNumber = res.Properties |> Seq.find (fun p->p.Name = "VariantNumber")
-        //let a = (res :?> CompilationMappingAttribute) in Some (a.SourceConstructFlags, a.SequenceNumber, a.VariantNumber)
-        Some (sourceConstructFlags.Argument.Value :?>SourceConstructFlags, 
-              sequenceNumber.Argument.Value :?>int, 
-              variantNumber.Argument.Value :?>int)
+        let customAttrGetValueAsInt (a:CustomAttributeArgument) = a.Value :?> int
+        let maybeCustomAttrToInt a = a |> Option.map customAttrGetValueAsInt |> Option.defaultValue 0
+        let sourceConstructFlags = res.ConstructorArguments |> Seq.find (fun p->p.Type.Name = "SourceConstructFlags") 
+        let sequenceNumber = res.ConstructorArguments |> Seq.tryFind (fun p->p.Type.Name = "SequenceNumber")
+        let variantNumber = res.ConstructorArguments |> Seq.tryFind (fun p->p.Type.Name = "VariantNumber")
+        
+        Some (sourceConstructFlags.Value :?>SourceConstructFlags, 
+              maybeCustomAttrToInt sequenceNumber, 
+              maybeCustomAttrToInt variantNumber)
       | _ -> raise <| System.InvalidOperationException "multipleCompilationMappings"
-
+    let tryFindCompilationRepresentationAttribute (attrs:CustomAttribute[]) =
+      match attrs with
+      | null | [| |] -> None
+      | [| res |] ->
+        let flags = res.ConstructorArguments |> Seq.find (fun p->p.Type.Name = "CompilationRepresentationFlags") 
+        Some (flags.Value :?>CompilationRepresentationFlags)
+      | _ -> raise <| System.InvalidOperationException "multipleCompilationRepresentations"
     let findCompilationMappingAttribute (attrs:CustomAttribute[]) =
       match tryFindCompilationMappingAttribute attrs with
       | None -> failwith "no compilation mapping attribute"
@@ -165,11 +174,10 @@ module Impl=
             // in this case it will be compiled as one class: return self type for non-nullary case and null for nullary
             let isTwoCasedDU =
                 if tagFields.Length = 2 then
-                    (*match typ.GetCustomAttributes(typeof<CompilationRepresentationAttribute>, false) with
-                    | [|:? CompilationRepresentationAttribute as attr|] -> 
-                        (attr.Flags &&& CompilationRepresentationFlags.UseNullAsTrueValue) = CompilationRepresentationFlags.UseNullAsTrueValue
-                    | _ -> false*)
-                    failwith "!"
+                    match tryFindCompilationRepresentationAttribute ( typ.CustomAttributes |> Seq.filter isCompilationRepresentationAttr |> Seq.toArray) with
+                    | Some flags ->
+                      (flags &&& CompilationRepresentationFlags.UseNullAsTrueValue) = CompilationRepresentationFlags.UseNullAsTrueValue
+                    | _ -> false
                 else
                     false
             if isTwoCasedDU then
