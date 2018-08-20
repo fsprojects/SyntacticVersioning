@@ -7,13 +7,36 @@ open Mono.Cecil
 // to Mono.Cecil
 
 type BindingFlags=System.Reflection.BindingFlags
+//NOTE: hacky way to filter some of the things and removing special special things
+module internal BindingFlags=
+  let matches (t:TypeDefinition) (b:BindingFlags) =
+    let mutable m=true
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && t.IsPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not t.IsPublic then m<-true
+    m && not t.IsSpecialName && not t.IsRuntimeSpecialName
+module internal MethodDefinition=
+  let matches (t:MethodDefinition) (b:BindingFlags) =
+    let mutable m=true
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && t.IsPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not t.IsPublic then m<-true
+    m && not t.IsSpecialName && not t.IsRuntimeSpecialName
+module internal PropertyDefinition=
+  let matches (t:PropertyDefinition) (b:BindingFlags) =
+    let mutable m=true
+    m && not t.IsSpecialName && not t.IsRuntimeSpecialName 
+module internal FieldDefinition=
+  let matches (t:FieldDefinition) (b:BindingFlags) =
+    let mutable m=true
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && t.IsPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not t.IsPublic then m<-true
+    m && not t.IsSpecialName && not t.IsRuntimeSpecialName
 module internal CustomAttribute=
   let typ (a:CustomAttribute)= a.AttributeType
   let typeName a = (typ a).Name
   let typeFullName a = (typ a).FullName
 module internal TypeDefinition =
-  let getNestedType (n:string) (b:BindingFlags) (t:TypeDefinition)= //TODO: is binding flags possible?
-    t.NestedTypes |> Seq.tryFind (fun t' -> t'.Name = n)
+  let getNestedType (n:string) (b:BindingFlags) (t:TypeDefinition)=
+    t.NestedTypes |> Seq.tryFind (fun t' -> t'.Name = n && BindingFlags.matches t' b)
 module internal AssemblyDefinition=
   /// the assumption is that this does not fail, i.e. that the tests pick it up in that case
   let getType (t:Type) (a:AssemblyDefinition) :TypeDefinition= 
@@ -46,7 +69,7 @@ module Impl=
     let isFunctionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<(_-> _)>) fsharpAssembly
     let isListType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<_ list>) fsharpAssembly
     let getInstancePropertyInfo (typ: TypeDefinition,propName,bindingFlags) = 
-        typ.Properties |> Seq.tryFind (fun p->p.Name = propName && p.HasThis) //TODO: instancePropertyFlags ||| bindingFlags) 
+        typ.Properties |> Seq.tryFind (fun p->p.Name = propName && p.HasThis && PropertyDefinition.matches p bindingFlags) 
     let getInstancePropertyInfos (typ,names,bindingFlags) = 
         names |> Array.choose (fun nm -> getInstancePropertyInfo (typ,nm,bindingFlags)) 
     
@@ -142,7 +165,7 @@ module Impl=
         // Unions with a singleton case do not get a Tags type (since there is only one tag), hence enumTyp may be null in this case
         match maybeEnumTyp with
         | None -> 
-            typ.Methods |> Seq.filter (fun m->m.IsStatic)// TODO?: filter on bindingFlags 
+            typ.Methods |> Seq.filter (fun m->m.IsStatic && MethodDefinition.matches m bindingFlags) 
             |> Seq.choose (fun minfo -> 
                 match tryFindCompilationMappingAttributeFromMemberInfo(minfo) with
                 | None -> None
@@ -160,7 +183,7 @@ module Impl=
                     else
                         None) 
         | Some enumTyp -> 
-            enumTyp.Fields |> Seq.filter (fun f->f.IsStatic)//TODO?: filter on bindingFlags 
+            enumTyp.Fields |> Seq.filter (fun f->f.IsStatic && FieldDefinition.matches f bindingFlags) 
             |> Seq.filter (fun f -> f.IsStatic && f.IsLiteral) 
             |> Seq.sortWith (fun f1 f2 -> compare (f1.Constant :?> int) (f2.Constant :?> int))
             |> Seq.map (fun tagfield -> (tagfield.Constant :?> int),tagfield.Name)
@@ -206,7 +229,7 @@ module Impl=
             // Lookup the type holding the fields for the union case
             let caseTyp = getUnionCaseTyp (typ, tag, bindingFlags)
             let caseTyp = match caseTyp with null ->  typ | _ -> caseTyp
-            caseTyp.Properties |> Seq.filter (fun p->p.HasThis)//.GetProperties(instancePropertyFlags ||| bindingFlags) 
+            caseTyp.Properties |> Seq.filter (fun p->p.HasThis && PropertyDefinition.matches p bindingFlags) 
             |> Seq.filter isFieldProperty
             |> Seq.filter (fun prop -> variantNumberOfMember prop = tag)
             |> Seq.sortWith (fun p1 p2 -> compare (sequenceNumberOfMember p1) (sequenceNumberOfMember p2))

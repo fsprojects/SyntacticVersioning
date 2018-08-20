@@ -212,7 +212,7 @@ module Decompile =
         | false -> []
         | true ->
           t.Fields
-          //|> Seq.filter(fun x -> x.FieldType.IsEnum)
+          |> Seq.filter(fun x -> not x.IsSpecialName && not x.IsRuntimeSpecialName)
           |> Seq.map(fun x -> EnumValue(typ, x.Name, sprintf "%A" (x.Constant)))
           |> List.ofSeq
 
