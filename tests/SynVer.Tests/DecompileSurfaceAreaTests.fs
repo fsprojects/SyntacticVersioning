@@ -25,7 +25,7 @@ let tests =
       let typ= area.Type
       let expected = [
                       UnionCase (typ, "Foo",
-                        [{Type= {FullName="System.Tuple<System.Int32,System.Double>"}; Name=null }])
+                        [{Type= {FullName="System.Tuple`2<System.Int32,System.Double>"}; Name=null }])
                       UnionCase (typ, "Bar",
                         [{Type={FullName="System.Double"}; Name=null}])
                       ]
