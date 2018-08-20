@@ -39,26 +39,26 @@ let tests =
     }
     
     
-    test "csharp can be read by both cecil and reflection" {
+    ptest "csharp can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.csharp T.csharp
     }
-    test "csharp2 can be read by both cecil and reflection" {
+    ptest "csharp2 can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.csharp2 T.csharp2
     }
-    test "enum can be read by both cecil and reflection" {
+    ptest "enum can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.enum T.enum
     }
-    test "enum2 can be read by both cecil and reflection" {
+    ptest "enum2 can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.enum2 T.enum2
     }
-    test "enum3 can be read by both cecil and reflection" {
+    ptest "enum3 can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.enum3 T.enum3
     }
 
-    test "fsharp can be read by both cecil and reflection" {
+    ptest "fsharp can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.fsharp T.fsharp
     }
-    test "fsharp2 can be read by both cecil and reflection" {
+    ptest "fsharp2 can be read by both cecil and reflection" {
       assertAssemblyDefinitionMatchesAssembly CT.fsharp2 T.fsharp2
     }
     ptest "fsharp can be serialized and deserialized" {

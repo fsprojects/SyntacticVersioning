@@ -23,6 +23,7 @@ module internal MethodDefinition=
 module internal PropertyDefinition=
   let matches (t:PropertyDefinition) (b:BindingFlags) =
     let mutable m=true
+    //NOTE: Missing IsPublic property
     m && not t.IsSpecialName && not t.IsRuntimeSpecialName 
 module internal FieldDefinition=
   let matches (t:FieldDefinition) (b:BindingFlags) =
@@ -77,15 +78,12 @@ module Impl=
       match attrs with
       | null | [| |] -> None
       | [| res |] ->
-        let customAttrGetValueAsInt (a:CustomAttributeArgument) = a.Value :?> int
-        let maybeCustomAttrToInt a = a |> Option.map customAttrGetValueAsInt |> Option.defaultValue 0
-        let sourceConstructFlags = res.ConstructorArguments |> Seq.find (fun p->p.Type.Name = "SourceConstructFlags") 
-        let sequenceNumber = res.ConstructorArguments |> Seq.tryFind (fun p->p.Type.Name = "SequenceNumber")
-        let variantNumber = res.ConstructorArguments |> Seq.tryFind (fun p->p.Type.Name = "VariantNumber")
         
-        Some (sourceConstructFlags.Value :?>SourceConstructFlags, 
-              maybeCustomAttrToInt sequenceNumber, 
-              maybeCustomAttrToInt variantNumber)
+        match res.ConstructorArguments |> Seq.toList with
+        | [sourceConstructFlags] -> Some (sourceConstructFlags.Value :?>SourceConstructFlags, 0, 0)
+        | [sourceConstructFlags; sequenceNumber] -> Some (sourceConstructFlags.Value :?>SourceConstructFlags, sequenceNumber.Value :?>int, 0)
+        | [sourceConstructFlags;variantNumber; sequenceNumber] -> Some (sourceConstructFlags.Value :?>SourceConstructFlags, sequenceNumber.Value :?>int, variantNumber.Value:?>int)
+        | _ -> raise <| System.InvalidOperationException "constructor"
       | _ -> raise <| System.InvalidOperationException "multipleCompilationMappings"
     let tryFindCompilationRepresentationAttribute (attrs:CustomAttribute[]) =
       match attrs with
