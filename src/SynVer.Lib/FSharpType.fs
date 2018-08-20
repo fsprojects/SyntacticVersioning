@@ -78,11 +78,16 @@ module Impl=
       match attrs with
       | null | [| |] -> None
       | [| res |] ->
-        
+        // https://github.com/fsharp/fsharp/blob/3ef054469387449dc7bd6f151960825235fe491c/src/fsharp/FSharp.Core/prim-types.fs#L220-L223
         match res.ConstructorArguments |> Seq.toList with
-        | [sourceConstructFlags] -> Some (sourceConstructFlags.Value :?>SourceConstructFlags, 0, 0)
-        | [sourceConstructFlags; sequenceNumber] -> Some (sourceConstructFlags.Value :?>SourceConstructFlags, sequenceNumber.Value :?>int, 0)
-        | [sourceConstructFlags;variantNumber; sequenceNumber] -> Some (sourceConstructFlags.Value :?>SourceConstructFlags, sequenceNumber.Value :?>int, variantNumber.Value:?>int)
+        | [sourceConstructFlags] ->
+          Some (sourceConstructFlags.Value :?>SourceConstructFlags, 0, 0)
+        | [sourceConstructFlags; sequenceNumber] when sourceConstructFlags.Type.Name = "SourceConstructFlags" ->
+          Some (sourceConstructFlags.Value :?>SourceConstructFlags, sequenceNumber.Value :?>int, 0)
+        | [_; _] ->
+          Some (SourceConstructFlags.None, 0, 0)
+        | [sourceConstructFlags;variantNumber; sequenceNumber] ->
+          Some (sourceConstructFlags.Value :?>SourceConstructFlags, sequenceNumber.Value :?>int, variantNumber.Value:?>int)
         | _ -> raise <| System.InvalidOperationException "constructor"
       | _ -> raise <| System.InvalidOperationException "multipleCompilationMappings"
     let tryFindCompilationRepresentationAttribute (attrs:CustomAttribute[]) =
