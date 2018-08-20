@@ -21,7 +21,7 @@ let assertAssemblyDefinitionMatchesAssembly assemblyDef assembly
     Expect.equal surfaceDef surface (assemblyDef.ToString())
 [<Tests>]
 let tests =
-  testList "Serialization tests (Mono.Cecil)" [    
+  testList "Read assembly tests (Mono.Cecil)" [    
     test "csharp can be serialized and deserialized" {
       assertCanSerializeAndDeserialize CT.csharp
     }

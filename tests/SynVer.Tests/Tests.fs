@@ -21,7 +21,7 @@ let tests =
                 |> wTrim
       Expect.equal enum2txt diff "enum 2 diff"
       let bump = Assemblies.bump "1.0.0" enum enum2
-      Expect.equal  ("2.0.0", Major) bump "Major change"
+      Expect.equal bump ("2.0.0", Major) "Major change"
     }
 
     test "enum vs enum3" {
@@ -30,12 +30,12 @@ let tests =
                 |> wTrim
       Expect.equal enum3txt diff "enum 3 diff"
       let bump = Assemblies.bump "1.0.0" enum enum3
-      Expect.equal ("1.1.0", Minor) bump "Minor change"
+      Expect.equal bump ("1.1.0", Minor) "Minor change"
     }
     test "fsharp vs fsharp2" {
       let diff = Assemblies.diff fsharp fsharp2
                 |> nlJoin
                 |> wTrim
-      Expect.equal fsharp2txt diff "fsharp 2 diff"
+      Expect.equal diff fsharp2txt "fsharp 2 diff"
     }
   ]

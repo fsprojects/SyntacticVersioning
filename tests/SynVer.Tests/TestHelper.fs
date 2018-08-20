@@ -58,6 +58,31 @@ module Types=
    end
   
   let ModuleT= TestAssemblies.fsharp.ExportedTypes |> Seq.find (fun t-> t.Name="Module")
+module internal AssemblyDefinition=
+  open Mono.Cecil
+  let getNestedTypes (t:TypeDefinition) =t.NestedTypes
+  let rec tryFindNestedType  (t:System.Type) (td:TypeDefinition) =
+    if td.FullName = t.FullName.Replace('+','/') then
+        Some td
+    else 
+        Seq.tryPick <| tryFindNestedType t <| getNestedTypes td
+  /// the assumption is that this does not fail, i.e. that the tests pick it up in that case
+  let getType (t:System.Type) (a:AssemblyDefinition) :TypeDefinition=
+    match Seq.tryPick <| tryFindNestedType t <| a.MainModule.Types with
+    | Some t' -> t'
+    | None -> failwithf "Could not find '%s', %s:%s" (t.FullName.Replace('+','/')) t.Namespace t.Name
+  
+module CecilTypes=
+  open Mono.Cecil
+  let assembly =
+    AssemblyDefinition.ReadAssembly (typeof< Types.UnionCaseWithName>).Assembly.Location
+  let unionCaseWithName = AssemblyDefinition.getType typeof< Types.UnionCaseWithName> assembly 
+  let union = AssemblyDefinition.getType typeof< Types.Union> assembly
+  let unionWithParam = AssemblyDefinition.getType typeof< Types.UnionWithParam> assembly
+  let enumType = AssemblyDefinition.getType typeof< Types.EnumType> assembly
+  let recordType = AssemblyDefinition.getType typeof< Types.RecordType> assembly
+  let unionWithParamNames = AssemblyDefinition.getType typeof< Types.UnionWithParamNames> assembly
+  let fsharpStruct = AssemblyDefinition.getType typeof< Types.FsharpStruct> assembly
 
 module Assemblies=
   [<CompiledName("Bump")>]

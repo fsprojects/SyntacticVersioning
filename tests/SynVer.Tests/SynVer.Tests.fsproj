@@ -17,6 +17,8 @@
     <Compile Include="NetTypeTests.fs" />
     <Compile Include="SerializationTests.fs" />
     <Compile Include="DecompileTests.fs" />
+    <Compile Include="DecompileSurfaceAreaTests.fs" />
+    <Compile Include="DecompileNetTypeTests.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
