@@ -15,7 +15,38 @@ let exampleProjectsLibPath = exampleProjectsPath </> "lib"
 let enum2txt = exampleProjectsPath </> "src" </> "Enum2.txt" |> File.ReadAllLines |>nlJoin |> wTrim
 let enum3txt = exampleProjectsPath </> "src" </> "Enum3.txt" |> File.ReadAllLines |>nlJoin |> wTrim
 let fsharp2txt = exampleProjectsPath </> "src" </> "Fsharp2.txt" |> File.ReadAllLines |>nlJoin |> wTrim
+module AssemblyDefinition=
+  open Mono.Cecil
+  open System
 
+  let readAssembly (path:string)=
+    let a= { new DefaultAssemblyResolver()
+             with
+               override this.Resolve(name:AssemblyNameReference)=
+                 try
+                   base.Resolve(name)
+                 with _->
+                   // hack to avoid assembly load failure on Windows
+                   if name.Name.Equals("FSharp.Core", StringComparison.OrdinalIgnoreCase) then 
+                     AssemblyDefinition.ReadAssembly (typeof< FSharp.Core.FSharpTypeFunc>).Assembly.Location
+                   else
+                     null
+           }
+    let r = ReaderParameters()
+    r.AssemblyResolver <- a
+    AssemblyDefinition.ReadAssembly(path,r)
+  let getNestedTypes (t:TypeDefinition) =t.NestedTypes
+  let rec tryFindNestedType  (t:System.Type) (td:TypeDefinition) =
+    if td.FullName = t.FullName.Replace('+','/') then
+        Some td
+    else 
+        Seq.tryPick <| tryFindNestedType t <| getNestedTypes td
+  /// the assumption is that this does not fail, i.e. that the tests pick it up in that case
+  let getType (t:System.Type) (a:AssemblyDefinition) :TypeDefinition=
+    match Seq.tryPick <| tryFindNestedType t <| a.MainModule.Types with
+    | Some t' -> t'
+    | None -> failwithf "Could not find '%s', %s:%s" (t.FullName.Replace('+','/')) t.Namespace t.Name
+  
 module TestAssemblies=
     // since all the dll-s have unique names, they can be loaded at the same time
     let csharp = exampleProjectsLibPath </> "Csharp.dll" |> Assembly.LoadFile
@@ -31,16 +62,16 @@ module TestAssemblies=
 module CecilTestAssemblies=
     open Mono.Cecil
     // since all the dll-s have unique names, they can be loaded at the same time
-    let csharp = exampleProjectsLibPath </> "Csharp.dll" |> AssemblyDefinition.ReadAssembly
-    let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> AssemblyDefinition.ReadAssembly
-    let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> AssemblyDefinition.ReadAssembly
-    let enum = exampleProjectsLibPath </> "Enum.dll" |> AssemblyDefinition.ReadAssembly
-    let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> AssemblyDefinition.ReadAssembly
-    let enum3 = exampleProjectsLibPath </> "Enum3.dll" |> AssemblyDefinition.ReadAssembly
-    let fsharp = exampleProjectsLibPath </> "Fsharp.dll" |> AssemblyDefinition.ReadAssembly
-    let fsharp2 = exampleProjectsLibPath </> "Fsharp2.dll" |> AssemblyDefinition.ReadAssembly
-    let arguAssembly= packagesPath </>"Argu"</>"lib"</> "net45" </>"Argu.dll" |> AssemblyDefinition.ReadAssembly
-    let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net40" </>"Chiron.dll" |> AssemblyDefinition.ReadAssembly
+    let csharp = exampleProjectsLibPath </> "Csharp.dll" |> AssemblyDefinition.readAssembly
+    let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> AssemblyDefinition.readAssembly
+    let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> AssemblyDefinition.readAssembly
+    let enum = exampleProjectsLibPath </> "Enum.dll" |> AssemblyDefinition.readAssembly
+    let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> AssemblyDefinition.readAssembly
+    let enum3 = exampleProjectsLibPath </> "Enum3.dll" |> AssemblyDefinition.readAssembly
+    let fsharp = exampleProjectsLibPath </> "Fsharp.dll" |> AssemblyDefinition.readAssembly
+    let fsharp2 = exampleProjectsLibPath </> "Fsharp2.dll" |> AssemblyDefinition.readAssembly
+    let arguAssembly= packagesPath </>"Argu"</>"lib"</> "net45" </>"Argu.dll" |> AssemblyDefinition.readAssembly
+    let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net40" </>"Chiron.dll" |> AssemblyDefinition.readAssembly
 
 module Types=
   type UnionCaseWithName = Foo of num: int * diff:float | Bar of diff:float
@@ -58,20 +89,7 @@ module Types=
    end
   
   let ModuleT= TestAssemblies.fsharp.ExportedTypes |> Seq.find (fun t-> t.Name="Module")
-module internal AssemblyDefinition=
-  open Mono.Cecil
-  let getNestedTypes (t:TypeDefinition) =t.NestedTypes
-  let rec tryFindNestedType  (t:System.Type) (td:TypeDefinition) =
-    if td.FullName = t.FullName.Replace('+','/') then
-        Some td
-    else 
-        Seq.tryPick <| tryFindNestedType t <| getNestedTypes td
-  /// the assumption is that this does not fail, i.e. that the tests pick it up in that case
-  let getType (t:System.Type) (a:AssemblyDefinition) :TypeDefinition=
-    match Seq.tryPick <| tryFindNestedType t <| a.MainModule.Types with
-    | Some t' -> t'
-    | None -> failwithf "Could not find '%s', %s:%s" (t.FullName.Replace('+','/')) t.Namespace t.Name
-  
+
 module CecilTypes=
   open Mono.Cecil
   let assembly =

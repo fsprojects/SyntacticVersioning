@@ -64,8 +64,7 @@ module Impl=
     //let func = typedefof<(obj -> obj)>
     
     let fsharpAssembly =
-        let f = (typeof< FSharp.Core.FSharpTypeFunc>)
-        AssemblyDefinition.ReadAssembly f.Assembly.Location
+        AssemblyDefinition.ReadAssembly (typeof< FSharp.Core.FSharpTypeFunc>).Assembly.Location
     let isOptionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<_ option>) fsharpAssembly 
     let isFunctionType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<(_-> _)>) fsharpAssembly
     let isListType typ = equivHeadTypes typ <| AssemblyDefinition.getType (typedefof<_ list>) fsharpAssembly
