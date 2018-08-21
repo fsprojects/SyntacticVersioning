@@ -93,7 +93,7 @@ module Types=
 module CecilTypes=
   open Mono.Cecil
   let assembly =
-    AssemblyDefinition.ReadAssembly (typeof< Types.UnionCaseWithName>).Assembly.Location
+    AssemblyDefinition.readAssembly (typeof< Types.UnionCaseWithName>).Assembly.Location
   let unionCaseWithName = AssemblyDefinition.getType typeof< Types.UnionCaseWithName> assembly 
   let union = AssemblyDefinition.getType typeof< Types.Union> assembly
   let unionWithParam = AssemblyDefinition.getType typeof< Types.UnionWithParam> assembly
