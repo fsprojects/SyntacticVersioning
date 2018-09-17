@@ -237,4 +237,20 @@ module Decompile =
            | null  -> false
            | type' -> (tagNetType (type'.Resolve())) = NetType.SumType)
 
-
+  [<CompiledName("ReadAssembly")>]
+  let readAssembly (path:string)=
+    let r = ReaderParameters()
+    r.AssemblyResolver <- {
+      new DefaultAssemblyResolver()
+      with
+        override this.Resolve(name:AssemblyNameReference)=
+          try
+            base.Resolve(name)
+          with _->
+            // hack to avoid assembly load failure on Windows
+            if name.Name.Equals("FSharp.Core", StringComparison.OrdinalIgnoreCase) then 
+              AssemblyDefinition.ReadAssembly (typeof< FSharp.Core.FSharpTypeFunc>).Assembly.Location
+            else
+              null
+    }
+    AssemblyDefinition.ReadAssembly(path, r)

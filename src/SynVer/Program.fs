@@ -30,7 +30,7 @@ let (|AssemblyFile|LsonFile|Other|) (maybeFile:string) =
 
 let loadAssembly f =
   try
-    AssemblyDefinition.ReadAssembly (Path.GetFullPath f)
+    Decompile.readAssembly (Path.GetFullPath f)
     |> Ok
   with ex ->
     (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 

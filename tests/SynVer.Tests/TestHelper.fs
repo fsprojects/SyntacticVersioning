@@ -19,22 +19,7 @@ module AssemblyDefinition=
   open Mono.Cecil
   open System
 
-  let readAssembly (path:string)=
-    let a= { new DefaultAssemblyResolver()
-             with
-               override this.Resolve(name:AssemblyNameReference)=
-                 try
-                   base.Resolve(name)
-                 with _->
-                   // hack to avoid assembly load failure on Windows
-                   if name.Name.Equals("FSharp.Core", StringComparison.OrdinalIgnoreCase) then 
-                     AssemblyDefinition.ReadAssembly (typeof< FSharp.Core.FSharpTypeFunc>).Assembly.Location
-                   else
-                     null
-           }
-    let r = ReaderParameters()
-    r.AssemblyResolver <- a
-    AssemblyDefinition.ReadAssembly(path,r)
+  let readAssembly (path:string) = Decompile.readAssembly path
   let getNestedTypes (t:TypeDefinition) =t.NestedTypes
   let rec tryFindNestedType  (t:System.Type) (td:TypeDefinition) =
     if td.FullName = t.FullName.Replace('+','/') then
