@@ -1,6 +1,4 @@
 module SynVer.Compare
-open System.Reflection
-open System
 type private Ns = Namespace
 type private T = SurfaceOfType
 type private M = Member

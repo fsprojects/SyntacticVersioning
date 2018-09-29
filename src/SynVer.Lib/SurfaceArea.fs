@@ -1,8 +1,5 @@
 module SynVer.SurfaceArea
 open System
-//open Reflect
-open System.IO
-open System.Security.Cryptography
 open Mono.Cecil
 
 /// Get the surface of a type

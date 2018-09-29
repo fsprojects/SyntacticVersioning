@@ -3,7 +3,6 @@ namespace SynVer
 open Microsoft.FSharp.Reflection
 open System
 open System.Reflection
-open Microsoft.FSharp.Reflection
  
 module Reflect =
   type private CAtDat = CustomAttributeData
