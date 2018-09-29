@@ -62,30 +62,30 @@ module Decompile =
       |> Seq.concat
       |> Seq.toList
   let rec internal typeFullName (t:TypeReference) =
+      let tickAndDigits = System.Text.RegularExpressions.Regex(@"`\d+")
+      let removeTickAndDigits (a:string)= 
+          tickAndDigits.Replace(a, String.Empty)
       let fullname =
         match t.HasGenericParameters with
           | false ->
             match String.IsNullOrEmpty t.FullName with
               | true -> sprintf "'%s" (t.Name.ToUpperInvariant())
-              | false -> t.FullName 
+              | false -> removeTickAndDigits t.FullName 
           | true ->
             let args =
               t.GenericParameters
               |> Seq.map typeFullName
               |> Seq.reduce(sprintf "%s,%s")
-            let removeAfterTick (a:string)=
-                let i = a.IndexOf('`')
-                if i>1 then a.Substring(0, i)
-                else a
             let name = 
                 if (not << String.IsNullOrEmpty) ( t.FullName ) then
-                    removeAfterTick t.FullName 
+                    removeTickAndDigits t.FullName 
                 else 
-                    removeAfterTick t.Name
+                    removeTickAndDigits t.Name
             sprintf "%s<%s>" name args
 
       let guid = Guid.NewGuid().ToString()
       fullname.Replace("+Tags",guid).Replace('+','.').Replace(guid,"+Tags")
+        .Replace("/",".")
 
   [<CompiledName("TypeToTyp")>]
   let typeToTyp (t:TypeReference):Typ={ FullName=typeFullName t }
@@ -99,9 +99,9 @@ module Decompile =
       else Some value
 
     let parameterToParameter (p:ParameterReference) :Parameter= { Type=typeToTyp p.ParameterType; Name=p.Name }
-    let parametersToParameter prms= prms |>Seq.map parameterToParameter |> List.ofSeq
+    let genericParametersToParameter (p:GenericParameter) :Parameter= { Type=typeToTyp p; Name=p.Name }
     let deconstructConstructor t (ctr:MethodDefinition) :ConstructorLike =
-      let params' = ctr.Parameters |> parametersToParameter
+      let params' = ctr.Parameters |>Seq.map parameterToParameter|> List.ofSeq
       {Type=typeToTyp t; Parameters=params'}
     let recordConstructor t ctr : Member=
       RecordConstructor (deconstructConstructor t ctr)
@@ -110,25 +110,45 @@ module Decompile =
     let isStatic b = match b with | true -> InstanceOrStatic.Static | false -> InstanceOrStatic.Instance
 
     let event' t (ei:EventDefinition) : Member=
-      let mi = ei.InvokeMethod //ei.EventType.GetMethod("Invoke")
-      let params' = mi.Parameters |> parametersToParameter
-      Event {Type=typeToTyp t
-             Instance= isStatic mi.IsStatic 
-             Name= ei.Name
-             Parameters= params'
-             Result= typeToTyp mi.ReturnType}
+      //printf "\n\n\n\nName: %s\nEventType: %O\nAddMethod: %O\nModule: %O\nInvokeMethod: %O\n\n\n" ei.Name ei.EventType ei.AddMethod ei.Module ei.InvokeMethod
+      //let mi = if isNull ei.InvokeMethod then ei.EventType.Resolve().Methods |> Seq.find (fun m->m.Name = "Invoke") else ei.InvokeMethod
+      //let p=Seq.head ei.EventType.GenericParameters
+      //let params' = p.GenericParameters |> Seq.map genericParametersToParameter |> List.ofSeq
+      match ei.EventType with
+      | :? GenericInstanceType as eventType->
+        if eventType.ElementType.FullName = "Microsoft.FSharp.Control.FSharpHandler`1" then
+          match Seq.tryHead eventType.GenericArguments with
+          | Some tuple->
+            let instance = isStatic false
+            let result = typeToTyp ei.EventType
+            Event {Type=typeToTyp t
+                   Instance= instance
+                   Name= ei.Name
+                   Parameters= [
+                     {Type = {FullName = "System.Object";}; Name = "sender";};
+                     {Type = typeToTyp tuple; Name = "args";}
+                   ]
+                   Result= {FullName = "System.Void"}}
+          | _  -> failwithf "Expected generic arguments"
+        else
+          failwithf "Could not interpret %s" eventType.ElementType.FullName
+      | _ -> failwithf "Could not interpret EventType %s" ei.EventType.FullName
     let field t (fi:FieldDefinition) : Member=
       Field {Type=typeToTyp t
              Instance=isStatic fi.IsStatic
              Name= fi.Name
              Result= typeToTyp fi.FieldType}
     let method' t (mi:MethodDefinition) : Member= 
-      let params' = mi.Parameters |> parametersToParameter
-      Method {Type=typeToTyp t
-              Instance= isStatic mi.IsStatic 
-              Name= mi.Name
-              Parameters= params'
-              Result= typeToTyp mi.ReturnType}
+      if not mi.IsConstructor then
+        let params' = mi.Parameters |>Seq.map parameterToParameter|> List.ofSeq
+        Method {Type=typeToTyp t
+                Instance= isStatic mi.IsStatic 
+                Name= mi.Name
+                Parameters= params'
+                Result= typeToTyp mi.ReturnType}
+      else
+        constructor' t mi
+
     let property t (pi:PropertyDefinition) : Member= 
       let static' =
           match notNull (pi.GetMethod), notNull (pi.SetMethod) with
@@ -171,7 +191,6 @@ module Decompile =
 
     let getTypeMember (t:TypeDefinition) (m:MemberReference) : Member list=
       let tag = tagNetType t
-      let m' = m.Resolve()
       // Handle cases like the Fsharp.Core does (and a bit more):
       //
       // https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/
@@ -220,12 +239,16 @@ module Decompile =
   let getTypeMembers (t:TypeDefinition) : Member list=
     //let t' = typeToTyp t
     let netT = tagNetType t
-    //t.Methods
-    let l= List.collect (getTypeMember t) (t.Properties |> Seq.toList)
-    let l2= List.collect (getTypeMember t) (t.Fields |> Seq.toList)
+    //let ctors = List.collect (getTypeMember t) (t.)
+    let properties= List.collect (getTypeMember t) (t.Properties |> Seq.filter(fun p->not p.IsSpecialName) |> Seq.toList)
+    let fields= List.collect (getTypeMember t) (t.Fields |> Seq.filter(fun p->not p.IsSpecialName && p.IsPublic) |> Seq.toList)
+    let events= List.collect (getTypeMember t) (t.Events |> Seq.filter(fun p->not p.IsSpecialName ) |> Seq.toList)
+    let methods= List.collect (getTypeMember t) (t.Methods |> Seq.filter(fun p->not p.IsSpecialName && p.IsPublic) |> Seq.toList)
+    let ctors= List.collect (getTypeMember t) (t.Methods |> Seq.filter(fun p->p.IsConstructor && p.IsPublic) |> Seq.toList)
+    let l = methods @ ctors @ properties @ fields @ events
     match netT with
-    | NetType.SumType -> l @ l2 @ toUnionCases t
-    | NetType.Enum -> l @ l2 @ (enumValues t)
+    | NetType.SumType -> l @ toUnionCases t
+    | NetType.Enum -> l @ (enumValues t)
     | _ -> l
 
   /// Concrete type of a SumType, i.e. Foo and Bar when 

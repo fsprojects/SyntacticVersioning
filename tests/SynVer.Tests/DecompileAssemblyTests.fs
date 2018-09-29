@@ -18,7 +18,8 @@ let assertAssemblyDefinitionMatchesAssembly assemblyDef assembly
   =
     let surfaceDef = SurfaceArea.ofAssemblyDefinition assemblyDef
     let surface = SurfaceArea.ofAssembly assembly
-    Expect.equal surfaceDef surface (assemblyDef.ToString())
+    let comparison = Compare.packages surface surfaceDef
+    Expect.equal surfaceDef surface (sprintf "\n\n\n%A\n\n\n" comparison)
 [<Tests>]
 let tests =
   testList "Read assembly definition tests" [    

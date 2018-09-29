@@ -1,41 +1,17 @@
 * SpiseMisu.MyClassWithCLIEvent
 
-        - (Instance/Inheritance of FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>).Event1.Add : 
-                sender:System.Object * args:System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>
-                -> System.Void
-
         Removed: SpiseMisu.MyClassWithCLIEvent (.NET type: Class and base: System.Object)
 
         - new SpiseMisu.MyClassWithCLIEvent : 
                 System.Void
                 -> SpiseMisu.MyClassWithCLIEvent
 
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).Equals : 
-                obj:System.Object
-                -> System.Boolean
-
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).GetHashCode : 
-                System.Void
-                -> System.Int32
-
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).GetType : 
-                System.Void
-                -> System.Type
+        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).Event1.Add : 
+                sender:System.Object * args:System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>
+                -> System.Void
 
         - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).TestEvent : 
                 arg:System.Object
-                -> System.Void
-
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).ToString : 
-                System.Void
-                -> System.String
-
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).add_Event1 : 
-                handler:FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>
-                -> System.Void
-
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).remove_Event1 : 
-                handler:FSharpHandler<System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>>
                 -> System.Void
 
         
@@ -46,14 +22,6 @@
 
         + (Instance/Inheritance of SpiseMisu.Struct).Qux : 
                 System.Int32
-
-        + (Instance/Inheritance of SpiseMisu.Struct).get_Baz : 
-                System.Void
-                -> System.Int32
-
-        + (Instance/Inheritance of SpiseMisu.Struct).get_Qux : 
-                System.Void
-                -> System.Int32
 
         
 * SpiseMisu.UnionPrime

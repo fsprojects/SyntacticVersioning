@@ -67,7 +67,12 @@ module Types=
   type RecordType = { Foo:int}
   type UnionWithParamNames = Foo of num: int * diff:float | Bar of diff:float
   let CSharpStructType = TestAssemblies.csharp.ExportedTypes |> Seq.find (fun t-> t.Name= "Struct")
+  type MyClassWithCLIEvent() =
+    let event1 = new Event<_>()
 
+    [<CLIEvent>]
+    member this.Event1 = event1.Publish
+    member this.TestEvent(arg) = event1.Trigger(this, arg)
   type FsharpStruct =
    struct
       val x: float
@@ -86,7 +91,7 @@ module CecilTypes=
   let recordType = AssemblyDefinition.getType typeof< Types.RecordType> assembly
   let unionWithParamNames = AssemblyDefinition.getType typeof< Types.UnionWithParamNames> assembly
   let fsharpStruct = AssemblyDefinition.getType typeof< Types.FsharpStruct> assembly
-
+  let myClassWithCLIEvent = AssemblyDefinition.getType typeof< Types.MyClassWithCLIEvent> assembly
 module Assemblies=
   [<CompiledName("Bump")>]
   let bump verNr released modified =

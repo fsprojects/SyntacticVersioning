@@ -187,6 +187,7 @@ with
 
   static member IsSumType (x:SurfaceOfType) = x.SumType
   static member GetNetType (x:SurfaceOfType) = x.NetType
+  [<CompiledName("Typ")>]static member typ (x:SurfaceOfType) = x.Type
 
 type Namespace=
     {
@@ -195,7 +196,7 @@ type Namespace=
     }
 with
   override x.ToString()=sprintf "%A" x
-
+  [<CompiledName("Name")>]static member name (n:Namespace) = n.Namespace
 type Package=
     {
       Namespaces: Namespace list
@@ -211,7 +212,8 @@ type 'a AddedAndRemoved when 'a:comparison=
 with
   override x.ToString()=sprintf "%A" x
   member this.IsEmpty=this.Added.IsEmpty && this.Removed.IsEmpty
-
+module AddedAndRemoved=
+  let isEmpty (c:AddedAndRemoved<_>)=c.IsEmpty
 type Changes<'t,'m when 't:comparison>=
     {
         Diff: AddedAndRemoved<'t>
@@ -220,3 +222,5 @@ type Changes<'t,'m when 't:comparison>=
 with
   override x.ToString()=sprintf "%A" x
   member this.IsEmpty=this.Diff.IsEmpty && this.Changes.IsEmpty
+module Changes=
+  let isEmpty (c:Changes<_,_>)=c.IsEmpty
