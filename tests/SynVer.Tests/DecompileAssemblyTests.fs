@@ -29,6 +29,9 @@ let tests =
     test "csharp2 can be serialized and deserialized" {
       assertCanSerializeAndDeserialize CT.csharp2
     }
+    test "csharp3 can be serialized and deserialized" {
+      assertCanSerializeAndDeserialize CT.csharp3
+    }
     test "enum can be serialized and deserialized" {
       assertCanSerializeAndDeserialize CT.enum
     }

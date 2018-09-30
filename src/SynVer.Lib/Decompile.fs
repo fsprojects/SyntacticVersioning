@@ -116,7 +116,8 @@ module Decompile =
       //let params' = p.GenericParameters |> Seq.map genericParametersToParameter |> List.ofSeq
       match ei.EventType with
       | :? GenericInstanceType as eventType->
-        if eventType.ElementType.FullName = "Microsoft.FSharp.Control.FSharpHandler`1" then
+        match eventType.ElementType.FullName with
+        | "Microsoft.FSharp.Control.FSharpHandler`1" ->
           match Seq.tryHead eventType.GenericArguments with
           | Some tuple->
             let instance = isStatic false
@@ -130,7 +131,22 @@ module Decompile =
                    ]
                    Result= {FullName = "System.Void"}}
           | _  -> failwithf "Expected generic arguments"
-        else
+        | "System.EventHandler`1" -> 
+          match Seq.tryHead eventType.GenericArguments with
+          | Some tuple->
+
+            let instance = isStatic false
+            let result = typeToTyp ei.EventType
+            Event {Type=typeToTyp t
+                   Instance= instance
+                   Name= ei.Name
+                   Parameters= [
+                     {Type = {FullName = "System.Object";}; Name = "sender";};
+                     {Type = typeToTyp tuple; Name = "e";}
+                   ]
+                   Result= {FullName = "System.Void"}}
+          | _  -> failwithf "Expected generic arguments"
+        | _ ->
           failwithf "Could not interpret %s" eventType.ElementType.FullName
       | _ -> failwithf "Could not interpret EventType %s" ei.EventType.FullName
     let field t (fi:FieldDefinition) : Member=

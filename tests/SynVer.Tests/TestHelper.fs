@@ -15,6 +15,7 @@ let exampleProjectsLibPath = exampleProjectsPath </> "lib"
 let enum2txt = exampleProjectsPath </> "src" </> "Enum2.txt" |> File.ReadAllLines |>nlJoin |> wTrim
 let enum3txt = exampleProjectsPath </> "src" </> "Enum3.txt" |> File.ReadAllLines |>nlJoin |> wTrim
 let fsharp2txt = exampleProjectsPath </> "src" </> "Fsharp2.txt" |> File.ReadAllLines |>nlJoin |> wTrim
+let csharp3txt = exampleProjectsPath </> "src" </> "Csharp3.txt" |> File.ReadAllLines |>nlJoin |> wTrim
 module AssemblyDefinition=
   open Mono.Cecil
   open System
@@ -31,11 +32,22 @@ module AssemblyDefinition=
     match Seq.tryPick <| tryFindNestedType t <| a.MainModule.Types with
     | Some t' -> t'
     | None -> failwithf "Could not find '%s', %s:%s" (t.FullName.Replace('+','/')) t.Namespace t.Name
-  
+
+  let bump verNr released modified =
+    SurfaceArea.bump verNr
+      (SurfaceArea.ofAssemblyDefinition released) 
+      (SurfaceArea.ofAssemblyDefinition modified)   
+
+  let diff released modified =
+    SurfaceArea.diff  
+      (SurfaceArea.ofAssemblyDefinition released) 
+      (SurfaceArea.ofAssemblyDefinition modified)
+
 module TestAssemblies=
     // since all the dll-s have unique names, they can be loaded at the same time
     let csharp = exampleProjectsLibPath </> "Csharp.dll" |> Assembly.LoadFile
     let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> Assembly.LoadFile
+    let csharp3 = exampleProjectsLibPath </> "Csharp3.dll" |> Assembly.LoadFile
     let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> Assembly.LoadFile
     let enum = exampleProjectsLibPath </> "Enum.dll" |> Assembly.LoadFile
     let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> Assembly.LoadFile
@@ -49,6 +61,7 @@ module CecilTestAssemblies=
     // since all the dll-s have unique names, they can be loaded at the same time
     let csharp = exampleProjectsLibPath </> "Csharp.dll" |> AssemblyDefinition.readAssembly
     let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> AssemblyDefinition.readAssembly
+    let csharp3 = exampleProjectsLibPath </> "Csharp3.dll" |> AssemblyDefinition.readAssembly
     let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> AssemblyDefinition.readAssembly
     let enum = exampleProjectsLibPath </> "Enum.dll" |> AssemblyDefinition.readAssembly
     let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> AssemblyDefinition.readAssembly

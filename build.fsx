@@ -87,34 +87,6 @@ let (|FsFile|CsFile|) (codeFileName:string) =
     | _                           -> failwith (sprintf "Code file %s not supported. Unknown code type." codeFileName)
 
 
-// Generate assembly info files with the right version & up-to-date information
-Target.Create "AssemblyInfo" (fun _ ->
-    let getAssemblyInfoAttributes projectName =
-        [ Attribute.Title (projectName)
-          Attribute.Product project
-          Attribute.Description summary
-          Attribute.Version release.AssemblyVersion
-          Attribute.FileVersion release.AssemblyVersion
-          Attribute.Configuration configuration ]
-
-    let getProjectDetails projectPath =
-        let projectName = System.IO.Path.GetFileNameWithoutExtension(projectPath)
-        ( projectPath,
-          projectName,
-          System.IO.Path.GetDirectoryName(projectPath),
-          (getAssemblyInfoAttributes projectName)
-        )
-
-    !! "src/**/*.??proj"
-    |> Seq.map getProjectDetails
-    |> Seq.iter (fun (projFileName, projectName, folderName, attributes) ->
-        match projFileName with
-        | Fsproj -> CreateFSharpAssemblyInfo (folderName </> "AssemblyInfo.fs") attributes
-        | Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
-        | Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
-        | Shproj -> ()
-        )
-)
 let exampleProjects = "tests/ExampleProjects/"
 #if MONO
 let extraCscParams = id
@@ -407,8 +379,7 @@ Target.Create "Release" Target.DoNothing
 
 Target.Create "All" Target.DoNothing
 open Fake.Core.TargetOperators
-"AssemblyInfo"
-  ==> "Restore"
+"Restore"
   ==> "Build"
   ==> "CopyBinaries"
   ==> "ExampleProjects"

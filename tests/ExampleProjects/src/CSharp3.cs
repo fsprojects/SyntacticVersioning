@@ -1,3 +1,4 @@
+using System;
 namespace SpiseMisu
 {
     public interface IFooBar
@@ -60,7 +61,9 @@ namespace SpiseMisu
 
         public int Method()
         {
+            SomeEvent?.Invoke(this, -1);
             return 42;
         }
+        public event EventHandler<object> SomeEvent;
     }
 }
