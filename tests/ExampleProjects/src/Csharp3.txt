@@ -1,0 +1,9 @@
+﻿* SpiseMisu.Class
+
+        + (Instance of SpiseMisu.Class).SomeEvent.Add : 
+                sender:System.Object * e:System.Object
+                -> System.Void
+
+        + (Instance of SpiseMisu.Class).SomeOtherEvent.Add : 
+                sender:System.Object * e:System.EventArgs
+                -> System.Void

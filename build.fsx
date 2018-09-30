@@ -82,39 +82,11 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
 let (|FsFile|CsFile|) (codeFileName:string) =
     match codeFileName with
     | f when f.EndsWith(".fsx") -> FsFile
-    | f when f.EndsWith(".fs") -> FsFile
-    | f when f.EndsWith(".cs") -> CsFile
-    | _                           -> failwith (sprintf "Code file %s not supported. Unknown code type." codeFileName)
+    | f when f.EndsWith(".fs")  -> FsFile
+    | f when f.EndsWith(".cs")  -> CsFile
+    | _                         -> failwith (sprintf "Code file %s not supported. Unknown code type." codeFileName)
 
 
-// Generate assembly info files with the right version & up-to-date information
-Target.Create "AssemblyInfo" (fun _ ->
-    let getAssemblyInfoAttributes projectName =
-        [ Attribute.Title (projectName)
-          Attribute.Product project
-          Attribute.Description summary
-          Attribute.Version release.AssemblyVersion
-          Attribute.FileVersion release.AssemblyVersion
-          Attribute.Configuration configuration ]
-
-    let getProjectDetails projectPath =
-        let projectName = System.IO.Path.GetFileNameWithoutExtension(projectPath)
-        ( projectPath,
-          projectName,
-          System.IO.Path.GetDirectoryName(projectPath),
-          (getAssemblyInfoAttributes projectName)
-        )
-
-    !! "src/**/*.??proj"
-    |> Seq.map getProjectDetails
-    |> Seq.iter (fun (projFileName, projectName, folderName, attributes) ->
-        match projFileName with
-        | Fsproj -> CreateFSharpAssemblyInfo (folderName </> "AssemblyInfo.fs") attributes
-        | Csproj -> CreateCSharpAssemblyInfo ((folderName </> "Properties") </> "AssemblyInfo.cs") attributes
-        | Vbproj -> CreateVisualBasicAssemblyInfo ((folderName </> "My Project") </> "AssemblyInfo.vb") attributes
-        | Shproj -> ()
-        )
-)
 let exampleProjects = "tests/ExampleProjects/"
 #if MONO
 let extraCscParams = id
@@ -124,6 +96,7 @@ let extraCscParams (parameters:CscHelper.CscParams) =
 #endif
 
 module create=
+    let failWhenNon0 name res = if res<>0 then failwithf "Non 0 exit code %d of %s" res name
     open FscHelper
     let fsharpProjectFromFile fileName name=
         let dllName = sprintf "%s.dll" name
@@ -133,7 +106,7 @@ module create=
             compile 
                 [ Out dll
                   Target Library ]
-        |> ignore
+        |> failWhenNon0 name
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
     open CscHelper
     let csharpProjectFromFile fileName name=
@@ -142,8 +115,8 @@ module create=
         let assemblyInfo =  exampleProjects </> "src"</> "AssemblyInfo.cs"
         [fileName; assemblyInfo] |>
             csc (fun parameters ->
-                { parameters with Output = dll; Target = Library } |> extraCscParams)
-        |> ignore
+                { parameters with Output = dll; Target = Library; } |> extraCscParams)
+        |> failWhenNon0 name
         //mcs -target:library -out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.cs"
 
 Target.Create "ExampleProjects" (fun _ ->
@@ -155,7 +128,6 @@ Target.Create "ExampleProjects" (fun _ ->
         | FsFile -> create.fsharpProjectFromFile fileName name
         | CsFile -> create.csharpProjectFromFile fileName name
     )
-
 )
 
 // Copies binaries from default VS location to expected bin folder
@@ -207,7 +179,7 @@ Target.Create "RunNet4Tests" (fun _ ->
 )
 
 Target.Create "RunNetCoreTests" (fun _ ->
-  DotNetCli.RunCommand id ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll --summary")
+  DotNetCli.RunCommand id (" run --project tests/SynVer.Tests/SynVer.Tests.fsproj --framework netcoreapp2.0 --summary")
 )
 
 Target.Create "RunTests" Target.DoNothing
@@ -407,8 +379,7 @@ Target.Create "Release" Target.DoNothing
 
 Target.Create "All" Target.DoNothing
 open Fake.Core.TargetOperators
-"AssemblyInfo"
-  ==> "Restore"
+"Restore"
   ==> "Build"
   ==> "CopyBinaries"
   ==> "ExampleProjects"
@@ -428,7 +399,9 @@ open Fake.Core.TargetOperators
 "Clean"
   ==> "Release"
 
+#if !MONO
 "RunNet4Tests" ==> "RunTests"
+#endif
 "RunNetCoreTests" ==> "RunTests"
 
 "ReleaseDocs"

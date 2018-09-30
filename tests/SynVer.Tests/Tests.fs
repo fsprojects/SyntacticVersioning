@@ -15,6 +15,14 @@ let tests =
       let bump = Assemblies.bump "1.0.0" csharp csharp2
       Expect.equal  ("1.0.1", Patch) bump "Patch change"
     }
+    test "csharp2 vs csharp3" {
+      let diff = Assemblies.diff csharp2 csharp3
+                |> nlJoin
+                |> wTrim
+      Expect.equal csharp3txt diff "csharp 3 diff"
+      let bump = Assemblies.bump "1.0.0" csharp2 csharp3
+      Expect.equal  ("1.1.0", Minor) bump "Minor change"
+    }
     test "enum vs enum2" {
       let diff = Assemblies.diff enum enum2
                 |> nlJoin

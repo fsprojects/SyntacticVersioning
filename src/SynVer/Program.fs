@@ -22,6 +22,7 @@ with
             | Output _-> "Send output to file"
             | Diff _ -> "Get the difference between two .net binaries"
             | Bump _ -> "Get the next version based on the difference between two .net binaries"
+            | Decompile -> "Decompile instead of using reflection"
 
 let (|AssemblyFile|LsonFile|Other|) (maybeFile:string) =
   match maybeFile, File.Exists(maybeFile) with

@@ -17,3 +17,6 @@
 * Filtering of compiler generated methods and inherited methods
 * Bugfix: Event rendered with wrong type
 * "Instance/Inheritance" -> "Instance"
+#### 0.0.8 - September 30 2018
+* Bugfix: Missing documentation for exe
+* FAKE lib 5
