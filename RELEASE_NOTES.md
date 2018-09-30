@@ -12,3 +12,8 @@
 * Upgrade to FSharp.Core 4.1
 #### 0.0.6 - March 18 2017
 * Null reference bug, Version was missing ToString
+#### 0.0.7 - September 30 2018
+* Possibility to load assembly using Mono.Cecil
+* Filtering of compiler generated methods and inherited methods
+* Bugfix: Event rendered with wrong type
+* "Instance/Inheritance" -> "Instance"

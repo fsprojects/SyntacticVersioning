@@ -48,7 +48,7 @@ with
   static member private WhenStatic (flag:InstanceOrStatic) (typ:Typ) : string =
     match flag with
       | InstanceOrStatic.Static -> typ.FullName
-      | InstanceOrStatic.Instance -> sprintf "(Instance/Inheritance of %s)" typ.FullName
+      | InstanceOrStatic.Instance -> sprintf "(Instance of %s)" typ.FullName
       | _ -> failwith "!"
 
   static member private Parameters (prms:Parameter list) : string =

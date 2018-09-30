@@ -163,7 +163,7 @@ let private sort' (x: string): string =
    x.Replace("Removed: ", System.String.Empty)
     .Replace("Added: ", System.String.Empty)
     .Replace("new ", System.String.Empty)
-    .Replace("(Instance/Inheritance of ", System.String.Empty)
+    .Replace("(Instance of ", System.String.Empty)
     .Replace("( ", System.String.Empty)
     .Replace("{ ", System.String.Empty)
 

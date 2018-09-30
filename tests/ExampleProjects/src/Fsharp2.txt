@@ -6,21 +6,21 @@
                 System.Void
                 -> SpiseMisu.MyClassWithCLIEvent
 
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).Event1.Add : 
+        - (Instance of SpiseMisu.MyClassWithCLIEvent).Event1.Add : 
                 sender:System.Object * args:System.Tuple<SpiseMisu.MyClassWithCLIEvent,System.Object>
                 -> System.Void
 
-        - (Instance/Inheritance of SpiseMisu.MyClassWithCLIEvent).TestEvent : 
+        - (Instance of SpiseMisu.MyClassWithCLIEvent).TestEvent : 
                 arg:System.Object
                 -> System.Void
 
         
 * SpiseMisu.Struct
 
-        + (Instance/Inheritance of SpiseMisu.Struct).Baz : 
+        + (Instance of SpiseMisu.Struct).Baz : 
                 System.Int32
 
-        + (Instance/Inheritance of SpiseMisu.Struct).Qux : 
+        + (Instance of SpiseMisu.Struct).Qux : 
                 System.Int32
 
         
