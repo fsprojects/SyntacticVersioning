@@ -82,9 +82,9 @@ let (|Fsproj|Csproj|Vbproj|Shproj|) (projFileName:string) =
 let (|FsFile|CsFile|) (codeFileName:string) =
     match codeFileName with
     | f when f.EndsWith(".fsx") -> FsFile
-    | f when f.EndsWith(".fs") -> FsFile
-    | f when f.EndsWith(".cs") -> CsFile
-    | _                           -> failwith (sprintf "Code file %s not supported. Unknown code type." codeFileName)
+    | f when f.EndsWith(".fs")  -> FsFile
+    | f when f.EndsWith(".cs")  -> CsFile
+    | _                         -> failwith (sprintf "Code file %s not supported. Unknown code type." codeFileName)
 
 
 let exampleProjects = "tests/ExampleProjects/"
@@ -96,6 +96,7 @@ let extraCscParams (parameters:CscHelper.CscParams) =
 #endif
 
 module create=
+    let failWhenNon0 name res = if res<>0 then failwithf "Non 0 exit code %d of %s" res name
     open FscHelper
     let fsharpProjectFromFile fileName name=
         let dllName = sprintf "%s.dll" name
@@ -105,7 +106,7 @@ module create=
             compile 
                 [ Out dll
                   Target Library ]
-        |> ignore
+        |> failWhenNon0 name
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
     open CscHelper
     let csharpProjectFromFile fileName name=
@@ -114,8 +115,8 @@ module create=
         let assemblyInfo =  exampleProjects </> "src"</> "AssemblyInfo.cs"
         [fileName; assemblyInfo] |>
             csc (fun parameters ->
-                { parameters with Output = dll; Target = Library } |> extraCscParams)
-        |> ignore
+                { parameters with Output = dll; Target = Library; } |> extraCscParams)
+        |> failWhenNon0 name
         //mcs -target:library -out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.cs"
 
 Target.Create "ExampleProjects" (fun _ ->
@@ -127,7 +128,6 @@ Target.Create "ExampleProjects" (fun _ ->
         | FsFile -> create.fsharpProjectFromFile fileName name
         | CsFile -> create.csharpProjectFromFile fileName name
     )
-
 )
 
 // Copies binaries from default VS location to expected bin folder

@@ -110,45 +110,56 @@ module Decompile =
     let isStatic b = match b with | true -> InstanceOrStatic.Static | false -> InstanceOrStatic.Instance
 
     let event' t (ei:EventDefinition) : Member=
-      //printf "\n\n\n\nName: %s\nEventType: %O\nAddMethod: %O\nModule: %O\nInvokeMethod: %O\n\n\n" ei.Name ei.EventType ei.AddMethod ei.Module ei.InvokeMethod
-      //let mi = if isNull ei.InvokeMethod then ei.EventType.Resolve().Methods |> Seq.find (fun m->m.Name = "Invoke") else ei.InvokeMethod
-      //let p=Seq.head ei.EventType.GenericParameters
-      //let params' = p.GenericParameters |> Seq.map genericParametersToParameter |> List.ofSeq
-      match ei.EventType with
-      | :? GenericInstanceType as eventType->
-        match eventType.ElementType.FullName with
-        | "Microsoft.FSharp.Control.FSharpHandler`1" ->
-          match Seq.tryHead eventType.GenericArguments with
-          | Some tuple->
-            let instance = isStatic false
-            let result = typeToTyp ei.EventType
-            Event {Type=typeToTyp t
-                   Instance= instance
-                   Name= ei.Name
-                   Parameters= [
-                     {Type = {FullName = "System.Object";}; Name = "sender";};
-                     {Type = typeToTyp tuple; Name = "args";}
-                   ]
-                   Result= {FullName = "System.Void"}}
-          | _  -> failwithf "Expected generic arguments"
-        | "System.EventHandler`1" -> 
-          match Seq.tryHead eventType.GenericArguments with
-          | Some tuple->
+      let expectGenericInstance() =
+        match ei.EventType with
+        | :? GenericInstanceType as eventType-> eventType
+        | _ -> failwithf "Could not interpret EventType '%s'" (ei.EventType.GetType().FullName)
+      let lessThanEtc = System.Text.RegularExpressions.Regex(@"<.+")
+      match lessThanEtc.Replace(ei.EventType.FullName, "") with
+      | "Microsoft.FSharp.Control.FSharpHandler`1" -> // NOTE: This is a bit ugly, can probably be improved later
+        let eventType = expectGenericInstance()
+        match Seq.tryHead eventType.GenericArguments with
+        | Some tuple->
+          let instance = isStatic false
+          let result = typeToTyp ei.EventType
+          Event {Type=typeToTyp t
+                 Instance= instance
+                 Name= ei.Name
+                 Parameters= [
+                   {Type = {FullName = "System.Object";}; Name = "sender";};
+                   {Type = typeToTyp tuple; Name = "args";}
+                 ]
+                 Result= {FullName = "System.Void"}}
+        | _  -> failwithf "Expected generic arguments"
+      | "System.EventHandler`1" -> 
+        let eventType = expectGenericInstance()
+        match Seq.tryHead eventType.GenericArguments with
+        | Some tuple->
 
-            let instance = isStatic false
-            let result = typeToTyp ei.EventType
-            Event {Type=typeToTyp t
-                   Instance= instance
-                   Name= ei.Name
-                   Parameters= [
-                     {Type = {FullName = "System.Object";}; Name = "sender";};
-                     {Type = typeToTyp tuple; Name = "e";}
-                   ]
-                   Result= {FullName = "System.Void"}}
-          | _  -> failwithf "Expected generic arguments"
-        | _ ->
-          failwithf "Could not interpret %s" eventType.ElementType.FullName
-      | _ -> failwithf "Could not interpret EventType %s" ei.EventType.FullName
+          let instance = isStatic false
+          let result = typeToTyp ei.EventType
+          Event {Type=typeToTyp t
+                 Instance= instance
+                 Name= ei.Name
+                 Parameters= [
+                   {Type = {FullName = "System.Object";}; Name = "sender";};
+                   {Type = typeToTyp tuple; Name = "e";}
+                 ]
+                 Result= {FullName = "System.Void"}}
+        | _  -> failwithf "Expected generic arguments"
+      | "System.EventHandler" ->
+        let instance = isStatic false
+        let result = typeToTyp ei.EventType
+        Event {Type=typeToTyp t
+               Instance= instance
+               Name= ei.Name
+               Parameters= [
+                 {Type = {FullName = "System.Object";}; Name = "sender";};
+                 {Type = {FullName = "System.EventArgs";}; Name = "e";}
+               ]
+               Result= {FullName = "System.Void"}}
+      | _ ->
+        failwithf "Could not interpret '%s'" ei.EventType.FullName
     let field t (fi:FieldDefinition) : Member=
       Field {Type=typeToTyp t
              Instance=isStatic fi.IsStatic
