@@ -20,7 +20,7 @@ version: 0.0.1.{build}
 artifacts:
   - path: bin
     name: bin
-  - path: '**\*.nupkg'
+  - path: 'src\**\*.nupkg'
     name: nupkgs
     type: NuGetPackage
 branches:
