@@ -1,6 +1,4 @@
 module SynVer.Compare
-open System.Reflection
-open System
 type private Ns = Namespace
 type private T = SurfaceOfType
 type private M = Member
@@ -18,19 +16,18 @@ let members (source:M list) (target: M list) =
 
 [<CompiledName("Types")>]
 let types (source:T list) (target: T list) =
-  let typ (t:T) = t.Type 
-  let setOfNames = List.map typ >> set
+  let setOfNames = List.map T.typ >> set
   let sourceSet = source |> setOfNames
   let targetSet = target |> setOfNames
   let maybeChanged = Set.intersect targetSet sourceSet
   let compareMembersForTyp t=
-    let withTyp = List.find (typ >> (=) t)
+    let withTyp = List.find (T.typ >> (=) t)
     let sourceT = source |> withTyp
     let targetT = target |> withTyp
     members sourceT.Members targetT.Members
   let changed = maybeChanged 
               |> Seq.map (fun t->t, compareMembersForTyp t ) 
-              |> Seq.filter (fun (_,c)-> not c.IsEmpty)
+              |> Seq.filter (snd >> AddedAndRemoved.isEmpty >> not)
               |> Map.ofSeq
   {
       Diff=diffSet sourceSet targetSet
@@ -41,21 +38,20 @@ let types (source:T list) (target: T list) =
 [<CompiledName("Packages")>]
 let packages (source: Package) (target:Package)=
   let namespaces (source:Ns list) (target:Ns list) =
-    let nameOf (ns:Ns) = ns.Namespace 
-    let setOfNames = List.map nameOf >> set
+    let setOfNames = List.map Ns.name >> set
     let sourceSet = source |> setOfNames
     let targetSet = target |> setOfNames
 
     let maybeChanged = Set.intersect targetSet sourceSet
     let compareTypesForNsWithName t=
-      let withName = List.find (nameOf >> (=) t)
+      let withName = List.find (Ns.name >> (=) t)
       let sourceT = source |> withName
       let targetT = target |> withName
       types sourceT.Types targetT.Types
 
     let changed = maybeChanged 
                 |> Seq.map (fun t->t, compareTypesForNsWithName t ) 
-                |> Seq.filter (fun (_,c)-> not c.IsEmpty)
+                |> Seq.filter (snd >> Changes.isEmpty >> not)
                 |> Map.ofSeq
     {
         Diff=diffSet sourceSet targetSet

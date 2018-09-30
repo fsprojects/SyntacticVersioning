@@ -41,11 +41,14 @@
     <Compile Include="Serialization.fs" />
     <Compile Include="Lson.fs" />
     <Compile Include="Reflect.fs" />
+    <Compile Include="FSharpType.fs" />
+    <Compile Include="Decompile.fs" />
     <Compile Include="Compare.fs" />
     <Compile Include="SurfaceArea.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.*" />
+    <PackageReference Include="ICSharpCode.Decompiler" Version="3.*" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

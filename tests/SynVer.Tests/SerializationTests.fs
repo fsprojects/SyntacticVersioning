@@ -2,6 +2,7 @@ module SynVer.SerializationTests
 open SynVer
 open Expecto
 open TestHelper
+open TestAssemblies
 
 let assertCanSerializeAndDeserialize assembly
   =

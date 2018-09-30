@@ -3,7 +3,6 @@ namespace SynVer
 open Microsoft.FSharp.Reflection
 open System
 open System.Reflection
-open Microsoft.FSharp.Reflection
  
 module Reflect =
   type private CAtDat = CustomAttributeData
@@ -122,7 +121,7 @@ module Reflect =
     let event' (ei:EventInfo) : Member=
       let mi = ei.EventHandlerType.GetMethod("Invoke")
       let params' = mi.GetParameters() |> parametersToParameter
-      Event {Type=typeToTyp mi.ReflectedType
+      Event {Type=typeToTyp ei.DeclaringType
              Instance= isStatic mi.IsStatic 
              Name= ei.Name
              Parameters= params'
@@ -185,20 +184,19 @@ module Reflect =
       // https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/
       //   FSharp.Core.Unittests/LibraryTestFx.fs#L103-L110
       //
-      match m.MemberType with
-        | MemberTypes.Constructor ->
-          let nameInfo = (m :?> ConstructorInfo)
+      match m with
+        | :? ConstructorInfo as nameInfo ->
           match tag with
             | NetType.RecordType ->[ (recordConstructor nameInfo)]
-            | __________ ->[ (constructor' nameInfo) ]
-        | MemberTypes.Event ->
-          [ (event' (m :?> EventInfo))]
-        | MemberTypes.Field -> 
-          [ (field (m :?> FieldInfo))]
-        | MemberTypes.Method ->
-          [ (method' (m :?> MethodInfo))]
-        | MemberTypes.NestedType ->
-          let nt = (m :?> Type)
+            | __________ ->[ constructor' nameInfo ]
+        | :? EventInfo as e -> [ event' e ]
+        | :? FieldInfo as f -> [ field f ]
+        | :? MethodInfo as m' ->
+            if m'.IsSpecialName then
+                []
+            else 
+                [ method' m' ]
+        | :? Type as nt ->
           match tag with
             | NetType.SumType ->
               [| nt |]
@@ -208,8 +206,8 @@ module Reflect =
             | _ ->
               // Already handled in `let types = ...`
               []
-        | MemberTypes.Property ->
-          [ (property (m :?> PropertyInfo))]
+        | :? PropertyInfo as p->
+          [ property p]
         | _ ->
           let fullname = m.ReflectedType.FullName
           failwith
@@ -229,7 +227,9 @@ module Reflect =
   let getTypeMembers (t:Type) : Member list=
     let t' = typeToTyp t
     let netT = tagNetType t
-    let l= List.collect (getTypeMember t') (t.GetMembers()|> Array.toList)
+    let members = t.GetMembers(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.Public||| BindingFlags.DeclaredOnly ) |> Array.toList
+    //let events = t.GetEvents(BindingFlags.Instance ||| BindingFlags.Static ||| BindingFlags.Public||| BindingFlags.DeclaredOnly) |> Array.toList
+    let l= List.collect (getTypeMember t') members
     match netT with
     | NetType.SumType -> l @ toUnionCases t
     | NetType.Enum -> l @ (enumValues t)

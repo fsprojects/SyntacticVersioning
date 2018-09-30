@@ -4,9 +4,11 @@ open Argu
 open SynVer
 open System.Reflection
 open System.IO
+open Mono.Cecil
 
 type CLIArguments =
     | Surface_of of path:string
+    | Decompile
     | Output of path:string
     | Diff of source:string * target:string
     | Bump of version:string * source:string * target:string
@@ -26,17 +28,19 @@ let (|AssemblyFile|LsonFile|Other|) (maybeFile:string) =
   | f, true when f.EndsWith(".lson") -> LsonFile
   | f, true when f.EndsWith(".dll") -> AssemblyFile
   | f, _  -> Other
+type 'a IAssemblyInterpreter=interface
+  abstract member ReadAssembly: string->'a
+  abstract member OfAssembly: 'a->Package
+end
 
-let loadAssembly f =
+let inline loadAssembly f readAssembly=
   try
-    Assembly.LoadFile (Path.GetFullPath f)
+    readAssembly (Path.GetFullPath f)
     |> Ok
   with ex ->
     (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 
     |> Error
-
-
-let getSurfaceAreaOf (f:string): Result<Package,string>=
+let getSurfaceAreaOf (f:string) (i:IAssemblyInterpreter<_>): Result<Package,string>=
   match f with
   | LsonFile ->
     let res = File.ReadAllText f
@@ -45,13 +49,13 @@ let getSurfaceAreaOf (f:string): Result<Package,string>=
     | Some p -> Ok p
     | None -> Error "Couldn't deserialize"
   | AssemblyFile -> 
-        loadAssembly f
-        |> Result.map SurfaceArea.ofAssembly
+        loadAssembly f i.ReadAssembly
+        |> Result.map i.OfAssembly
   | Other -> Error "No dll or lson specified"
 
-
-let getDiff released modified : Result<string,string>=
-    let maybeReleased,maybeModified= getSurfaceAreaOf released, getSurfaceAreaOf modified
+let getDiff released modified (i:IAssemblyInterpreter<_>): Result<string,string>=
+    let maybeReleased,maybeModified= getSurfaceAreaOf released i,
+                                     getSurfaceAreaOf modified i
     match maybeReleased,maybeModified with
     | Ok released, Ok modified ->
         let changes =  SurfaceArea.diff released modified
@@ -65,9 +69,10 @@ let getDiff released modified : Result<string,string>=
         
         Error (String.Join(Environment.NewLine, errors) )
 
-let getBump version released modified : Result<string*Version,string>=
-    let maybeReleased,maybeModified= getSurfaceAreaOf released, getSurfaceAreaOf modified
-    match maybeReleased,maybeModified with
+let getBump version released modified (i:IAssemblyInterpreter<_>): Result<string*Version,string>=
+    let maybeReleased, maybeModified= getSurfaceAreaOf released i, getSurfaceAreaOf modified i
+
+    match maybeReleased, maybeModified with
     | Ok released, Ok modified ->
         SurfaceArea.bump version released modified
         |> Ok
@@ -78,7 +83,14 @@ let getBump version released modified : Result<string*Version,string>=
             |> List.toArray
         
         Error (String.Join(Environment.NewLine, errors) )
-
+let decompiler = { new IAssemblyInterpreter<AssemblyDefinition> with
+                   member __.ReadAssembly f = Decompile.readAssembly f
+                   member __.OfAssembly a = SurfaceArea.ofAssemblyDefinition a
+                 }
+let reflector = { new IAssemblyInterpreter<Assembly> with
+                  member __.ReadAssembly f = Assembly.LoadFile f
+                  member __.OfAssembly a = SurfaceArea.ofAssembly a
+                }
 [<EntryPoint>]
 let main argv = 
     let parser = ArgumentParser.Create<CLIArguments>(programName = "synver.exe")
@@ -100,26 +112,29 @@ let main argv =
         let maybeBump = results.TryGetResult(<@ Bump @>)
         let maybeMagnitude = results.TryGetResult(<@ Magnitude @>)
         let maybeOutput = results.TryGetResult(<@ Output @>)
+        let decompile = results.TryGetResult(<@ Decompile @>) |> Option.map (fun _->true) |> Option.defaultValue false
 
         match maybeFile, maybeDiff, maybeMagnitude, maybeBump with
         | Some file, None, None, None ->
-            loadAssembly file
-            |> Result.map (
-                SurfaceArea.ofAssembly 
-                >> Lson.serialize
-            )
+            if decompile then
+              loadAssembly file Decompile.readAssembly
+              |> Result.map (SurfaceArea.ofAssemblyDefinition >> Lson.serialize)
+            else
+              loadAssembly file Assembly.LoadFile
+              |> Result.map (SurfaceArea.ofAssembly>> Lson.serialize)
         | None, Some (released, modified), None, None ->
-            getDiff released modified
+          if decompile then getDiff released modified decompiler
+          else getDiff released modified reflector
         | None, None, Some (released,modified), None ->
-            getBump "0.0.0" released modified
-            |> function 
-                | Ok (_,version)->version.ToString() |>Ok
-                | Error a->Error a
+          let res =
+            if decompile then getBump "0.0.0" released modified decompiler
+            else getBump "0.0.0" released modified reflector
+          res |> Result.map (snd>>string)
         | None, None, None, Some (version,released,modified) ->
-            getBump version released modified
-            |> function 
-                | Ok (version,_)->version |>Ok
-                | Error a->Error a
+          let res =
+            if decompile then getBump version released modified decompiler
+            else getBump version released modified reflector
+          res |> Result.map fst
         | _,_,_,_ ->
             Error(parser.PrintUsage())
         |> (fun res-> 
