@@ -1,13 +1,28 @@
 image: Visual Studio 2017
 init:
   - git config --global core.autocrlf input
+before_build:
+  - ps: >-
+      $buildId = $env:APPVEYOR_BUILD_NUMBER.PadLeft(5, '0');
+      $versionSuffixPR = "-PR$($env:APPVEYOR_PULL_REQUEST_NUMBER)-$buildId";
+      $branchName = "$env:APPVEYOR_REPO_BRANCH".Replace("_","");
+      $versionSuffixBRANCH = "-$branchName-$buildId";
+      $env:VersionSuffix = if ("$env:APPVEYOR_REPO_TAG" -eq "true") { "" } else { if ("$env:APPVEYOR_PULL_REQUEST_NUMBER") { $versionSuffixPR } else { $versionSuffixBRANCH } };
+
 build_script:
+  - cmd: echo vs %VersionSuffix%"
   - cmd: build.cmd All
+  - cmd: dotnet pack src\SynVer -c Release
+  - cmd: dotnet pack src\SynVer.FAKE -c Release
+  - cmd: dotnet pack src\SynVer.Lib -c Release
 test: off
 version: 0.0.1.{build}
 artifacts:
   - path: bin
     name: bin
+  - path: '**\*.nupkg'
+    name: nupkgs
+    type: NuGetPackage
 branches:
   only:
   - master
