@@ -399,7 +399,9 @@ open Fake.Core.TargetOperators
 "Clean"
   ==> "Release"
 
+#if !MONO
 "RunNet4Tests" ==> "RunTests"
+#endif
 "RunNetCoreTests" ==> "RunTests"
 
 "ReleaseDocs"
