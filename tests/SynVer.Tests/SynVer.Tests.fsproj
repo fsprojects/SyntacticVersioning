@@ -25,8 +25,8 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\SynVer.Lib\SynVer.Lib.fsproj" />
-    <PackageReference Include="FSharp.Core" Version="4.3.*" />
-    <PackageReference Include="Expecto" Version="5.1.*" />
-    <PackageReference Include="Expecto.FsCheck" Version="5.1.*" />
+    <PackageReference Update="FSharp.Core" Version="4.5.0" />
+    <PackageReference Include="Expecto" Version="8.4.2" />
+    <PackageReference Include="Expecto.FsCheck" Version="8.4.2" />
   </ItemGroup>
 </Project>

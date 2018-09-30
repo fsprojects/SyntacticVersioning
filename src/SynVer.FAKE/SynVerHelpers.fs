@@ -1,7 +1,8 @@
 ﻿namespace SynVer.FAKE
 open Fake
-open Fake.NuGetVersion
-open Fake.SemVerHelper
+open Fake.DotNet.NuGet
+open Fake.Core
+open Fake.DotNet.NuGet.Version
 open SynVer
 [<AutoOpen>]
 module SynVerHelpers=
