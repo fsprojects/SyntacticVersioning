@@ -179,7 +179,7 @@ Target.Create "RunNet4Tests" (fun _ ->
 )
 
 Target.Create "RunNetCoreTests" (fun _ ->
-  DotNetCli.RunCommand id ("tests/SynVer.Tests/bin/"+configuration+"/netcoreapp2.0/SynVer.Tests.dll --summary")
+  DotNetCli.RunCommand id (" run --project tests/SynVer.Tests/SynVer.Tests.fsproj --framework netcoreapp2.0 --summary")
 )
 
 Target.Create "RunTests" Target.DoNothing
