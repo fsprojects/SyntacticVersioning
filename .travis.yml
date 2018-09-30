@@ -1,5 +1,5 @@
 language: csharp
-dotnet: 2.0.0
+dotnet: 2.1.401
 sudo: false  # use the new container-based Travis infrastructure 
 install:
   # workaround for missing .net 4.5 targing pack
