@@ -213,24 +213,6 @@ Target.Create "RunNetCoreTests" (fun _ ->
 Target.Create "RunTests" Target.DoNothing
 
 // --------------------------------------------------------------------------------------
-// Build a NuGet package
-
-Target.Create "NuGet" (fun _ ->
-    Paket.Pack(fun p ->
-        { p with
-            OutputPath = "bin"
-            Version = release.NugetVersion
-            ReleaseNotes = toLines release.Notes})
-)
-
-Target.Create "PublishNuget" (fun _ ->
-    Paket.Push(fun p ->
-        { p with
-            WorkingDir = "bin" })
-)
-
-
-// --------------------------------------------------------------------------------------
 // Generate the documentation
 
 
@@ -420,8 +402,6 @@ Target.Create "Release" (fun _ ->
 Target.Create "Release" Target.DoNothing
 #endif
 
-Target.Create "BuildPackage" Target.DoNothing
-
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
@@ -435,8 +415,6 @@ open Fake.Core.TargetOperators
   ==> "RunTests"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
-  ==> "NuGet"
-  ==> "BuildPackage"
   ==> "All"
   =?> ("ReleaseDocs",isLocalBuild)
 
@@ -452,10 +430,6 @@ open Fake.Core.TargetOperators
 
 "RunNet4Tests" ==> "RunTests"
 "RunNetCoreTests" ==> "RunTests"
-
-"BuildPackage"
-  ==> "PublishNuget"
-  ==> "Release"
 
 "ReleaseDocs"
   ==> "Release"

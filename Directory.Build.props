@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PackageIconUrl>https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <RepositoryUrl>https://github.com/fsprojects/SyntacticVersioning/</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/fsprojects/SyntacticVersioning/</PackageProjectUrl>
+    <Authors>Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)</Authors>
+    <Owners>Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)</Owners>
+    <PackageTags>syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff</PackageTags>
+    <Description>Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)</Description>
+
+    <WarningLevel>3</WarningLevel>
+
+    <VersionPrefix>0.0.7</VersionPrefix>
+    <Version Condition=" '$(VersionSuffix)' != '' ">$(VersionPrefix)$(VersionSuffix)</Version>
+    <Version Condition=" '$(VersionSuffix)' == '' ">$(VersionPrefix)</Version>
+    <AssemblyVersion>$(VersionPrefix).0</AssemblyVersion>
+    <FileVersion>$(VersionPrefix).0</FileVersion>
+  </PropertyGroup>
+</Project>

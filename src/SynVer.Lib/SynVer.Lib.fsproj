@@ -1,27 +1,12 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
+  <Import Project="..\..\netfx.props" />
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <Title>Syntactic Versioning Library</Title>
-    <WarningLevel>3</WarningLevel>
-    <Authors>Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)</Authors>
-    <Owners>Oskar Gewalli; SPISE MISU ApS (Ramón Soto Mathiesen)</Owners>
-    <Description>Syntactic (Semantic) Versioning for .NET libraries heavily inspired in elm-package (bump and diff)</Description>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageLicenseUrl>https://github.com/fsprojects/SyntacticVersioning/blob/master/LICENSE.txt</PackageLicenseUrl>
-    <RepositoryUrl>https://github.com/fsprojects/SyntacticVersioning/</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/fsprojects/SyntacticVersioning/</PackageProjectUrl>
-    <PackageTags>syntactic semantic versioning dotnet assembly nuget csharp fsharp bump diff</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/fsprojects/SyntacticVersioning/master/docs/files/img/logo.png</PackageIconUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <OtherFlags Condition=" '$(TargetFramework)' == 'netstandard2.0'">--warnon:1182</OtherFlags>
     <OtherFlags Condition=" '$(TargetFramework)' == 'net461'">--warnon:1182</OtherFlags>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
   </PropertyGroup>
