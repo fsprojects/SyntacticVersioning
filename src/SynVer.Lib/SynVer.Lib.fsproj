@@ -17,6 +17,9 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
   </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.5.1" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\fsprojects\LSON\LSON.fs">
       <Paket>True</Paket>
@@ -32,7 +35,8 @@
     <Compile Include="SurfaceArea.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="ICSharpCode.Decompiler" Version="3.*" />
+    <PackageReference Update="FSharp.Core" Version="4.5.4" />
+    <PackageReference Include="ICSharpCode.Decompiler" Version="4.0.0.4521" />
   </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

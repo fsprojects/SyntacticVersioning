@@ -24,7 +24,7 @@ with
     if x.Name<>null then
       sprintf "%s:%O" x.Name (x.Type)
     else
-      sprintf "%O" x.Type
+      string x.Type
   static member Create (typ:Typ,name:Name) : Parameter= { Type=typ ; Name=name }
   override x.ToString() = Parameter.ToString x
 

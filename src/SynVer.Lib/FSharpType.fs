@@ -1,7 +1,9 @@
 namespace SynVer
 
 open System
-open Mono.Cecil
+open ICSharpCode.Decompiler
+open ICSharpCode.Decompiler.TypeSystem
+//open Mono.Cecil
 // port of selected parts of
 // https://github.com/fsharp/fsharp/blob/7ac8931b4595f0f30bc9b3bc8a094ecc69ccc443/src/fsharp/FSharp.Core/reflect.fs
 // to Mono.Cecil
@@ -9,44 +11,49 @@ open Mono.Cecil
 type BindingFlags=System.Reflection.BindingFlags
 //NOTE: hacky way to filter some of the things and removing special special things
 module internal BindingFlags=
-  let matches (t:TypeDefinition) (b:BindingFlags) =
+  let matches (t:ITypeDefinition) (b:BindingFlags) =
     let mutable m=true
-    if (b&&& BindingFlags.Public) = BindingFlags.Public && t.IsPublic then m<-true
-    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not t.IsPublic then m<-true
-    m && not t.IsSpecialName && not t.IsRuntimeSpecialName
+    let isPublic = t.Accessibility.HasFlag(Accessibility.Public)
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && isPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not isPublic then m<-true
+    m && not <| t.IsCompilerGenerated()
 module internal MethodDefinition=
-  let matches (t:MethodDefinition) (b:BindingFlags) =
+  let matches (t:IMethod) (b:BindingFlags) =
     let mutable m=true
-    if (b&&& BindingFlags.Public) = BindingFlags.Public && t.IsPublic then m<-true
-    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not t.IsPublic then m<-true
-    m && not t.IsSpecialName && not t.IsRuntimeSpecialName
+    let isPublic = t.Accessibility.HasFlag(Accessibility.Public)
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && isPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not isPublic then m<-true
+    m && not <| t.IsCompilerGenerated()
 module internal PropertyDefinition=
-  let matches (t:PropertyDefinition) (b:BindingFlags) =
+  let matches (t:IProperty) (b:BindingFlags) =
     let mutable m=true
-    //NOTE: Missing IsPublic property
-    m && not t.IsSpecialName && not t.IsRuntimeSpecialName 
+    let isPublic = t.Accessibility.HasFlag(Accessibility.Public)
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && isPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not isPublic then m<-true
+    m && not <| t.IsCompilerGenerated()
 module internal FieldDefinition=
-  let matches (t:FieldDefinition) (b:BindingFlags) =
+  let matches (t:IField) (b:BindingFlags) =
     let mutable m=true
-    if (b&&& BindingFlags.Public) = BindingFlags.Public && t.IsPublic then m<-true
-    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not t.IsPublic then m<-true
-    m && not t.IsSpecialName && not t.IsRuntimeSpecialName
+    let isPublic = t.Accessibility.HasFlag(Accessibility.Public)
+    if (b&&& BindingFlags.Public) = BindingFlags.Public && isPublic then m<-true
+    if (b&&& BindingFlags.NonPublic) = BindingFlags.NonPublic && not isPublic then m<-true
+    m && not <| t.IsCompilerGenerated()
 module internal CustomAttribute=
   let typ (a:CustomAttribute)= a.AttributeType
   let typeName a = (typ a).Name
   let typeFullName a = (typ a).FullName
 module internal TypeDefinition =
-  let getNestedType (n:string) (b:BindingFlags) (t:TypeDefinition)=
+  let getNestedType (n:string) (b:BindingFlags) (t:ITypeDefinition)=
     t.NestedTypes |> Seq.tryFind (fun t' -> t'.Name = n && BindingFlags.matches t' b)
 module internal AssemblyDefinition=
   /// the assumption is that this does not fail, i.e. that the tests pick it up in that case
-  let getType (t:Type) (a:AssemblyDefinition) :TypeDefinition= 
+  let getType (t:Type) (a:AssemblyDefinition) :ITypeDefinition= 
     match a.MainModule.Types |> Seq.tryFind (fun t'->t'.FullName = t.FullName) with
     | Some t' -> t'
     | None -> failwithf "Could not find '%s'" t.FullName 
     
 module Impl=
-    let isNamedType(typ:TypeReference) = not (typ.IsArray || typ.IsByReference || typ.IsPointer)
+    let isNamedType(typ:ITypeReference) = not (typ.IsArray || typ.IsByReference || typ.IsPointer)
 
 
     let isCompilationMappingAttr a = CustomAttribute.typeName a = "CompilationMappingAttribute"
@@ -100,7 +107,7 @@ module Impl=
       match tryFindCompilationMappingAttribute attrs with
       | None -> failwith "no compilation mapping attribute"
       | Some a -> a
-    let tryFindCompilationMappingAttributeFromType (typ:TypeDefinition) = 
+    let tryFindCompilationMappingAttributeFromType (typ:ITypeDefinition) = 
         tryFindCompilationMappingAttribute ( typ.CustomAttributes |> Seq.filter isCompilationMappingAttr |> Seq.toArray)
 
     let tryFindSourceConstructFlagsOfType (typ:TypeDefinition) = 
@@ -108,14 +115,14 @@ module Impl=
       | None -> None
       | Some (flags,_n,_vn) -> Some flags
 
-    let tryFindCompilationMappingAttributeFromMemberInfo (info:IMemberDefinition) = 
+    let tryFindCompilationMappingAttributeFromMemberInfo (info:IMember) = 
         tryFindCompilationMappingAttribute ( info.CustomAttributes |> Seq.filter isCompilationMappingAttr |> Seq.toArray)
         
-    let findCompilationMappingAttributeFromMemberInfo (info: IMemberDefinition) = findCompilationMappingAttribute ( info.CustomAttributes |> Seq.filter isCompilationMappingAttr |> Seq.toArray)
-    let sequenceNumberOfMember          (x: IMemberDefinition) = let (_,n,_) = findCompilationMappingAttributeFromMemberInfo x in n
-    let variantNumberOfMember           (x: IMemberDefinition) = let (_,_,vn) = findCompilationMappingAttributeFromMemberInfo x in vn
+    let findCompilationMappingAttributeFromMemberInfo (info: IMember) = findCompilationMappingAttribute ( info.CustomAttributes |> Seq.filter isCompilationMappingAttr |> Seq.toArray)
+    let sequenceNumberOfMember          (x: IMember) = let (_,n,_) = findCompilationMappingAttributeFromMemberInfo x in n
+    let variantNumberOfMember           (x: IMember) = let (_,_,vn) = findCompilationMappingAttributeFromMemberInfo x in vn
 
-    let isExceptionRepr (typ:TypeDefinition,bindingFlags) = 
+    let isExceptionRepr (typ:ITypeDefinition,bindingFlags) = 
         match tryFindSourceConstructFlagsOfType(typ) with 
         | None -> false 
         | Some(flags) -> 
@@ -126,12 +133,12 @@ module Impl=
            else 
               true)
               
-    let isFieldProperty (prop : PropertyDefinition) =
+    let isFieldProperty (prop : IProperty) =
         match tryFindCompilationMappingAttributeFromMemberInfo(prop) with
         | None -> false
         | Some (flags,_n,_vn) -> (flags &&& SourceConstructFlags.KindMask) = SourceConstructFlags.Field
 
-    let isUnionType (typ:TypeDefinition,bindingFlags:BindingFlags) = 
+    let isUnionType (typ:ITypeDefinition,bindingFlags:BindingFlags) = 
         isOptionType typ || 
         isListType typ || 
         match tryFindSourceConstructFlagsOfType(typ) with 
@@ -143,8 +150,8 @@ module Impl=
               (bindingFlags &&& BindingFlags.NonPublic) <> enum(0)
            else 
               true)
-    let unionTypeOfUnionCaseType (typ:TypeDefinition,bindingFlags) = 
-        let rec get (typ:TypeDefinition) = if isUnionType (typ,bindingFlags) then typ else match typ.BaseType with null -> typ | b -> get <| b.Resolve()
+    let unionTypeOfUnionCaseType (typ: ITypeDefinition,bindingFlags) = 
+        let rec get (typ:ITypeDefinition) = if isUnionType (typ,bindingFlags) then typ else match typ.BaseType with null -> typ | b -> get <| b.Resolve()
         get typ
     // Check the base type - if it is also an F# type then
     // for the moment we know it is a Discriminated Union
@@ -154,7 +161,7 @@ module Impl=
     let rec isClosureRepr (typ:TypeReference) = 
         isFunctionType typ || 
         (match typ.Resolve().BaseType with null -> false | bty -> isClosureRepr bty)
-    let getTypeOfReprType (typ:TypeDefinition,bindingFlags)= 
+    let getTypeOfReprType (typ: ITypeDefinition,bindingFlags)= 
         if isExceptionRepr(typ,bindingFlags) then typ.BaseType.Resolve()
         elif isConstructorRepr(typ,bindingFlags) then unionTypeOfUnionCaseType(typ,bindingFlags)
         elif isClosureRepr(typ) then 
@@ -162,7 +169,7 @@ module Impl=
           get typ 
         else typ
         
-    let getUnionTypeTagNameMap (typ:TypeDefinition,bindingFlags) = 
+    let getUnionTypeTagNameMap (typ: ITypeDefinition,bindingFlags) = 
         let maybeEnumTyp =TypeDefinition.getNestedType "Tags" bindingFlags typ
         // Unions with a singleton case do not get a Tags type (since there is only one tag), hence enumTyp may be null in this case
         match maybeEnumTyp with
@@ -189,7 +196,7 @@ module Impl=
             |> Seq.filter (fun f -> f.IsStatic && f.IsLiteral) 
             |> Seq.sortWith (fun f1 f2 -> compare (f1.Constant :?> int) (f2.Constant :?> int))
             |> Seq.map (fun tagfield -> (tagfield.Constant :?> int),tagfield.Name)
-    let getUnionCaseTyp (typ: TypeDefinition, tag: int, bindingFlags) = 
+    let getUnionCaseTyp (typ: ITypeDefinition, tag: int, bindingFlags) = 
         let tagFields = getUnionTypeTagNameMap(typ,bindingFlags) |> Seq.toArray
         let tagField = tagFields |> Array.pick (fun (i,f) -> if i = tag then Some f else None)
         if tagFields.Length = 1 then 
@@ -216,7 +223,7 @@ module Impl=
                 failwithf "! %s" caseTyp.Name 
                 //caseTyp.MakeGenericType(casesTyp.GetGenericArguments())
             | Some caseTyp -> caseTyp
-    let fieldsPropsOfUnionCase(typ:TypeDefinition, tag:int, bindingFlags) =
+    let fieldsPropsOfUnionCase(typ: ITypeDefinition, tag:int, bindingFlags) =
         if isOptionType typ then 
             match tag with 
             | 0 (* None *) -> getInstancePropertyInfos (typ,[| |],bindingFlags) 
@@ -236,14 +243,14 @@ module Impl=
             |> Seq.filter (fun prop -> variantNumberOfMember prop = tag)
             |> Seq.sortWith (fun p1 p2 -> compare (sequenceNumberOfMember p1) (sequenceNumberOfMember p2))
             |> Seq.toArray
-    let getUnionTagConverter (typ:TypeDefinition,bindingFlags) = 
+    let getUnionTagConverter (typ:ITypeDefinition,bindingFlags) = 
         if isOptionType typ then (fun tag -> match tag with 0 -> "None" | 1 -> "Some" | _ -> invalidArg "tag" "outOfRange")
         elif isListType typ then (fun tag -> match tag with  0 -> "Empty" | 1 -> "Cons" | _ -> invalidArg "tag" "outOfRange")
         else 
           let tagfieldmap = getUnionTypeTagNameMap (typ,bindingFlags) |> Map.ofSeq
           (fun tag -> tagfieldmap.[tag])                
 [<Sealed>]
-type UnionCaseInfo(typ: TypeDefinition, tag:int) =
+type UnionCaseInfo(typ: ITypeDefinition, tag:int) =
     // Cache the tag -> name map
     let mutable names = None
     //let getMethInfo() = Impl.getUnionCaseConstructorMethod (typ, tag, BindingFlags.Public ||| BindingFlags.NonPublic) 
