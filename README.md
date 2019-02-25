@@ -1,5 +1,3 @@
-[![Issue Stats](http://issuestats.com/github/fsprojects/SyntacticVersioning/badge/issue)](http://issuestats.com/github/fsprojects/SyntacticVersioning)
-[![Issue Stats](http://issuestats.com/github/fsprojects/SyntacticVersioning/badge/pr)](http://issuestats.com/github/fsprojects/SyntacticVersioning)
 [![NuGet Status](https://img.shields.io/nuget/v/SynVer.svg?style=flat)](https://www.nuget.org/packages/SynVer/)
 
 # SyntacticVersioning
