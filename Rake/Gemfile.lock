@@ -8,7 +8,7 @@ GEM
       semver2 (~> 3.4)
     map (6.6.0)
     mini_portile2 (2.4.0)
-    nokogiri (1.10.1)
+    nokogiri (1.10.4)
       mini_portile2 (~> 2.4.0)
     nuget (2.8.50126.400)
     nuget_helper (1.0.0)
