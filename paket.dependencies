@@ -1,10 +1,15 @@
 source https://api.nuget.org/v3/index.json
 redirects on
 
+framework: netstandard2.0, netstandard2.1, netcoreapp2.2, netcoreapp3.0
+
 nuget Chiron ~> 6
 github fsprojects/LSON LSON.fs
-nuget Argu 
+nuget Argu
 nuget vswhere
+nuget FSharp.Core ~> 4.6
+nuget ICSharpCode.Decompiler ~> 3.0
+nuget Fake.Lib ~> 5.0
 
 group Build
   source https://api.nuget.org/v3/index.json

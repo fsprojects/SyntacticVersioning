@@ -173,13 +173,8 @@ Target.Create "Build" (fun _ ->
 // --------------------------------------------------------------------------------------
 // Run the unit tests using test runner
 
-Target.Create "RunNet4Tests" (fun _ ->
-    Shell.Exec ("tests/SynVer.Tests/bin/"+configuration+"/net461/SynVer.Tests.exe","--summary")
-    |> fun r -> if r<>0 then failwith "SynVer.Tests.exe failed"
-)
-
 Target.Create "RunNetCoreTests" (fun _ ->
-  DotNetCli.RunCommand id (" run --project tests/SynVer.Tests/SynVer.Tests.fsproj --framework netcoreapp2.0 --summary")
+  DotNetCli.RunCommand id (" run --project tests/SynVer.Tests/SynVer.Tests.fsproj --summary")
 )
 
 Target.Create "RunTests" Target.DoNothing
@@ -399,9 +394,6 @@ open Fake.Core.TargetOperators
 "Clean"
   ==> "Release"
 
-#if !MONO
-"RunNet4Tests" ==> "RunTests"
-#endif
 "RunNetCoreTests" ==> "RunTests"
 
 "ReleaseDocs"
