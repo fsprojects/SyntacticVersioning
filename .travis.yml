@@ -1,9 +1,7 @@
 language: csharp
-dotnet: 2.1.401
-sudo: false  # use the new container-based Travis infrastructure 
-install:
-  # workaround for missing .net 4.5 targing pack
-  - export FrameworkPathOverride=$(dirname $(which mono))/../lib/mono/4.5/
+language: csharp
+dist: xenial
+dotnet: 2.2
 
 script:
   - sh ./build.sh RunTests
