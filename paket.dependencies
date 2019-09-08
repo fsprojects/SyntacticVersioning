@@ -16,7 +16,9 @@ group Build
   source https://nuget.org/api/v2
   source https://ci.appveyor.com/nuget/fsharp-formatting
 
-  nuget FAKE ~> 5 prerelease
+  nuget Fake.Core.Target
+  nuget Fake.IO.Filesystem
+
   nuget FSharp.Formatting ~> 3 prerelease
 
   github fsharp/FAKE modules/Octokit/Octokit.fsx

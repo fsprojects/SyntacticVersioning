@@ -10,7 +10,7 @@ open Fake.ReleaseNotesHelper
 open System
 open System.IO
 open Fake.Core
-open Fake.Core.Globbing.Operators
+open Fake.IO.Globbing.Operators
 open Fake.IO.FileSystemOperators
 open Fake.DotNet
 open Fake.IO
@@ -144,30 +144,22 @@ Target.Create "CopyBinaries" (fun _ ->
 // Clean build results
 
 let vsProjProps = 
-#if MONO
-    [ ("DefineConstants","MONO"); ("Configuration", configuration) ]
-#else
-    [ ("Configuration", configuration); ("Platform", "Any CPU") ]
-#endif
+    [ ("Configuration", configuration) ]
 
 Target.Create "Clean" (fun _ ->
-    !! solutionFile |> MSBuildReleaseExt "" vsProjProps "Clean" |> ignore
-    CleanDirs ["bin"; "temp"; "docs/output"]
+  DotNet.Cli.Dotnet id "clean" "" |> ignore
+  CleanDirs ["bin"; "temp"; "docs/output"]
 )
 
 // --------------------------------------------------------------------------------------
 // Build library & test project
 
 Target.Create "Restore" (fun _ ->
-    !! solutionFile
-    |> MSBuildReleaseExt "" vsProjProps "Restore"
-    |> ignore
+  DotNet.Cli.DotnetRestore id solutionFile
 )
 
 Target.Create "Build" (fun _ ->
-    !! solutionFile
-    |> MSBuildReleaseExt "" vsProjProps "Rebuild"
-    |> ignore
+    DotNet.Cli.DotnetBuild (fun o -> { o with Configuration = Cli.BuildConfiguration.Release }) solutionFile
 )
 
 // --------------------------------------------------------------------------------------
