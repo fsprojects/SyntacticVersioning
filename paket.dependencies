@@ -1,3 +1,4 @@
+version 5.219.0
 source https://api.nuget.org/v3/index.json
 redirects on
 
@@ -9,17 +10,23 @@ nuget Argu
 nuget vswhere
 nuget FSharp.Core ~> 4.6
 nuget ICSharpCode.Decompiler ~> 3.0
-nuget Fake.Lib ~> 5.0
+nuget Fake.Core.SemVer
+nuget Expecto.FsCheck
 
 group Build
+  framework: netstandard2.0
+
   source https://api.nuget.org/v3/index.json
   source https://nuget.org/api/v2
   source https://ci.appveyor.com/nuget/fsharp-formatting
 
+  nuget Fake.Api.GitHub
+  nuget Fake.Core.ReleaseNotes
   nuget Fake.Core.Target
+  nuget Fake.DotNet.AssemblyInfoFile
+  nuget Fake.DotNet.Cli
+  nuget Fake.DotNet.Fsc
   nuget Fake.IO.Filesystem
-
-  nuget FSharp.Formatting ~> 3 prerelease
-
-  github fsharp/FAKE modules/Octokit/Octokit.fsx
-
+  nuget Fake.Tools.Git
+  nuget FSharp.Compiler.Service ~> 30
+  //nuget FSharp.Formatting ~> 3 prerelease

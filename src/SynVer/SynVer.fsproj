@@ -19,9 +19,5 @@
   <ItemGroup>
     <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Argu" Version="5.1.0" />
-    <PackageReference Update="FSharp.Core" Version="4.3.4" />
-  </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

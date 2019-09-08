@@ -192,3 +192,5 @@ docs/content/release-notes.md
 docs/tools/FSharp.Formatting.svclog
 .idea/
 .ionide
+.paket
+!.paket/Paket.Restore.targets
