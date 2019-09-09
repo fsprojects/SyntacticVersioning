@@ -1,6 +1,6 @@
 language: csharp
 dotnet: "3.0.100-preview8-013656"
-sudo: false  # use the new container-based Travis infrastructure 
+dist: xenial
 
 script:
   - sh ./build.sh RunTests
