@@ -8,7 +8,8 @@ before_build:
       $branchName = "$env:APPVEYOR_REPO_BRANCH".Replace("_","");
       $versionSuffixBRANCH = "-$branchName-$buildId";
       $env:VersionSuffix = if ("$env:APPVEYOR_REPO_TAG" -eq "true") { "" } else { if ("$env:APPVEYOR_PULL_REQUEST_NUMBER") { $versionSuffixPR } else { $versionSuffixBRANCH } };
-
+install:
+  - cmd: choco install dotnetcore-sdk -y
 build_script:
   - cmd: echo vs %VersionSuffix%"
   - cmd: build.cmd All
@@ -20,7 +21,6 @@ artifacts:
     name: bin
   - path: 'src\**\*.nupkg'
     name: nupkgs
-    type: NuGetPackage
 branches:
   only:
   - master

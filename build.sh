@@ -1,16 +1,31 @@
 #!/usr/bin/env bash
-dotnet tool install fake-cli --tool-path .fake
-dotnet tool install paket --tool-path .paket
 
 set -eu
+set -o pipefail
 
-PAKET_EXE=.paket/paket
-FAKE_EXE=.fake/fake
+# liberated from https://stackoverflow.com/a/18443300/433393
+realpath() {
+  OURPWD=$PWD
+  cd "$(dirname "$1")"
+  LINK=$(readlink "$(basename "$1")")
+  while [ "$LINK" ]; do
+    cd "$(dirname "$LINK")"
+    LINK=$(readlink "$(basename "$1")")
+  done
+  REALPATH="$PWD/$(basename "$1")"
+  cd "$OURPWD"
+  echo "$REALPATH"
+}
 
-$PAKET_EXE restore
+echo "Restoring dotnet tools..."
+dotnet tool restore
 
+PAKET_TOOL_PATH=$(realpath .paket)
+PAKET="$PAKET_TOOL_PATH"/paket
 
-[ ! -e build.fsx ] && run $PAKET_EXE update
+if ! [ -e "$PAKET" ]
+then
+  dotnet tool install paket --tool-path "$PAKET_TOOL_PATH"
+fi
 
-$FAKE_EXE run build.fsx $@
-
+FAKE_DETAILED_ERRORS=true dotnet fake build -t "$@"

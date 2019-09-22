@@ -1,4 +1,4 @@
-version 5.219.0
+version 5.219.2
 source https://api.nuget.org/v3/index.json
 redirects on
 
@@ -20,6 +20,7 @@ group Build
   source https://nuget.org/api/v2
   source https://ci.appveyor.com/nuget/fsharp-formatting
 
+  nuget FSharp.Compiler.Tools
   nuget Fake.Api.GitHub
   nuget Fake.Core.ReleaseNotes
   nuget Fake.Core.Target

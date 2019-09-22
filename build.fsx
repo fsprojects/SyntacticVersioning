@@ -116,6 +116,9 @@ module SDKs =
   let latestVersion () = findVersions () |> List.last
 
 module create =
+    let fsiExe = 
+        let source = (__SOURCE_DIRECTORY__ @@ "packages" @@ "build" @@ "FSharp.Compiler.Tools" @@ "tools" @@ "fsc.exe")
+        if Environment.isWindows then source else (__SOURCE_DIRECTORY__ @@ "mono.fsc.sh")
     let failWhenNon0 name res = if res<>0 then failwithf "Non 0 exit code %d of %s" res name
 
     let execCsc cscPath outputDll refs target sources =
@@ -135,7 +138,7 @@ module create =
         let dll =  exampleProjects </> "lib"</> dllName
         let assemblyInfo =  exampleProjects </> "src"</> "AssemblyInfo.fs"
         [fileName; assemblyInfo]
-        |> Fsc.compile [ Fsc.Out dll; Fsc.Target Fsc.Library ]
+        |> Fsc.compileExternal fsiExe [ Fsc.Out dll; Fsc.Target Fsc.Library ]
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
 
     let csharpProjectFromFile fileName name =
