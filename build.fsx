@@ -146,7 +146,7 @@ module create =
           Path.Combine(sdk.path, sdk.version, "Roslyn", "bincore", "csc.dll")
 
         let netstandardDll (sdk: SDKs.Sdk) =
-          Path.Combine(sdk.path, "NugetFallbackFolder", "netstandard.library", "2.0.3", "build", "netstandard2.0", "ref", "netstandard.dll") 
+          Path.Combine("packages", "build", "NETStandard.Library", "build", "netstandard2.0", "ref", "netstandard.dll") 
 
         let dllName = sprintf "%s.dll" name
         let dll =  exampleProjects </> "lib"</> dllName

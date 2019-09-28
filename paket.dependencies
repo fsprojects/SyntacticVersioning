@@ -30,4 +30,5 @@ group Build
   nuget Fake.IO.Filesystem
   nuget Fake.Tools.Git
   nuget FSharp.Compiler.Service ~> 30
+  nuget netstandard.library ~> 2.0.3
   //nuget FSharp.Formatting ~> 3 prerelease
