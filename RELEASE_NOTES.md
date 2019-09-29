@@ -20,3 +20,5 @@
 #### 0.0.8 - October 1 2018
 * Bugfix: Missing documentation for exe
 * FAKE lib 5
+#### 0.0.9 - September 29 2019
+* Dotnet tool thanks to @baronfel

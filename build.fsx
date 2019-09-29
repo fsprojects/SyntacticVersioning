@@ -399,6 +399,27 @@ Target.create "Release" (fun _ ->
     |> Async.RunSynchronously
 )
 
+let dotnetPack ctx =
+    let distDir = __SOURCE_DIRECTORY__  @@ "dist"
+
+    let configuration (targets : Target list) =
+        DotNet.BuildConfiguration.Release
+    let args =
+        [
+            sprintf "/p:PackageVersion=%s" release.NugetVersion
+            sprintf "/p:PackageReleaseNotes=\"%s\"" (release.Notes |> String.concat "\n")
+        ]
+    DotNet.pack (fun c ->
+        { c with
+            Configuration = configuration (ctx.Context.AllExecutingTargets)
+            OutputPath = Some distDir
+            Common =
+                c.Common
+                |> DotNet.Options.withAdditionalArgs args
+        }) solutionFile
+
+Target.create "DotnetPack" dotnetPack
+
 // --------------------------------------------------------------------------------------
 // Run all targets by default. Invoke 'build <Target>' to override
 
@@ -411,6 +432,7 @@ open Fake.Core.TargetOperators
   ==> "CopyBinaries"
   ==> "ExampleProjects"
   ==> "RunTests"
+  ==> "DotnetPack"
   ==> "GenerateReferenceDocs"
   ==> "GenerateDocs"
   ==> "All"
