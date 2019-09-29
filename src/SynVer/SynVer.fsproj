@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\netfx.props" />
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <Title>Syntactic Versioning Tool</Title>
@@ -11,8 +10,8 @@
     <RootNamespace>SynVer</RootNamespace>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworks>net461;netcoreapp2.0</TargetFrameworks>
-
+    <TargetFrameworks>netcoreapp2.2;netcoreapp3.0</TargetFrameworks>
+    <PackAsTool>true</PackAsTool>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Program.fs" />
@@ -20,8 +19,5 @@
   <ItemGroup>
     <ProjectReference Include="..\SynVer.Lib\SynVer.Lib.fsproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Argu" Version="5.1.0" />
-    <PackageReference Update="FSharp.Core" Version="4.3.4" />
-  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

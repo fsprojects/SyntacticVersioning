@@ -1,11 +1,9 @@
 language: csharp
-language: csharp
+sudo: required
+dotnet: 3.0.100
 dist: xenial
-dotnet: 2.2
-
 script:
-  - sh ./build.sh RunTests
-
+  - ./build.sh RunTests
 branches:
   only: 
     - master

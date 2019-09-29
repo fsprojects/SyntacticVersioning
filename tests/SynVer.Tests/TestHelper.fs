@@ -55,7 +55,7 @@ module TestAssemblies=
     let fsharp = exampleProjectsLibPath </> "Fsharp.dll" |> Assembly.LoadFile
     let fsharp2 = exampleProjectsLibPath </> "Fsharp2.dll" |> Assembly.LoadFile
     let arguAssembly= packagesPath </>"Argu"</>"lib"</> "net45" </>"Argu.dll" |> Assembly.LoadFile
-    let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net40" </>"Chiron.dll" |> Assembly.LoadFile
+    let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net452" </>"Chiron.dll" |> Assembly.LoadFile
 module CecilTestAssemblies=
     open Mono.Cecil
     // since all the dll-s have unique names, they can be loaded at the same time
@@ -69,7 +69,7 @@ module CecilTestAssemblies=
     let fsharp = exampleProjectsLibPath </> "Fsharp.dll" |> AssemblyDefinition.readAssembly
     let fsharp2 = exampleProjectsLibPath </> "Fsharp2.dll" |> AssemblyDefinition.readAssembly
     let arguAssembly= packagesPath </>"Argu"</>"lib"</> "net45" </>"Argu.dll" |> AssemblyDefinition.readAssembly
-    let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net40" </>"Chiron.dll" |> AssemblyDefinition.readAssembly
+    let chironAssembly= packagesPath </>"Chiron"</>"lib"</> "net452" </>"Chiron.dll" |> AssemblyDefinition.readAssembly
 
 module Types=
   type UnionCaseWithName = Foo of num: int * diff:float | Bar of diff:float
