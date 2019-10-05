@@ -147,7 +147,6 @@ module create =
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
 
     let csharpProjectFromFile fileName name =
-        Console.WriteLine(sdk.path)
         let cscLocation (sdk: SDKs.Sdk) =
           Path.Combine(sdk.path, sdk.version, "Roslyn", "bincore", "csc.dll")
 
