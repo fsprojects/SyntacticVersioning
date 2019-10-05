@@ -5,6 +5,7 @@ open Fake.Tools
 open Fake.DotNet
 open System
 open System.IO
+open System.Runtime.InteropServices
 open Fake.Core
 open Fake.IO.Globbing.Operators
 open Fake.IO.FileSystemOperators
@@ -88,7 +89,11 @@ let exampleProjects = "tests/ExampleProjects/"
 
 module DotNet = 
   let binary =
-    CreateProcess.fromRawCommand "which" ["dotnet"]
+    let locationCommand = 
+      if RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+        then "where" // The 'where' command can be used on Windows...
+        else "which" // ...and the 'which' command can be used on Linux.
+    CreateProcess.fromRawCommand locationCommand ["dotnet"]
       |> CreateProcess.redirectOutput
       |> CreateProcess.ensureExitCode
       |> Proc.run
@@ -98,9 +103,9 @@ module SDKs =
   type Sdk = { version: string; path: string}
 
   let parseSdk (line: string) =
-    match line.Split(' ') with
+    match line.Split('[') with
     | [| s |] when String.IsNullOrWhiteSpace s -> None
-    | [| version; location |] -> Some { version = version; path = location.TrimEnd(']').TrimStart('[') }
+    | [| version; location |] -> Some { version = version.TrimEnd(); path = location.Split(']').[0] }
     | _ ->  failwithf "unknown version string %s" line
 
   let findVersions () =
@@ -142,6 +147,7 @@ module create =
         //fsharpc --target:library --out:"./lib/"${name%.*}".dll" $f "./src/AssemblyInfo.fs"
 
     let csharpProjectFromFile fileName name =
+        Console.WriteLine(sdk.path)
         let cscLocation (sdk: SDKs.Sdk) =
           Path.Combine(sdk.path, sdk.version, "Roslyn", "bincore", "csc.dll")
 
