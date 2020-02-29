@@ -1,21 +1,21 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    albacore (3.0.1)
+    albacore (2.0.4)
       map (~> 6.5)
       nokogiri (~> 1.5)
-      rake (~> 10)
+      rake (> 10)
       semver2 (~> 3.4)
     map (6.6.0)
     mini_portile2 (2.4.0)
-    nokogiri (1.10.4)
+    nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
-    nuget (2.8.50126.400)
-    nuget_helper (1.0.0)
+    nuget (3.4.4)
+    nuget_helper (1.0.1)
       nokogiri (~> 1.5)
-      nuget (~> 2.8.50126.400)
+      nuget (~> 3.4.4)
       semver2 (~> 3.4)
-    rake (10.5.0)
+    rake (13.0.1)
     semver2 (3.4.2)
 
 PLATFORMS
@@ -24,6 +24,7 @@ PLATFORMS
 DEPENDENCIES
   albacore
   nuget_helper
+  rake (>= 12.3.3)
 
 BUNDLED WITH
-   2.0.1
+   2.0.2

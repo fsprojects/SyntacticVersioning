@@ -3,3 +3,4 @@ source "https://rubygems.org"
 
 gem "albacore"
 gem "nuget_helper"
+gem "rake", ">= 12.3.3"

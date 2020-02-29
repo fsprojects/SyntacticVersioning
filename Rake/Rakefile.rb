@@ -22,6 +22,7 @@ task :restore do
   NugetHelper.run_tool_with_result("../.paket/paket.exe", "restore")
 end
 
+desc "Answers the question what the next version of your library is."
 task :bump, [:restore] do
     v = magnitude_next_nuget_version "SynVer.Lib", "../src/SynVer.Lib/bin/Debug/SynVer.Lib.dll"
     # use v to set the version
