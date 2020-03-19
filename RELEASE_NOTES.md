@@ -22,3 +22,5 @@
 * FAKE lib 5
 #### 0.0.9 - September 29 2019
 * Dotnet tool thanks to @baronfel
+#### 0.0.10-alpha-1 - March 19 2020
+* Null reference exception
