@@ -1,7 +1,10 @@
 module SynVer.SurfaceArea
 open System
 open Mono.Cecil
+open System.Runtime.CompilerServices
 
+[<assembly: InternalsVisibleTo("SynVer.Tests")>]
+do()
 /// Get the surface of a type
 [<CompiledName("OfType")>]
 let ofType (t:Type) : SurfaceOfType=

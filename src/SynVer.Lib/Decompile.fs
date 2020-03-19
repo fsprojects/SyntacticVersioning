@@ -58,8 +58,7 @@ module Decompile =
     //let r = ReaderParameters() 
     //let a = AssemblyDefinition.ReadAssembly (filename, r)
     a.Modules 
-      |> Seq.map (fun m-> m.Types)
-      |> Seq.concat
+      |> Seq.collect (fun m-> m.Types)
       |> Seq.toList
   let rec internal typeFullName (t:TypeReference) =
       let tickAndDigits = System.Text.RegularExpressions.Regex(@"`\d+")
