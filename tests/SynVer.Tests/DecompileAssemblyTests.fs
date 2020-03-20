@@ -77,11 +77,5 @@ let tests =
     ptest "chiron can be serialized and deserialized"{
       assertCanSerializeAndDeserialize CT.chironAssembly
     }
-
-    test "net type fullname"{
-      Expect.equal (Decompile.typeFullName CecilTypes.enumType) "SynVer.TestHelper.Types.EnumType" "enum type"
-      Expect.equal (Decompile.typeFullName CecilTypes.fsharpStruct) "SynVer.TestHelper.Types.FsharpStruct" "fsharp struct type"
-      Expect.equal (Decompile.typeFullName CecilTypes.recordType) "SynVer.TestHelper.Types.RecordType" "fsharp record type"
-    }
   ]
 

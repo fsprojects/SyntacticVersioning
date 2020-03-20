@@ -32,4 +32,9 @@ let tests =
       let t = CT.fsharpStruct
       Expect.equal (Decompile.tagNetType t) NetType.Struct "struct type"
     }
+    test "net type fullname"{
+      Expect.equal (Decompile.typeFullName CT.enumType) "SynVer.TestHelper.Types.EnumType" "enum type"
+      Expect.equal (Decompile.typeFullName CT.fsharpStruct) "SynVer.TestHelper.Types.FsharpStruct" "fsharp struct type"
+      Expect.equal (Decompile.typeFullName CT.recordType) "SynVer.TestHelper.Types.RecordType" "fsharp record type"
+    }
   ]
