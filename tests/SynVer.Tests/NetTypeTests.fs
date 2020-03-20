@@ -49,4 +49,12 @@ let tests =
     test "Tag net type module"{
       Expect.equal (Reflect.tagNetType ModuleT) NetType.Module "module"
     }
+    test "net type fullname"{
+      let enumType = typeof<EnumType>
+      let fsharpStruct = typeof<FsharpStruct>
+      let recordType = typeof<RecordType>
+      Expect.equal (Reflect.typeFullName enumType) "SynVer.TestHelper.Types.EnumType" "enum type"
+      Expect.equal (Reflect.typeFullName fsharpStruct) "SynVer.TestHelper.Types.FsharpStruct" "fsharp struct type"
+      Expect.equal (Reflect.typeFullName recordType) "SynVer.TestHelper.Types.RecordType" "fsharp record type"
+    }
   ]
