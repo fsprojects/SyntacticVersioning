@@ -79,6 +79,10 @@ module Types=
   type EnumType = FooBar=0 | Foo=1 | Bar =2
   type RecordType = { Foo:int}
   type UnionWithParamNames = Foo of num: int * diff:float | Bar of diff:float
+  
+  type GenericType<'a> (value:'a)=
+      member __.Value = value
+  type ClosedGenericType = GenericType<string>
   let CSharpStructType = TestAssemblies.csharp.ExportedTypes |> Seq.find (fun t-> t.Name= "Struct")
   type MyClassWithCLIEvent() =
     let event1 = new Event<_>()
@@ -105,6 +109,8 @@ module CecilTypes=
   let unionWithParamNames = AssemblyDefinition.getType typeof< Types.UnionWithParamNames> assembly
   let fsharpStruct = AssemblyDefinition.getType typeof< Types.FsharpStruct> assembly
   let myClassWithCLIEvent = AssemblyDefinition.getType typeof< Types.MyClassWithCLIEvent> assembly
+  let openGeneric = AssemblyDefinition.getType typedefof< Types.GenericType<_>> assembly
+
 module Assemblies=
   [<CompiledName("Bump")>]
   let bump verNr released modified =

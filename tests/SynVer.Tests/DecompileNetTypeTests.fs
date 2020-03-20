@@ -36,5 +36,6 @@ let tests =
       Expect.equal (Decompile.typeFullName CT.enumType) "SynVer.TestHelper.Types.EnumType" "enum type"
       Expect.equal (Decompile.typeFullName CT.fsharpStruct) "SynVer.TestHelper.Types.FsharpStruct" "fsharp struct type"
       Expect.equal (Decompile.typeFullName CT.recordType) "SynVer.TestHelper.Types.RecordType" "fsharp record type"
+      Expect.equal (Decompile.typeFullName CT.openGeneric) "SynVer.TestHelper.Types.GenericType<a>" "open generic"
     }
   ]

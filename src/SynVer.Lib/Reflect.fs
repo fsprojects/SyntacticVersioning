@@ -100,9 +100,6 @@ module Reflect =
   let typeToTyp (t:Type):Typ={ FullName=typeFullName t }
   [<AutoOpen>]
   module private ToMember=
-    type 'a Roc = System.Collections.ObjectModel.ReadOnlyCollection<'a>
-    type CatArg = CustomAttributeTypedArgument
-
     let notNull value = 
       if obj.ReferenceEquals(value, null) then None 
       else Some value

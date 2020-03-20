@@ -1,6 +1,8 @@
 module SynVer.NetTypeTests
 open SynVer
 open Expecto
+open SynVer.TestHelper.Types
+
 open TestHelper.Types
 [<Tests>]
 let tests =
@@ -53,8 +55,14 @@ let tests =
       let enumType = typeof<EnumType>
       let fsharpStruct = typeof<FsharpStruct>
       let recordType = typeof<RecordType>
+      let openGeneric = typedefof<GenericType<_>>
+      let closedGeneric = typeof<GenericType<string>>
+      let closedGeneric2 = typeof<GenericType<RecordType>>
       Expect.equal (Reflect.typeFullName enumType) "SynVer.TestHelper.Types.EnumType" "enum type"
       Expect.equal (Reflect.typeFullName fsharpStruct) "SynVer.TestHelper.Types.FsharpStruct" "fsharp struct type"
       Expect.equal (Reflect.typeFullName recordType) "SynVer.TestHelper.Types.RecordType" "fsharp record type"
+      Expect.equal (Reflect.typeFullName openGeneric) "SynVer.TestHelper.Types.GenericType<'A>" "Open generic"
+      Expect.equal (Reflect.typeFullName closedGeneric) "SynVer.TestHelper.Types.GenericType<System.String>" "Closed generic"
+      Expect.equal (Reflect.typeFullName closedGeneric2) "SynVer.TestHelper.Types.GenericType<SynVer.TestHelper.Types.RecordType>" "Closed generic 2"
     }
   ]
