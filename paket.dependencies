@@ -7,6 +7,7 @@ framework: netstandard2.0, netstandard2.1, netcoreapp2.2, netcoreapp3.0
 nuget Chiron ~> 6
 github fsprojects/LSON LSON.fs
 nuget Argu
+nuget LSON
 nuget vswhere
 nuget FSharp.Core ~> 4.6
 nuget ICSharpCode.Decompiler ~> 3.0

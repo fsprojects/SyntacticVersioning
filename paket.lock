@@ -32,6 +32,9 @@ NUGET
       Mono.Cecil (>= 0.10)
       System.Collections.Immutable (>= 1.3.1)
       System.ValueTuple (>= 4.3)
+    LSON (0.1.2)
+      FParsec (>= 1.0.3)
+      FSharp.Core (>= 4.3.4)
     Microsoft.NETCore.Platforms (3.0)
     Microsoft.NETCore.Targets (3.0)
     Microsoft.Win32.SystemEvents (4.6) - restriction: || (&& (== netcoreapp2.2) (>= netcoreapp3.0)) (== netcoreapp3.0) (&& (== netstandard2.0) (>= netcoreapp3.0)) (&& (== netstandard2.1) (>= netcoreapp3.0))
@@ -116,7 +119,7 @@ NUGET
     vswhere (2.7.1)
 GITHUB
   remote: fsprojects/LSON
-    LSON.fs (4e9fcebc550d7ad3f3556bc33486b80d5bb74ac7)
+    LSON.fs (a611f3942ee61141b54ed91a08f371106e306a0f)
 GROUP Build
 RESTRICTION: == netstandard2.0
 NUGET
