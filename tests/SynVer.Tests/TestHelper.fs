@@ -49,6 +49,7 @@ module TestAssemblies=
     let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> Assembly.LoadFile
     let csharp3 = exampleProjectsLibPath </> "Csharp3.dll" |> Assembly.LoadFile
     let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> Assembly.LoadFile
+    let csharpWithGenerics = exampleProjectsLibPath </> "CSharpWithGenerics.dll" |> Assembly.LoadFile
     let enum = exampleProjectsLibPath </> "Enum.dll" |> Assembly.LoadFile
     let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> Assembly.LoadFile
     let enum3 = exampleProjectsLibPath </> "Enum3.dll" |> Assembly.LoadFile
@@ -63,6 +64,7 @@ module CecilTestAssemblies=
     let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> AssemblyDefinition.readAssembly
     let csharp3 = exampleProjectsLibPath </> "Csharp3.dll" |> AssemblyDefinition.readAssembly
     let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> AssemblyDefinition.readAssembly
+    let csharpWithGenerics = exampleProjectsLibPath </> "CSharpWithGenerics.dll" |> AssemblyDefinition.readAssembly
     let enum = exampleProjectsLibPath </> "Enum.dll" |> AssemblyDefinition.readAssembly
     let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> AssemblyDefinition.readAssembly
     let enum3 = exampleProjectsLibPath </> "Enum3.dll" |> AssemblyDefinition.readAssembly
@@ -123,3 +125,7 @@ module Assemblies=
     SurfaceArea.diff  
       (SurfaceArea.ofAssembly released) 
       (SurfaceArea.ofAssembly modified)
+
+module Type=
+  type Typ=System.Type
+  let name (t:Typ)= t.Name
