@@ -9,10 +9,6 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\fsprojects\LSON\LSON.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/LSON.fs</Link>
-    </Compile>
     <Compile Include="Models.fs" />
     <Compile Include="Serialization.fs" />
     <Compile Include="Lson.fs" />

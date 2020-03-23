@@ -49,6 +49,7 @@ module TestAssemblies=
     let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> Assembly.LoadFile
     let csharp3 = exampleProjectsLibPath </> "Csharp3.dll" |> Assembly.LoadFile
     let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> Assembly.LoadFile
+    let csharpWithGenerics = exampleProjectsLibPath </> "CSharpWithGenerics.dll" |> Assembly.LoadFile
     let enum = exampleProjectsLibPath </> "Enum.dll" |> Assembly.LoadFile
     let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> Assembly.LoadFile
     let enum3 = exampleProjectsLibPath </> "Enum3.dll" |> Assembly.LoadFile
@@ -63,6 +64,7 @@ module CecilTestAssemblies=
     let csharp2 = exampleProjectsLibPath </> "Csharp2.dll" |> AssemblyDefinition.readAssembly
     let csharp3 = exampleProjectsLibPath </> "Csharp3.dll" |> AssemblyDefinition.readAssembly
     let csharpWithAttribute = exampleProjectsLibPath </> "CsharpWithAttribute.dll" |> AssemblyDefinition.readAssembly
+    let csharpWithGenerics = exampleProjectsLibPath </> "CSharpWithGenerics.dll" |> AssemblyDefinition.readAssembly
     let enum = exampleProjectsLibPath </> "Enum.dll" |> AssemblyDefinition.readAssembly
     let enum2 = exampleProjectsLibPath </> "Enum2.dll" |> AssemblyDefinition.readAssembly
     let enum3 = exampleProjectsLibPath </> "Enum3.dll" |> AssemblyDefinition.readAssembly
@@ -79,6 +81,10 @@ module Types=
   type EnumType = FooBar=0 | Foo=1 | Bar =2
   type RecordType = { Foo:int}
   type UnionWithParamNames = Foo of num: int * diff:float | Bar of diff:float
+  
+  type GenericType<'a> (value:'a)=
+      member __.Value = value
+  type ClosedGenericType = GenericType<string>
   let CSharpStructType = TestAssemblies.csharp.ExportedTypes |> Seq.find (fun t-> t.Name= "Struct")
   type MyClassWithCLIEvent() =
     let event1 = new Event<_>()
@@ -105,6 +111,8 @@ module CecilTypes=
   let unionWithParamNames = AssemblyDefinition.getType typeof< Types.UnionWithParamNames> assembly
   let fsharpStruct = AssemblyDefinition.getType typeof< Types.FsharpStruct> assembly
   let myClassWithCLIEvent = AssemblyDefinition.getType typeof< Types.MyClassWithCLIEvent> assembly
+  let openGeneric = AssemblyDefinition.getType typedefof< Types.GenericType<_>> assembly
+
 module Assemblies=
   [<CompiledName("Bump")>]
   let bump verNr released modified =
@@ -117,3 +125,7 @@ module Assemblies=
     SurfaceArea.diff  
       (SurfaceArea.ofAssembly released) 
       (SurfaceArea.ofAssembly modified)
+
+module Type=
+  type Typ=System.Type
+  let name (t:Typ)= t.Name

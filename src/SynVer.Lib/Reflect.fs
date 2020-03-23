@@ -71,25 +71,32 @@ module Reflect =
       ts |> Array.toList
   let rec internal typeFullName (t:Type) =
       let fsharpCoreAssembly = [].GetType().Assembly
+      let removeAfterTick (a:string)=
+          let i = a.IndexOf('`')
+          if i>1 then a.Substring(0, i)
+          else a
       let fullname =
-        match t.IsGenericType with
-          | false ->
+        match t.IsGenericType, t.HasElementType with
+          | false, false ->
             match String.IsNullOrEmpty t.FullName with
               | true -> sprintf "'%s" (t.Name.ToUpperInvariant())
-              | false -> t.FullName 
-          | true ->
+              | false -> t.FullName
+          | false, true ->
+            let arg = t.GetElementType() |> typeFullName
+            match t.IsArray,t.IsPointer,t.IsByRef with
+            | true,_,_ ->  sprintf "%s[]" arg
+            | _,true,_ ->  sprintf "* %s" arg
+            | _,_,true ->  sprintf "ref %s" arg
+            | _ -> failwithf "Unknown type with element type %A" t
+          | true, _ ->
             let args =
               t.GetGenericArguments()
               |> Array.map typeFullName
               |> Array.reduce(sprintf "%s,%s")
-            let removeAfterTick (a:string)=
-                let i = a.IndexOf('`')
-                if i>1 then a.Substring(0, i)
-                else a
-            let name = 
+            let name =
                 if t.Assembly <> fsharpCoreAssembly && (not << String.IsNullOrEmpty) ( t.FullName ) then
-                    removeAfterTick t.FullName 
-                else 
+                    removeAfterTick t.FullName
+                else
                     removeAfterTick t.Name
             sprintf "%s<%s>" name args
 
@@ -100,9 +107,6 @@ module Reflect =
   let typeToTyp (t:Type):Typ={ FullName=typeFullName t }
   [<AutoOpen>]
   module private ToMember=
-    type 'a Roc = System.Collections.ObjectModel.ReadOnlyCollection<'a>
-    type CatArg = CustomAttributeTypedArgument
-
     let notNull value = 
       if obj.ReferenceEquals(value, null) then None 
       else Some value
