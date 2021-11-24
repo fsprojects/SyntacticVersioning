@@ -29,5 +29,6 @@ Mono | .NET
 
 - [@gentauro](https://github.com/gentauro)
 - [@wallymathieu](https://github.com/wallymathieu)
+- [@baronfel](https://github.com/baronfel)
 
 The default maintainer account for projects under "fsprojects" is [@fsprojectsgit](https://github.com/fsprojectsgit) - F# Community Project Incubation Space (repo management)
