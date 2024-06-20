@@ -19,12 +19,6 @@ When upgrading a package you want to know the magnitude of the changes. In many 
 
 SyntacticVersioning requires a local git installation. You can download git from [Git Downloads](https://git-scm.com/downloads).
 
-## Build Status
-
-Mono | .NET
----- | ----
-[![Mono CI Build Status](https://img.shields.io/travis/fsprojects/SyntacticVersioning/master.svg)](https://travis-ci.org/fsprojects/SyntacticVersioning) | [![Build status](https://ci.appveyor.com/api/projects/status/tm885fiupthd22dp/branch/master?svg=true)](https://ci.appveyor.com/project/wallymathieu/syntacticversioning/branch/master)
-
 ## Maintainer(s)
 
 - [@gentauro](https://github.com/gentauro)
