@@ -10,6 +10,7 @@ type CLIArguments =
     | Surface_of of path:string
     | Decompile
     | Output of path:string
+    | Nuget_source of package:string * version:string * framework:string
     | Diff of source:string * target:string
     | Bump of version:string * source:string * target:string
     | Magnitude of source:string * target:string
@@ -20,6 +21,7 @@ with
             | Surface_of _ -> "Get the public api surface of the .net binary as lson"
             | Magnitude _-> "Get the magnitude of the difference between two .net binaries"
             | Output _-> "Send output to file"
+            | Nuget_source _ -> "Load the source assembly from a NuGet package"
             | Diff _ -> "Get the difference between two .net binaries"
             | Bump _ -> "Get the next version based on the difference between two .net binaries"
             | Decompile -> "Decompile instead of using reflection"
@@ -41,18 +43,30 @@ let inline loadAssembly f readAssembly=
   with ex ->
     (sprintf "Failed to load assembly %s due to %s\n%s" f ex.Message ex.StackTrace) 
     |> Error
-let getSurfaceAreaOf (f:string) (i:IAssemblyInterpreter<_>): Result<Package,string>=
-  match f with
-  | LsonFile ->
-    let res = File.ReadAllText f
-              |> Lson.tryDeserialize
-    match res with
-    | Some p -> Ok p
-    | None -> Error "Couldn't deserialize"
-  | AssemblyFile -> 
-        loadAssembly f i.ReadAssembly
-        |> Result.map i.OfAssembly
-  | Other -> Error "No dll or lson specified"
+
+type AssemblySource =
+  | LocalFile of path:string
+  | NuGetPackage of package:string * version:string * framework:string * assembly:string
+
+let getSurfaceAreaOf source (i:IAssemblyInterpreter<_>): Result<Package,string>=
+  match source with
+  | NuGetPackage (package, version, framework, assembly) ->
+    NuGetPackage.downloadAssembly package version framework assembly
+    |> Result.bind (fun path ->
+      loadAssembly path i.ReadAssembly
+      |> Result.map i.OfAssembly)
+  | LocalFile f ->
+    match f with
+    | LsonFile ->
+      let res = File.ReadAllText f
+                |> Lson.tryDeserialize
+      match res with
+      | Some p -> Ok p
+      | None -> Error "Couldn't deserialize"
+    | AssemblyFile ->
+          loadAssembly f i.ReadAssembly
+          |> Result.map i.OfAssembly
+    | Other -> Error "No dll or lson specified"
 
 let getDiff released modified (i:IAssemblyInterpreter<_>): Result<string,string>=
     let maybeReleased,maybeModified= getSurfaceAreaOf released i,
@@ -113,28 +127,40 @@ let main argv =
         let maybeBump = results.TryGetResult(<@ Bump @>)
         let maybeMagnitude = results.TryGetResult(<@ Magnitude @>)
         let maybeOutput = results.TryGetResult(<@ Output @>)
+        let maybeNugetSource = results.TryGetResult(<@ Nuget_source @>)
         let decompile = results.TryGetResult(<@ Decompile @>) |> Option.map (fun _->true) |> Option.defaultValue false
+        let source file =
+          match maybeNugetSource with
+          | Some (package, version, framework) -> NuGetPackage (package, version, framework, file)
+          | None -> LocalFile file
 
         match maybeFile, maybeDiff, maybeMagnitude, maybeBump with
         | Some file, None, None, None ->
-            if decompile then
-              loadAssembly file Decompile.readAssembly
-              |> Result.map (SurfaceArea.ofAssemblyDefinition >> Lson.serialize)
-            else
-              loadAssembly file Assembly.LoadFile
-              |> Result.map (SurfaceArea.ofAssembly>> Lson.serialize)
+            match maybeNugetSource with
+            | Some _ ->
+              let result =
+                if decompile then getSurfaceAreaOf (source file) decompiler
+                else getSurfaceAreaOf (source file) reflector
+              result |> Result.map Lson.serialize
+            | None ->
+              if decompile then
+                loadAssembly file Decompile.readAssembly
+                |> Result.map (SurfaceArea.ofAssemblyDefinition >> Lson.serialize)
+              else
+                loadAssembly file Assembly.LoadFile
+                |> Result.map (SurfaceArea.ofAssembly >> Lson.serialize)
         | None, Some (released, modified), None, None ->
-          if decompile then getDiff released modified decompiler
-          else getDiff released modified reflector
+          if decompile then getDiff (source released) (LocalFile modified) decompiler
+          else getDiff (source released) (LocalFile modified) reflector
         | None, None, Some (released,modified), None ->
           let res =
-            if decompile then getBump "0.0.0" released modified decompiler
-            else getBump "0.0.0" released modified reflector
+            if decompile then getBump "0.0.0" (source released) (LocalFile modified) decompiler
+            else getBump "0.0.0" (source released) (LocalFile modified) reflector
           res |> Result.map (snd>>string)
         | None, None, None, Some (version,released,modified) ->
           let res =
-            if decompile then getBump version released modified decompiler
-            else getBump version released modified reflector
+            if decompile then getBump version (source released) (LocalFile modified) decompiler
+            else getBump version (source released) (LocalFile modified) reflector
           res |> Result.map fst
         | _,_,_,_ ->
             Error(parser.PrintUsage())

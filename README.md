@@ -19,6 +19,16 @@ When upgrading a package you want to know the magnitude of the changes. In many 
 
 SyntacticVersioning requires a local git installation. You can download git from [Git Downloads](https://git-scm.com/downloads).
 
+## Comparing with a NuGet package
+
+Use `--nuget-source` to load the source assembly from a published package. The source argument names the assembly in the package, and the target framework must be specified explicitly:
+
+```
+synver --diff My.Library.dll ./bin/My.Library.dll --nuget-source My.Library 1.2.3 netstandard2.0
+```
+
+The option also works with `--bump`, `--magnitude`, and `--surface-of`. SynVer looks for the assembly in `lib/<framework>` and then `ref/<framework>`.
+
 ## Maintainer(s)
 
 - [@gentauro](https://github.com/gentauro)

@@ -9,6 +9,7 @@
     <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NuGetPackage.fs" />
     <Compile Include="Models.fs" />
     <Compile Include="Serialization.fs" />
     <Compile Include="Lson.fs" />
